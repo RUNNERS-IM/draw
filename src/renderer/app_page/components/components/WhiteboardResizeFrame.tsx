@@ -1,20 +1,21 @@
-import type { Callback } from '../types';
-import './WhiteboardResizeFrame.scss';
+import type { Callback } from '../types'
+import './WhiteboardResizeFrame.scss'
 
-const RESIZE_HANDLES = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
-const CENTER_SNAP_HANDLE = 'center';
+const RESIZE_HANDLES = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w']
+const CENTER_SNAP_HANDLE = 'center'
 
 const WhiteboardResizeFrame = ({
   onStartMove,
   onStartResize,
   onSnapResize,
-  onApply,
-}: { onStartMove: Callback; onStartResize: Callback; onSnapResize: Callback; onApply: Callback }) => (
-  <div
-    className="whiteboard-resize-frame"
-    onPointerDown={onStartMove}
-    onDoubleClick={onApply}
-  >
+  onApply
+}: {
+  onStartMove: Callback
+  onStartResize: Callback
+  onSnapResize: Callback
+  onApply: Callback
+}) => (
+  <div className="whiteboard-resize-frame" onPointerDown={onStartMove} onDoubleClick={onApply}>
     <div className="whiteboard-resize-frame__hint">
       <span>Double</span>
       <span>click</span>
@@ -24,31 +25,27 @@ const WhiteboardResizeFrame = ({
       <rect x="0" y="0" width="100%" height="100%" rx="20" ry="20" />
     </svg>
 
-    {
-      RESIZE_HANDLES.map((handle) => (
-        <div
-          key={handle}
-          className={`whiteboard-resize-frame__handle whiteboard-resize-frame__handle--${handle}`}
-          onPointerDown={(event) => onStartResize(event, handle)}
-        />
-      ))
-    }
+    {RESIZE_HANDLES.map((handle) => (
+      <div
+        key={handle}
+        className={`whiteboard-resize-frame__handle whiteboard-resize-frame__handle--${handle}`}
+        onPointerDown={(event) => onStartResize(event, handle)}
+      />
+    ))}
 
-    {
-      [CENTER_SNAP_HANDLE, ...RESIZE_HANDLES].map((handle) => (
-        <div
-          key={handle}
-          className={`whiteboard-resize-frame__snap whiteboard-resize-frame__snap--${handle}`}
-          onPointerDown={(event) => onSnapResize(event, handle)}
-          onDoubleClick={(event) => event.stopPropagation()}
-        >
-          <div className="whiteboard-resize-frame__snap-preview">
-            <div className="whiteboard-resize-frame__snap-preview-fill" />
-          </div>
+    {[CENTER_SNAP_HANDLE, ...RESIZE_HANDLES].map((handle) => (
+      <div
+        key={handle}
+        className={`whiteboard-resize-frame__snap whiteboard-resize-frame__snap--${handle}`}
+        onPointerDown={(event) => onSnapResize(event, handle)}
+        onDoubleClick={(event) => event.stopPropagation()}
+      >
+        <div className="whiteboard-resize-frame__snap-preview">
+          <div className="whiteboard-resize-frame__snap-preview-fill" />
         </div>
-      ))
-    }
+      </div>
+    ))}
   </div>
-);
+)
 
-export default WhiteboardResizeFrame;
+export default WhiteboardResizeFrame

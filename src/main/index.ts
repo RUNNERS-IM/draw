@@ -1,13 +1,29 @@
-import { pageUrl, preloadPath } from './pages';
-import { app, nativeImage, Tray, Menu, BrowserWindow, screen, globalShortcut, shell, ipcMain, nativeTheme, systemPreferences, desktopCapturer, autoUpdater, dialog, clipboard } from 'electron';
-import Store from 'electron-store';
-import { isDeepStrictEqual } from 'util';
-import fs from 'fs';
-import path from 'path';
-import { getPointerToolbarOffset, isToolbarReversed } from '../shared/toolbarPosition';
-import { t, setLocale, currentLocale } from '../shared/i18n';
-import { startUpdates, checkNow } from './updates';
-import { runTestShots } from './testShots';
+import { pageUrl, preloadPath } from './pages'
+import {
+  app,
+  nativeImage,
+  Tray,
+  Menu,
+  BrowserWindow,
+  screen,
+  globalShortcut,
+  shell,
+  ipcMain,
+  nativeTheme,
+  systemPreferences,
+  desktopCapturer,
+  autoUpdater,
+  dialog,
+  clipboard
+} from 'electron'
+import Store from 'electron-store'
+import { isDeepStrictEqual } from 'node:util'
+import fs from 'node:fs'
+import path from 'node:path'
+import { getPointerToolbarOffset, isToolbarReversed } from '../shared/toolbarPosition'
+import { t, setLocale, currentLocale } from '../shared/i18n'
+import { startUpdates, checkNow } from './updates'
+import { runTestShots } from './testShots'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isDebugLoggingEnabled = process.env.DRAW_DEBUG === '1'
@@ -17,17 +33,17 @@ const isMac = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
 const isWin = process.platform === 'win32'
 
-const KEY_SHOW_HIDE_APP        = 'CmdOrCtrl+Shift+A'
-const KEY_SHOW_HIDE_TOOLBAR    = 'CmdOrCtrl+T'
-const KEY_CLEAR_DESK           = 'CmdOrCtrl+K'
-const KEY_SETTINGS             = 'CmdOrCtrl+,'
-const KEY_Q                    = 'CmdOrCtrl+Q'
-const KEY_NULL                 = '[NULL]'
+const KEY_SHOW_HIDE_APP = 'CmdOrCtrl+Shift+A'
+const KEY_SHOW_HIDE_TOOLBAR = 'CmdOrCtrl+T'
+const KEY_CLEAR_DESK = 'CmdOrCtrl+K'
+const KEY_SETTINGS = 'CmdOrCtrl+,'
+const KEY_Q = 'CmdOrCtrl+Q'
+const KEY_NULL = '[NULL]'
 
 // 첫 판은 그리기만 한다. 화이트보드 · 화면 저장 · 확대는 코드만 두고 단축키를 비워 꺼 둔다.
 const KEY_SHOW_HIDE_WHITEBOARD = KEY_NULL
-const KEY_MAKE_SCREENSHOT      = KEY_NULL
-const KEY_START_ZOOM           = KEY_NULL
+const KEY_MAKE_SCREENSHOT = KEY_NULL
+const KEY_START_ZOOM = KEY_NULL
 
 const EXTENDED_TOOLBAR_WINDOW_MARGIN = 10
 const EXTENDED_TOOLBAR_WINDOW_PADDING = 5
@@ -37,12 +53,26 @@ const EXTENDED_TOOLBAR_SLIDER_SIZE = 17
 
 // Reserve an arrow slot on both sides so flipping it never moves the native window or icon.
 const EXTENDED_TOOLBAR_HORIZONTAL_WINDOW_SIZE = {
-  width: EXTENDED_TOOLBAR_WINDOW_MARGIN + EXTENDED_TOOLBAR_MODE_SWITCHER_WIDTH + 2 * EXTENDED_TOOLBAR_SLIDER_SIZE + EXTENDED_TOOLBAR_WINDOW_PADDING,
-  height: EXTENDED_TOOLBAR_WINDOW_MARGIN + EXTENDED_TOOLBAR_MODE_SWITCHER_HEIGHT + EXTENDED_TOOLBAR_WINDOW_PADDING,
+  width:
+    EXTENDED_TOOLBAR_WINDOW_MARGIN +
+    EXTENDED_TOOLBAR_MODE_SWITCHER_WIDTH +
+    2 * EXTENDED_TOOLBAR_SLIDER_SIZE +
+    EXTENDED_TOOLBAR_WINDOW_PADDING,
+  height:
+    EXTENDED_TOOLBAR_WINDOW_MARGIN +
+    EXTENDED_TOOLBAR_MODE_SWITCHER_HEIGHT +
+    EXTENDED_TOOLBAR_WINDOW_PADDING
 }
 const EXTENDED_TOOLBAR_VERTICAL_WINDOW_SIZE = {
-  width: EXTENDED_TOOLBAR_WINDOW_MARGIN + EXTENDED_TOOLBAR_MODE_SWITCHER_WIDTH + EXTENDED_TOOLBAR_WINDOW_PADDING,
-  height: EXTENDED_TOOLBAR_WINDOW_MARGIN + EXTENDED_TOOLBAR_MODE_SWITCHER_HEIGHT + 2 * EXTENDED_TOOLBAR_SLIDER_SIZE + EXTENDED_TOOLBAR_WINDOW_PADDING,
+  width:
+    EXTENDED_TOOLBAR_WINDOW_MARGIN +
+    EXTENDED_TOOLBAR_MODE_SWITCHER_WIDTH +
+    EXTENDED_TOOLBAR_WINDOW_PADDING,
+  height:
+    EXTENDED_TOOLBAR_WINDOW_MARGIN +
+    EXTENDED_TOOLBAR_MODE_SWITCHER_HEIGHT +
+    2 * EXTENDED_TOOLBAR_SLIDER_SIZE +
+    EXTENDED_TOOLBAR_WINDOW_PADDING
 }
 
 const PANEL_WIDTH = 300
@@ -56,9 +86,9 @@ const LAUNCH_ON_LOGIN_APPLIED = 'open-at-login-default'
 const ABOUT_WIDTH = 520
 const ABOUT_HEIGHT = 560
 
-let lastShortcutTime = 0;
-const throttleDelay = 250;
-const updateStoreDelay = 300;
+let lastShortcutTime = 0
+const throttleDelay = 250
+const updateStoreDelay = 300
 
 const schema = {
   show_whiteboard: {
@@ -75,7 +105,7 @@ const schema = {
       x: 10,
       y: 10,
       width: 80,
-      height: 80,
+      height: 80
     }
   },
   whiteboard_opacity: {
@@ -127,7 +157,7 @@ const schema = {
       color_3: '#52E06C',
       color_4: '#E0A552',
       color_5: '#FFFFFF',
-      color_6: '#1E1E1E',
+      color_6: '#1E1E1E'
     }
   },
   tool_bar_active_weight_index: {
@@ -146,8 +176,9 @@ const schema = {
     type: 'boolean',
     default: false
   },
-  active_monitor_id: { // show on what monitor we renderED draw window last time
-    type: 'number',
+  active_monitor_id: {
+    // show on what monitor we renderED draw window last time
+    type: 'number'
   },
   show_drawing_border: {
     type: 'boolean',
@@ -227,19 +258,19 @@ const schema = {
     default: {
       mode: 'auto', // auto | fixed
       display_id: null,
-      label: null,
+      label: null
     }
   },
   screenshot_directory: {
     type: 'string',
-    default: path.join(app.getPath('pictures'), 'draw'),
-  },
-};
+    default: path.join(app.getPath('pictures'), 'draw')
+  }
+}
 
 // rawLog('[STORE PATH]:', app.getPath('userData') + '/config.json');
 const store = new Store<Record<string, any>>({
   schema: schema as any
-});
+})
 
 store.onDidChange('show_tool_bar', () => {
   updateExternalToolbarVisibility()
@@ -279,23 +310,35 @@ let zoomModeStarting = false
 let extendedToolbarPositionStoreTimeout: ReturnType<typeof setTimeout> | null = null
 
 const iconSrc = {
-  WHITE:           path.resolve(__dirname, '../renderer/assets/trayIconWhite.png'),
-  BLACK:           path.resolve(__dirname, '../renderer/assets/trayIconBlack.png'),
-  DARWIN_TEMPLATE: path.resolve(__dirname, '../renderer/assets/trayIconTemplate@2x.png'),
+  WHITE: path.resolve(__dirname, '../renderer/assets/trayIconWhite.png'),
+  BLACK: path.resolve(__dirname, '../renderer/assets/trayIconBlack.png'),
+  DARWIN_TEMPLATE: path.resolve(__dirname, '../renderer/assets/trayIconTemplate@2x.png')
 }
 
 function getTrayIconPath() {
-  if (isMac) return iconSrc.DARWIN_TEMPLATE
+  if (isMac) {
+    return iconSrc.DARWIN_TEMPLATE
+  }
 
   const appIconColor = store.get('app_icon_color')
 
-  if (appIconColor === 'white') return iconSrc.WHITE
-  if (appIconColor === 'black') return iconSrc.BLACK
+  if (appIconColor === 'white') {
+    return iconSrc.WHITE
+  }
+  if (appIconColor === 'black') {
+    return iconSrc.BLACK
+  }
 
-  if (isWin && nativeTheme.shouldUseDarkColors) return iconSrc.WHITE
-  if (isWin) return iconSrc.BLACK
+  if (isWin && nativeTheme.shouldUseDarkColors) {
+    return iconSrc.WHITE
+  }
+  if (isWin) {
+    return iconSrc.BLACK
+  }
 
-  if (isLinux) return iconSrc.WHITE
+  if (isLinux) {
+    return iconSrc.WHITE
+  }
 
   return iconSrc.BLACK
 }
@@ -303,36 +346,50 @@ function getTrayIconPath() {
 function updateContextMenu() {
   rawLog('Updating context menu...')
 
-  if (!tray) return;
+  if (!tray) {
+    return
+  }
 
-  const key_show_hide_app        = store.get('key_binding_show_hide_app')
-  const key_show_hide_toolbar    = store.get('key_binding_show_hide_toolbar')
-  const key_clear_desk           = store.get('key_binding_clear_desk')
+  const key_show_hide_app = store.get('key_binding_show_hide_app')
+  const key_show_hide_toolbar = store.get('key_binding_show_hide_toolbar')
+  const key_clear_desk = store.get('key_binding_clear_desk')
 
   const accelForTray = (accel: string) => {
-    if (!accel) return undefined;
-    if (accel === KEY_NULL) return undefined;
-
-    if (isLinux) return undefined; // Disable tray menu accelerators on Linux
-
-    return accel
-  };
-
-  const withAccelHint = (label: string, accel: string) => {
-    if (!accel) return label;
-    if (accel === KEY_NULL) return label;
-
-    if (isLinux) {
-      return `${label} (${normalizeAcceleratorForUI(accel)})`;
+    if (!accel) {
+      return undefined
+    }
+    if (accel === KEY_NULL) {
+      return undefined
     }
 
-    return label;
+    if (isLinux) {
+      return undefined
+    } // Disable tray menu accelerators on Linux
+
+    return accel
+  }
+
+  const withAccelHint = (label: string, accel: string) => {
+    if (!accel) {
+      return label
+    }
+    if (accel === KEY_NULL) {
+      return label
+    }
+
+    if (isLinux) {
+      return `${label} (${normalizeAcceleratorForUI(accel)})`
+    }
+
+    return label
   }
 
   sendPanelState()
 
   // 맥은 메뉴 막대 패널을 쓴다. 윈도우 · 리눅스는 패널을 옮기기 전까지 기본 메뉴를 쓴다.
-  if (isMac) return;
+  if (isMac) {
+    return
+  }
 
   const contextMenu = Menu.buildFromTemplate([
     {
@@ -366,14 +423,16 @@ function updateContextMenu() {
       accelerator: accelForTray(KEY_Q),
       click: quitApp
     }
-  ]);
+  ])
 
-  tray.setContextMenu(contextMenu);
+  tray.setContextMenu(contextMenu)
 }
 
 function registerTrayActions() {
   nativeTheme.on('updated', () => {
-    if (!tray) return;
+    if (!tray) {
+      return
+    }
 
     tray.setImage(getTrayIconPath())
   })
@@ -414,19 +473,24 @@ function createPanelWindow() {
     webPreferences: {
       nodeIntegration: false,
       backgroundThrottling: false,
-      preload: preloadPath('panel_page'),
+      preload: preloadPath('panel_page')
     }
   })
 
   panelWindow.setAlwaysOnTop(true, 'pop-up-menu')
-  panelWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })
+  panelWindow.setVisibleOnAllWorkspaces(true, {
+    visibleOnFullScreen: true,
+    skipTransformProcessType: true
+  })
   panelWindow.loadURL(pageUrl('panel_page'))
 
   panelWindow.on('blur', () => {
     rawLog('Panel blur', Date.now() - panelOpenedAt)
 
     // 패널을 여는 클릭이 곧바로 포커스 잃음을 보내는 일이 있어 잠깐은 무시한다.
-    if (Date.now() - panelOpenedAt < PANEL_BLUR_GUARD_MS) return;
+    if (Date.now() - panelOpenedAt < PANEL_BLUR_GUARD_MS) {
+      return
+    }
 
     hidePanel()
   })
@@ -452,7 +516,9 @@ function placePanelUnderTray() {
 }
 
 function togglePanel() {
-  if (!panelWindow) return;
+  if (!panelWindow) {
+    return
+  }
 
   if (panelWindow.isVisible()) {
     hidePanel()
@@ -460,7 +526,9 @@ function togglePanel() {
   }
 
   // 패널이 열려 있을 때 아이콘을 누르면 먼저 포커스를 잃어 닫히므로, 그 클릭으로 다시 열지 않는다.
-  if (Date.now() - panelClosedAt < PANEL_REOPEN_GUARD_MS) return;
+  if (Date.now() - panelClosedAt < PANEL_REOPEN_GUARD_MS) {
+    return
+  }
 
   showPanel()
 }
@@ -479,7 +547,9 @@ function showPanel() {
 }
 
 function hidePanel() {
-  if (!panelWindow || !panelWindow.isVisible()) return;
+  if (!panelWindow || !panelWindow.isVisible()) {
+    return
+  }
 
   panelClosedAt = Date.now()
   panelWindow.hide()
@@ -502,15 +572,19 @@ function getPanelState() {
       toolbar: normalizeKeyForPanel(store.get('key_binding_show_hide_toolbar')),
       clear: normalizeKeyForPanel(store.get('key_binding_clear_desk')),
       settings: normalizeKeyForPanel(KEY_SETTINGS),
-      quit: normalizeKeyForPanel(KEY_Q),
-    },
+      quit: normalizeKeyForPanel(KEY_Q)
+    }
   }
 }
 
 function normalizeKeyForPanel(accelerator: string) {
-  if (!accelerator || accelerator === KEY_NULL) return undefined;
+  if (!accelerator || accelerator === KEY_NULL) {
+    return undefined
+  }
 
-  if (!isMac) return accelerator.replace('CmdOrCtrl', 'Ctrl');
+  if (!isMac) {
+    return accelerator.replace('CmdOrCtrl', 'Ctrl')
+  }
 
   return accelerator
     .replace('CmdOrCtrl', '⌘')
@@ -522,7 +596,9 @@ function normalizeKeyForPanel(accelerator: string) {
 }
 
 function sendPanelState() {
-  if (!panelWindow || panelWindow.isDestroyed()) return;
+  if (!panelWindow || panelWindow.isDestroyed()) {
+    return
+  }
 
   panelWindow.webContents.send('panel_state_changed', getPanelState())
 }
@@ -535,7 +611,7 @@ const panelActions = {
   check_update: () => checkNow(),
   settings: () => showSettingsWindow(),
   help: () => shell.openExternal(HELP_URL),
-  quit: () => quitApp(),
+  quit: () => quitApp()
 }
 
 function createMainWindow() {
@@ -545,7 +621,12 @@ function createMainWindow() {
     store.set('active_monitor_id', currentDisplay.id)
   }
 
-  let { x: displayX, y: displayY, width: displayWidth, height: displayHeight } = currentDisplay.workArea
+  let {
+    x: displayX,
+    y: displayY,
+    width: displayWidth,
+    height: displayHeight
+  } = currentDisplay.workArea
 
   let isResizable = false
   let hasDevTools = false
@@ -577,20 +658,22 @@ function createMainWindow() {
     webPreferences: {
       devTools: hasDevTools,
       nodeIntegration: false,
-      preload: preloadPath('app_page'),
+      preload: preloadPath('app_page')
     }
   })
 
-  mainWindow.loadURL(pageUrl('app_page'));
-  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  mainWindow.loadURL(pageUrl('app_page'))
+  mainWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   mainWindow.setAlwaysOnTop(true)
 
   mainWindow.on('close', function (event) {
     rawLog('Main window: on close')
 
-    if (isQuitting) return;
+    if (isQuitting) {
+      return
+    }
 
-    event.preventDefault();
+    event.preventDefault()
 
     hideApp()
   })
@@ -601,12 +684,15 @@ function createMainWindow() {
     app.quit()
   })
 
-  mainWindow.webContents.setVisualZoomLevelLimits(1, 1);
+  mainWindow.webContents.setVisualZoomLevelLimits(1, 1)
   mainWindow.webContents.on('before-input-event', (event, input) => {
-    if ((input.control || input.meta) && ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())) {
-      event.preventDefault();
+    if (
+      (input.control || input.meta) &&
+      ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())
+    ) {
+      event.preventDefault()
     }
-  });
+  })
   mainWindow.webContents.on('did-start-loading', () => {
     zoomModeStarting = false
     zoomMode = false
@@ -641,20 +727,22 @@ function createExtendedToolbarWindow() {
     webPreferences: {
       devTools: hasDevTools,
       nodeIntegration: false,
-      preload: preloadPath('extended_toolbar_page'),
+      preload: preloadPath('extended_toolbar_page')
     }
   })
 
   extendedToolbarWindow.loadURL(pageUrl('extended_toolbar_page'))
-  extendedToolbarWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true });
+  extendedToolbarWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true })
   extendedToolbarWindow.setAlwaysOnTop(true)
 
   extendedToolbarWindow.on('close', function (event) {
     rawLog('Extended toolbar window: on close')
 
-    if (isQuitting) return;
+    if (isQuitting) {
+      return
+    }
 
-    event.preventDefault();
+    event.preventDefault()
 
     hideApp()
   })
@@ -676,33 +764,40 @@ function createExtendedToolbarWindow() {
   })
 
   extendedToolbarWindow.webContents.once('did-finish-load', () => {
-    if (startAsHidden) return;
+    if (startAsHidden) {
+      return
+    }
 
     enablePointerMode()
   })
 
-  extendedToolbarWindow.webContents.setVisualZoomLevelLimits(1, 1);
+  extendedToolbarWindow.webContents.setVisualZoomLevelLimits(1, 1)
   extendedToolbarWindow.webContents.on('before-input-event', (event, input) => {
-    if ((input.control || input.meta) && ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())) {
-      event.preventDefault();
+    if (
+      (input.control || input.meta) &&
+      ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())
+    ) {
+      event.preventDefault()
     }
-  });
+  })
 }
 
 function showAboutWindow() {
-  if (zoomModeStarting) return
+  if (zoomModeStarting) {
+    return
+  }
 
   withThrottle(() => {
     if (aboutWindow) {
-      aboutWindow.focus();
+      aboutWindow.focus()
     } else {
-      createAboutWindow();
+      createAboutWindow()
     }
 
     if (drawingMode) {
       enablePointerMode()
     }
-  });
+  })
 }
 
 function createAboutWindow() {
@@ -729,14 +824,13 @@ function createAboutWindow() {
     webPreferences: {
       devTools: hasDevTools,
       nodeIntegration: false,
-      preload: preloadPath('about_page'),
+      preload: preloadPath('about_page')
     }
   })
-  aboutWindow.center();
+  aboutWindow.center()
   aboutWindow.on('page-title-updated', (event) => event.preventDefault())
 
   aboutWindow.loadURL(pageUrl('about_page'))
-
 
   aboutWindow.on('closed', () => {
     aboutWindow = null
@@ -744,39 +838,46 @@ function createAboutWindow() {
 
   aboutWindow.webContents.on('did-finish-load', () => {
     aboutWindow?.center()
-    if (isMac) app.focus({ steal: true })
+    if (isMac) {
+      app.focus({ steal: true })
+    }
     aboutWindow?.show()
     aboutWindow?.focus()
   })
 
   aboutWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url);
+    shell.openExternal(details.url)
 
-    return { action: "deny" };
+    return { action: 'deny' }
   })
 
-  aboutWindow.webContents.setVisualZoomLevelLimits(1, 1);
+  aboutWindow.webContents.setVisualZoomLevelLimits(1, 1)
   aboutWindow.webContents.on('before-input-event', (event, input) => {
-    if ((input.control || input.meta) && ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())) {
-      event.preventDefault();
+    if (
+      (input.control || input.meta) &&
+      ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())
+    ) {
+      event.preventDefault()
     }
-  });
+  })
 }
 
 function showSettingsWindow() {
-  if (zoomModeStarting) return
+  if (zoomModeStarting) {
+    return
+  }
 
   withThrottle(() => {
     if (settingsWindow) {
-      settingsWindow.focus();
+      settingsWindow.focus()
     } else {
-      createSettingsWindow();
+      createSettingsWindow()
     }
 
     if (drawingMode) {
       enablePointerMode()
     }
-  });
+  })
 }
 
 function createSettingsWindow() {
@@ -801,45 +902,51 @@ function createSettingsWindow() {
     webPreferences: {
       devTools: hasDevTools,
       nodeIntegration: false,
-      preload: preloadPath('settings_page'),
+      preload: preloadPath('settings_page')
     }
   })
-  settingsWindow.center();
+  settingsWindow.center()
 
   settingsWindow.loadURL(pageUrl('settings_page'))
-
 
   settingsWindow.on('closed', () => {
     settingsWindow = null
   })
 
   settingsWindow.webContents.on('did-finish-load', () => {
-    if (isMac) app.focus({ steal: true })
+    if (isMac) {
+      app.focus({ steal: true })
+    }
     settingsWindow?.show()
     settingsWindow?.focus()
   })
 
-  settingsWindow.webContents.setVisualZoomLevelLimits(1, 1);
+  settingsWindow.webContents.setVisualZoomLevelLimits(1, 1)
   settingsWindow.webContents.on('before-input-event', (event, input) => {
-    if ((input.control || input.meta) && ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())) {
-      event.preventDefault();
+    if (
+      (input.control || input.meta) &&
+      ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())
+    ) {
+      event.preventDefault()
     }
-  });
+  })
 }
 
 // Must be before "app.whenReady()"
 if (!app.requestSingleInstanceLock()) {
-  app.quit();
-  process.exit(0); // return is forbidden in this context
+  app.quit()
+  process.exit(0) // return is forbidden in this context
 }
 
 app.on('second-instance', () => {
-  if (!mainWindow) return
+  if (!mainWindow) {
+    return
+  }
 
   enableDrawMode()
-});
+})
 
-app.commandLine.appendSwitch('disable-pinch');
+app.commandLine.appendSwitch('disable-pinch')
 
 app.whenReady().then(() => {
   setLocale(testLanguage() || app.getPreferredSystemLanguages()[0] || app.getLocale())
@@ -860,7 +967,13 @@ app.whenReady().then(() => {
   updateContextMenu()
   registerTrayActions()
 
-  startUpdates({ store, beforeInstall: () => { isQuitting = true; flushExtendedToolbarPosition() } })
+  startUpdates({
+    store,
+    beforeInstall: () => {
+      isQuitting = true
+      flushExtendedToolbarPosition()
+    }
+  })
 
   if (DRAW_TEST_BUILD && process.env.DRAW_TEST_SHOTS) {
     runTestShots({
@@ -871,9 +984,15 @@ app.whenReady().then(() => {
       hidePanel,
       showAboutWindow,
       showSettingsWindow,
-      getWindows: () => ({ mainWindow, extendedToolbarWindow, panelWindow, aboutWindow, settingsWindow }),
+      getWindows: () => ({
+        mainWindow,
+        extendedToolbarWindow,
+        panelWindow,
+        aboutWindow,
+        settingsWindow
+      }),
       isDrawing: () => drawingMode,
-      quit: quitApp,
+      quit: quitApp
     })
   }
 
@@ -887,20 +1006,20 @@ app.whenReady().then(() => {
 })
 
 app.on('before-quit', () => {
-  isQuitting = true;
+  isQuitting = true
   flushExtendedToolbarPosition()
-});
+})
 
 autoUpdater.on('before-quit-for-update', () => {
-  isQuitting = true;
+  isQuitting = true
   flushExtendedToolbarPosition()
-});
+})
 
 app.on('will-quit', () => {
   rawLog('Will quit app... (Unregister all shortcuts)')
 
   unRegisterGlobalShortcuts()
-});
+})
 
 app.on('window-all-closed', () => {
   rawLog('All windows closed.')
@@ -920,65 +1039,68 @@ function startAsHiddenCheck() {
 
   if (store.get('starts_hidden')) {
     startAsHidden = true
-    return
   }
 }
 
 function hideDock() {
   if (isMac) {
-    app.dock?.hide();
+    app.dock?.hide()
   }
 }
 
 ipcMain.on('get_locale', (event) => {
   event.returnValue = currentLocale()
-});
+})
 
-ipcMain.handle('panel_state', () => getPanelState());
+ipcMain.handle('panel_state', () => getPanelState())
 
 ipcMain.handle('panel_action', (_event, name) => {
   hidePanel()
   panelActions[name as keyof typeof panelActions]?.()
 
   return null
-});
+})
 
 ipcMain.handle('fit_window_height', (event, height) => {
   const window = BrowserWindow.fromWebContents(event.sender)
-  if (!window) return null
+  if (!window) {
+    return null
+  }
 
   const [width] = window.getContentSize()
   window.setContentSize(width, height)
 
   return null
-});
+})
 
 ipcMain.handle('close_window', (event) => {
   BrowserWindow.fromWebContents(event.sender)?.close()
 
   return null
-});
+})
 
 // https 주소만 연다. 잘못된 값이 다른 프로그램을 띄우지 못하게 한다.
 ipcMain.handle('open_external', (_event, url) => {
   try {
-    if (new URL(url).protocol === 'https:') shell.openExternal(url)
+    if (new URL(url).protocol === 'https:') {
+      shell.openExternal(url)
+    }
   } catch {
     rawLog('Bad url:', url)
   }
 
   return null
-});
+})
 
 ipcMain.handle('set_auto_check_updates', (_event, value) => {
   store.set('auto_check_updates', value)
 
   return null
-});
+})
 
 ipcMain.handle('get_app_version', () => {
-  return app.getVersion();
-});
+  return app.getVersion()
+})
 
 ipcMain.handle('get_settings', () => {
   return {
@@ -1008,14 +1130,18 @@ ipcMain.handle('get_settings', () => {
     laser_time: store.get('laser_time'),
     clear_drawings_on_hide: store.get('clear_drawings_on_hide'),
 
-    key_binding_show_hide_toolbar:    normalizeAcceleratorForUI(store.get('key_binding_show_hide_toolbar')),
-    key_binding_show_hide_whiteboard: normalizeAcceleratorForUI(store.get('key_binding_show_hide_whiteboard')),
-    key_binding_clear_desk:           normalizeAcceleratorForUI(store.get('key_binding_clear_desk')),
-    key_binding_open_settings:        normalizeAcceleratorForUI(KEY_SETTINGS),
-    key_binding_make_screenshot:      normalizeAcceleratorForUI(KEY_MAKE_SCREENSHOT),
-    key_binding_start_zoom:           normalizeAcceleratorForUI(KEY_START_ZOOM),
-  };
-});
+    key_binding_show_hide_toolbar: normalizeAcceleratorForUI(
+      store.get('key_binding_show_hide_toolbar')
+    ),
+    key_binding_show_hide_whiteboard: normalizeAcceleratorForUI(
+      store.get('key_binding_show_hide_whiteboard')
+    ),
+    key_binding_clear_desk: normalizeAcceleratorForUI(store.get('key_binding_clear_desk')),
+    key_binding_open_settings: normalizeAcceleratorForUI(KEY_SETTINGS),
+    key_binding_make_screenshot: normalizeAcceleratorForUI(KEY_MAKE_SCREENSHOT),
+    key_binding_start_zoom: normalizeAcceleratorForUI(KEY_START_ZOOM)
+  }
+})
 
 ipcMain.handle('set_settings', (_event, newSettings) => {
   rawLog('Updating settings from Renderer:')
@@ -1023,67 +1149,67 @@ ipcMain.handle('set_settings', (_event, newSettings) => {
   store.set({ ...store.store, ...newSettings })
 
   return null
-});
+})
 
 ipcMain.handle('commit_toolbar_position', (_event, position) => {
   rawLog('Committing toolbar position from Renderer:')
 
   store.set({
     tool_bar_x: position.tool_bar_x,
-    tool_bar_y: position.tool_bar_y,
+    tool_bar_y: position.tool_bar_y
   })
 
   return null
-});
+})
 
 ipcMain.handle('close_app', () => {
-  hideApp();
+  hideApp()
 
   return null
-});
+})
 
 ipcMain.handle('toggle_draw_or_pointer_window', () => {
   toggleDrawOrPointerMode()
 
   return null
-});
+})
 
 ipcMain.handle('open_settings', () => {
   showSettingsWindow()
 
   return null
-});
+})
 
 ipcMain.handle('make_screenshot', () => {
   makeScreenshot()
 
   return null
-});
+})
 
 ipcMain.handle('request_zoom_start', () => {
   startZoomMode()
 
   return null
-});
+})
 
 ipcMain.handle('capture_zoom_image', () => {
   captureZoomImage()
 
   return null
-});
+})
 
 ipcMain.handle('reject_zoom_start', () => {
   zoomModeStarting = false
 
   return null
-});
+})
 
 ipcMain.handle('exit_zoom', () => {
   exitZoomMode()
   updateContextMenu()
 
   return null
-});
+})
 
 ipcMain.handle('open_notification', (_event, info) => {
   if (info.action === 'open_screenshot') {
@@ -1105,69 +1231,82 @@ ipcMain.handle('open_notification', (_event, info) => {
     enablePointerMode()
 
     if (isMac) {
-      shell.openExternal('x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture');
+      shell.openExternal(
+        'x-apple.systempreferences:com.apple.preference.security?Privacy_ScreenCapture'
+      )
     }
 
     return null
   }
-});
+})
 
 ipcMain.handle('reset_to_originals', () => {
-  resetApp();
+  resetApp()
 
   return null
-});
+})
 
 ipcMain.handle('get_extended_window_configuration', () => {
   rawLog('Getting extended window configuration...')
 
   return {
     tool_bar_orientation: store.get('tool_bar_orientation'),
-    isReversed: getExtendedToolbarDirection(),
-  };
-});
+    isReversed: getExtendedToolbarDirection()
+  }
+})
 
 ipcMain.handle('get_configuration', () => {
   rawLog('Getting configuration...')
 
   return {
-    app_version:                              app.getVersion(),
+    app_version: app.getVersion(),
 
-    show_drawing_border:                      store.get('show_drawing_border'),
-    cute_cursor_mode:                         store.get('cute_cursor_mode'),
-    pen_smoothing:                            store.get('pen_smoothing'),
-    tool_bar_color_palette:                   store.get('tool_bar_color_palette'),
-    swap_colors_indexes:                      store.get('swap_colors_indexes'),
-    fade_disappear_after_ms:                  store.get('fade_disappear_after_ms'),
-    fade_out_duration_time_ms:                store.get('fade_out_duration_time_ms'),
-    laser_time:                               store.get('laser_time'),
+    show_drawing_border: store.get('show_drawing_border'),
+    cute_cursor_mode: store.get('cute_cursor_mode'),
+    pen_smoothing: store.get('pen_smoothing'),
+    tool_bar_color_palette: store.get('tool_bar_color_palette'),
+    swap_colors_indexes: store.get('swap_colors_indexes'),
+    fade_disappear_after_ms: store.get('fade_disappear_after_ms'),
+    fade_out_duration_time_ms: store.get('fade_out_duration_time_ms'),
+    laser_time: store.get('laser_time'),
 
-    displays:                                 getAllDisplaysInfo(),
-    drawing_monitor:                          store.get('drawing_monitor'),
-    app_icon_color:                           store.get('app_icon_color'),
-    launch_on_login:                          store.get('launch_on_login'),
-    auto_check_updates:                       store.get('auto_check_updates'),
-    starts_hidden:                            store.get('starts_hidden'),
-    clear_drawings_on_hide:                   store.get('clear_drawings_on_hide'),
-    disable_toolbar_in_pointer_mode:          store.get('disable_toolbar_in_pointer_mode'),
-    tool_bar_orientation:                     store.get('tool_bar_orientation'),
+    displays: getAllDisplaysInfo(),
+    drawing_monitor: store.get('drawing_monitor'),
+    app_icon_color: store.get('app_icon_color'),
+    launch_on_login: store.get('launch_on_login'),
+    auto_check_updates: store.get('auto_check_updates'),
+    starts_hidden: store.get('starts_hidden'),
+    clear_drawings_on_hide: store.get('clear_drawings_on_hide'),
+    disable_toolbar_in_pointer_mode: store.get('disable_toolbar_in_pointer_mode'),
+    tool_bar_orientation: store.get('tool_bar_orientation'),
 
-    screenshot_directory:                     store.get('screenshot_directory'),
-    screenshot_directory_is_default:          store.get('screenshot_directory') === schema.screenshot_directory.default,
+    screenshot_directory: store.get('screenshot_directory'),
+    screenshot_directory_is_default:
+      store.get('screenshot_directory') === schema.screenshot_directory.default,
 
-    key_binding_show_hide_app:                normalizeAcceleratorForUI(store.get('key_binding_show_hide_app')),
-    key_binding_show_hide_app_default:        normalizeAcceleratorForUI(schema.key_binding_show_hide_app.default),
+    key_binding_show_hide_app: normalizeAcceleratorForUI(store.get('key_binding_show_hide_app')),
+    key_binding_show_hide_app_default: normalizeAcceleratorForUI(
+      schema.key_binding_show_hide_app.default
+    ),
 
-    key_binding_show_hide_toolbar:            normalizeAcceleratorForUI(store.get('key_binding_show_hide_toolbar')),
-    key_binding_show_hide_toolbar_default:    normalizeAcceleratorForUI(schema.key_binding_show_hide_toolbar.default),
+    key_binding_show_hide_toolbar: normalizeAcceleratorForUI(
+      store.get('key_binding_show_hide_toolbar')
+    ),
+    key_binding_show_hide_toolbar_default: normalizeAcceleratorForUI(
+      schema.key_binding_show_hide_toolbar.default
+    ),
 
-    key_binding_show_hide_whiteboard:         normalizeAcceleratorForUI(store.get('key_binding_show_hide_whiteboard')),
-    key_binding_show_hide_whiteboard_default: normalizeAcceleratorForUI(schema.key_binding_show_hide_whiteboard.default),
+    key_binding_show_hide_whiteboard: normalizeAcceleratorForUI(
+      store.get('key_binding_show_hide_whiteboard')
+    ),
+    key_binding_show_hide_whiteboard_default: normalizeAcceleratorForUI(
+      schema.key_binding_show_hide_whiteboard.default
+    ),
 
-    key_binding_clear_desk:                   normalizeAcceleratorForUI(store.get('key_binding_clear_desk')),
-    key_binding_clear_desk_default:           normalizeAcceleratorForUI(schema.key_binding_clear_desk.default),
-  };
-});
+    key_binding_clear_desk: normalizeAcceleratorForUI(store.get('key_binding_clear_desk')),
+    key_binding_clear_desk_default: normalizeAcceleratorForUI(schema.key_binding_clear_desk.default)
+  }
+})
 
 ipcMain.handle('choose_screenshot_directory', async () => {
   const screenshotDirectory = store.get('screenshot_directory')
@@ -1175,7 +1314,7 @@ ipcMain.handle('choose_screenshot_directory', async () => {
   const dialogOptions: Electron.OpenDialogOptions = {
     title: 'Choose screenshot folder',
     buttonLabel: 'Choose',
-    properties: isMac ? ['openDirectory', 'createDirectory'] : ['openDirectory'],
+    properties: isMac ? ['openDirectory', 'createDirectory'] : ['openDirectory']
   }
 
   if (fs.existsSync(screenshotDirectory)) {
@@ -1186,7 +1325,9 @@ ipcMain.handle('choose_screenshot_directory', async () => {
 
   try {
     const result = await dialog.showOpenDialog(settingsWindow!, dialogOptions)
-    if (result.canceled) return null
+    if (result.canceled) {
+      return null
+    }
 
     const selectedDirectory = result.filePaths[0]
 
@@ -1194,22 +1335,22 @@ ipcMain.handle('choose_screenshot_directory', async () => {
 
     return {
       path: selectedDirectory,
-      isDefault: selectedDirectory === schema.screenshot_directory.default,
+      isDefault: selectedDirectory === schema.screenshot_directory.default
     }
   } catch (error) {
     dialog.showErrorBox('Unable to select screenshot folder', (error as Error).message)
     return null
   }
-});
+})
 
 ipcMain.handle('reset_screenshot_directory', () => {
   store.reset('screenshot_directory')
 
   return {
     path: store.get('screenshot_directory'),
-    isDefault: true,
+    isDefault: true
   }
-});
+})
 
 ipcMain.handle('open_screenshot_directory', async () => {
   try {
@@ -1222,7 +1363,7 @@ ipcMain.handle('open_screenshot_directory', async () => {
   }
 
   return null
-});
+})
 
 ipcMain.handle('can_register_shortcut', async (_event, value) => {
   rawLog('Checking shortcut registration:', value)
@@ -1235,28 +1376,28 @@ ipcMain.handle('can_register_shortcut', async (_event, value) => {
     store.get('key_binding_show_hide_whiteboard'),
     store.get('key_binding_clear_desk'),
     KEY_MAKE_SCREENSHOT,
-    KEY_START_ZOOM,
-  ].filter(s => s && s !== KEY_NULL)
+    KEY_START_ZOOM
+  ].filter((s) => s && s !== KEY_NULL)
 
   if (shortcutsInUse.includes(accelerator)) {
-    return false;
+    return false
   }
 
   if (globalShortcut.isRegistered(accelerator)) {
-    return false;
+    return false
   }
 
   try {
-    const success = globalShortcut.register(accelerator, () => {});
+    const success = globalShortcut.register(accelerator, () => {})
     if (success) {
-      globalShortcut.unregister(accelerator);
+      globalShortcut.unregister(accelerator)
     }
 
-    return success;
+    return success
   } catch {
-    return false;
+    return false
   }
-});
+})
 
 ipcMain.handle('set_shortcut', (_event, key, value) => {
   rawLog('Setting shortcut:', key, value)
@@ -1270,91 +1411,91 @@ ipcMain.handle('set_shortcut', (_event, key, value) => {
     store.delete(key)
   }
 
-  registerGlobalShortcuts();
+  registerGlobalShortcuts()
   updateContextMenu()
 
   mainWindow.reload()
 
   return null
-});
+})
 
 ipcMain.handle('set_launch_on_login', (_event, value) => {
   rawLog('Setting launch on login:', value)
 
-  safeSetLoginItemSettings({ openAtLogin: value });
+  safeSetLoginItemSettings({ openAtLogin: value })
 
   store.set('launch_on_login', value)
 
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_starts_hidden', (_event, value) => {
   rawLog('Setting starts hidden:', value)
 
   store.set('starts_hidden', value)
 
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_clear_drawings_on_hide', (_event, value) => {
   rawLog('Setting clear drawings on hide:', value)
 
   store.set('clear_drawings_on_hide', value)
 
-  refreshSettingsInRenderer();
+  refreshSettingsInRenderer()
 
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_show_drawing_border', (_event, value) => {
   rawLog('Setting drawing border:', value)
 
   store.set('show_drawing_border', value)
 
-  refreshSettingsInRenderer();
+  refreshSettingsInRenderer()
 
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_cute_cursor_mode', (_event, value) => {
   rawLog('Setting cute cursor mode:', value)
 
   store.set('cute_cursor_mode', value)
 
-  refreshSettingsInRenderer();
+  refreshSettingsInRenderer()
 
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_pen_smoothing', (_event, value) => {
   rawLog('Setting pen smoothing:', value)
 
   store.set('pen_smoothing', value)
 
-  refreshSettingsInRenderer();
+  refreshSettingsInRenderer()
 
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_swap_colors', (_event, value) => {
   rawLog('Setting swap colors:', value)
 
   store.set('swap_colors_indexes', value)
 
-  refreshSettingsInRenderer();
+  refreshSettingsInRenderer()
 
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_toolbar_color', (_event, colorId, normalizedColor) => {
   rawLog('Setting toolbar color:', colorId, normalizedColor)
 
   store.set(`tool_bar_color_palette.${colorId}`, normalizedColor)
 
-  refreshSettingsInRenderer();
+  refreshSettingsInRenderer()
 
   return null
-});
+})
 
 ipcMain.handle('set_fade_disappear_after_ms', (_event, value) => {
   rawLog('Setting fade disappear after:', value)
@@ -1364,7 +1505,7 @@ ipcMain.handle('set_fade_disappear_after_ms', (_event, value) => {
   mainWindow.reload()
 
   return null
-});
+})
 
 ipcMain.handle('set_fade_out_duration_time_ms', (_event, value) => {
   rawLog('Setting fade out duration time:', value)
@@ -1374,7 +1515,7 @@ ipcMain.handle('set_fade_out_duration_time_ms', (_event, value) => {
   mainWindow.reload()
 
   return null
-});
+})
 
 ipcMain.handle('set_laser_time', (_event, value) => {
   rawLog('Setting laser time:', value)
@@ -1384,7 +1525,7 @@ ipcMain.handle('set_laser_time', (_event, value) => {
   mainWindow.reload()
 
   return null
-});
+})
 
 ipcMain.handle('set_app_icon_color', (_event, value) => {
   rawLog('Setting app icon color:', value)
@@ -1392,8 +1533,8 @@ ipcMain.handle('set_app_icon_color', (_event, value) => {
   store.set('app_icon_color', value)
 
   tray.setImage(getTrayIconPath())
-  return null;
-});
+  return null
+})
 
 ipcMain.handle('set_drawing_monitor', (_event, value) => {
   rawLog('Setting drawing monitor:', value)
@@ -1401,7 +1542,7 @@ ipcMain.handle('set_drawing_monitor', (_event, value) => {
   store.set('drawing_monitor', value)
 
   return null
-});
+})
 
 ipcMain.handle('set_disable_toolbar_in_pointer_mode', (_event, value) => {
   rawLog('Setting disable toolbar in pointer mode:', value)
@@ -1411,13 +1552,14 @@ ipcMain.handle('set_disable_toolbar_in_pointer_mode', (_event, value) => {
   updateExternalToolbarVisibility()
 
   return null
-});
+})
 
 ipcMain.handle('set_toolbar_orientation', (_event, value) => {
   rawLog('Setting toolbar orientation:', value)
 
   flushExtendedToolbarPosition()
-  const currentDisplay = getLockedMonitor() || getUnderToolbarMonitor() || getActiveMonitor() || getUnderCursorMonitor()
+  const currentDisplay =
+    getLockedMonitor() || getUnderToolbarMonitor() || getActiveMonitor() || getUnderCursorMonitor()
   store.set('tool_bar_orientation', value)
 
   const { width, height } = getExtendedToolbarWindowSize()
@@ -1428,28 +1570,28 @@ ipcMain.handle('set_toolbar_orientation', (_event, value) => {
   extendedToolbarWindow.reload()
 
   return null
-});
+})
 
 function refreshSettingsInRenderer() {
   mainWindow.webContents.send('refresh_settings', {
-    whiteboard_color:        store.get('whiteboard_color'),
-    whiteboard_layout:       store.get('whiteboard_layout'),
-    whiteboard_opacity:      store.get('whiteboard_opacity'),
-    whiteboard_style:        store.get('whiteboard_style'),
-    whiteboard_spacing:      store.get('whiteboard_spacing'),
-    show_drawing_border:     store.get('show_drawing_border'),
-    cute_cursor_mode:        store.get('cute_cursor_mode'),
-    pen_smoothing:           store.get('pen_smoothing'),
-    tool_bar_color_palette:  store.get('tool_bar_color_palette'),
-    swap_colors_indexes:     store.get('swap_colors_indexes'),
-    clear_drawings_on_hide:  store.get('clear_drawings_on_hide'),
+    whiteboard_color: store.get('whiteboard_color'),
+    whiteboard_layout: store.get('whiteboard_layout'),
+    whiteboard_opacity: store.get('whiteboard_opacity'),
+    whiteboard_style: store.get('whiteboard_style'),
+    whiteboard_spacing: store.get('whiteboard_spacing'),
+    show_drawing_border: store.get('show_drawing_border'),
+    cute_cursor_mode: store.get('cute_cursor_mode'),
+    pen_smoothing: store.get('pen_smoothing'),
+    tool_bar_color_palette: store.get('tool_bar_color_palette'),
+    swap_colors_indexes: store.get('swap_colors_indexes'),
+    clear_drawings_on_hide: store.get('clear_drawings_on_hide')
   })
 }
 
 function updateToolbarPositionInRenderer() {
   mainWindow.webContents.send('update_toolbar_position', {
-    tool_bar_x:          store.get('tool_bar_x'),
-    tool_bar_y:          store.get('tool_bar_y'),
+    tool_bar_x: store.get('tool_bar_x'),
+    tool_bar_y: store.get('tool_bar_y')
   })
 }
 
@@ -1463,21 +1605,25 @@ function registerGlobalShortcuts() {
 function unRegisterGlobalShortcuts() {
   rawLog('UNREGISTER global shortcuts...')
 
-  globalShortcut.unregisterAll();
+  globalShortcut.unregisterAll()
 }
 
 function withThrottle(callback: (...args: any[]) => any) {
   rawLog('withThrottle called...')
 
-  const now = Date.now();
-  if (now < lastShortcutTime + throttleDelay) return;
-  lastShortcutTime = now;
+  const now = Date.now()
+  if (now < lastShortcutTime + throttleDelay) {
+    return
+  }
+  lastShortcutTime = now
 
-  callback();
+  callback()
 }
 
 function toggleDrawOrPointerMode() {
-  if (zoomModeStarting) return
+  if (zoomModeStarting) {
+    return
+  }
 
   if (zoomMode) {
     exitZoomMode()
@@ -1493,11 +1639,13 @@ function toggleDrawOrPointerMode() {
     } else {
       enableDrawMode()
     }
-  });
+  })
 }
 
 function enableDrawMode() {
-  if (zoomModeStarting) return
+  if (zoomModeStarting) {
+    return
+  }
 
   rawLog('Enable drawing mode...')
 
@@ -1512,7 +1660,9 @@ function enableDrawMode() {
 }
 
 function enablePointerMode() {
-  if (zoomModeStarting) return
+  if (zoomModeStarting) {
+    return
+  }
 
   rawLog('Enable pointer mode...')
 
@@ -1529,7 +1679,9 @@ function enablePointerMode() {
 }
 
 function hideApp() {
-  if (zoomModeStarting) return
+  if (zoomModeStarting) {
+    return
+  }
 
   rawLog('Hiding app...')
 
@@ -1547,7 +1699,7 @@ function hideApp() {
 
 function resetScreenOnHide() {
   if (store.get('clear_drawings_on_hide')) {
-    sendResetScreen();
+    sendResetScreen()
   }
 }
 
@@ -1557,7 +1709,9 @@ function handleDisplayChange() {
 }
 
 function updateExternalToolbarVisibility() {
-  if (drawingMode) return;
+  if (drawingMode) {
+    return
+  }
 
   if (store.get('disable_toolbar_in_pointer_mode')) {
     hideWindow(extendedToolbarWindow)
@@ -1575,13 +1729,15 @@ function toggleToolbar() {
   withThrottle(() => {
     rawLog('Toggling toolbar...')
 
-    store.set('show_tool_bar', !store.get('show_tool_bar'));
+    store.set('show_tool_bar', !store.get('show_tool_bar'))
     mainWindow.webContents.send('toggle_toolbar') // Roundtrip request ...
-  });
+  })
 }
 
 function resetApp() {
-  if (zoomModeStarting) return
+  if (zoomModeStarting) {
+    return
+  }
 
   withThrottle(() => {
     rawLog('Resetting app to original settings...')
@@ -1593,7 +1749,7 @@ function resetApp() {
     registerGlobalShortcuts()
 
     if (safeIsOpenAtLogin()) {
-      safeSetLoginItemSettings({ openAtLogin: false });
+      safeSetLoginItemSettings({ openAtLogin: false })
     }
 
     tray.setImage(getTrayIconPath())
@@ -1613,17 +1769,19 @@ function resetApp() {
 }
 
 function resetScreen() {
-  withThrottle(sendResetScreen);
+  withThrottle(sendResetScreen)
 }
 
 function sendResetScreen() {
   rawLog('Resetting screen...')
 
-  mainWindow.webContents.send('reset_screen');
+  mainWindow.webContents.send('reset_screen')
 }
 
 function startZoomMode() {
-  if (zoomMode || zoomModeStarting) return
+  if (zoomMode || zoomModeStarting) {
+    return
+  }
 
   if (!drawingMode) {
     enableDrawMode()
@@ -1639,12 +1797,14 @@ function getInitialZoomPoint() {
 
   return {
     x: Math.max(0, Math.min(windowBounds.width, cursor.x - windowBounds.x)),
-    y: Math.max(0, Math.min(windowBounds.height, cursor.y - windowBounds.y)),
+    y: Math.max(0, Math.min(windowBounds.height, cursor.y - windowBounds.y))
   }
 }
 
 async function captureZoomImage() {
-  if (!zoomModeStarting) return
+  if (!zoomModeStarting) {
+    return
+  }
 
   try {
     const image = await captureMainWindowImage()
@@ -1652,7 +1812,9 @@ async function captureZoomImage() {
     const imageDataUrl = image.toDataURL()
     const initialZoomPoint = getInitialZoomPoint()
 
-    if (!zoomModeStarting) return
+    if (!zoomModeStarting) {
+      return
+    }
 
     zoomModeStarting = false
     zoomMode = true
@@ -1660,10 +1822,12 @@ async function captureZoomImage() {
 
     mainWindow.webContents.send('show_zoom', {
       imageDataUrl: imageDataUrl,
-      initialZoomPoint: initialZoomPoint,
+      initialZoomPoint: initialZoomPoint
     })
   } catch (error) {
-    if (!zoomModeStarting && !zoomMode) return
+    if (!zoomModeStarting && !zoomMode) {
+      return
+    }
 
     zoomModeStarting = false
     zoomMode = false
@@ -1676,13 +1840,15 @@ async function captureZoomImage() {
       body: (error as Error).message,
       button_label: isMac ? 'Settings' : null,
       button_action: isMac ? 'open_security_preferences' : null,
-      button_data: null,
+      button_data: null
     })
   }
 }
 
 function exitZoomMode() {
-  if (!zoomMode) return
+  if (!zoomMode) {
+    return
+  }
 
   zoomMode = false
   mainWindow.webContents.send('stop_zoom')
@@ -1692,35 +1858,33 @@ function quitApp() {
   withThrottle(() => {
     rawLog('Quitting app...')
 
-    app.quit();
-  });
+    app.quit()
+  })
 }
 
 function screenshotTimecode4(date: Date) {
-  let value = date.getHours() * 3600 +
-              date.getMinutes() * 60 +
-              date.getSeconds(); // 0..86399
+  let value = date.getHours() * 3600 + date.getMinutes() * 60 + date.getSeconds() // 0..86399
 
-  let code = '';
+  let code = ''
   for (let i = 0; i < 4; i++) {
-    code = String.fromCharCode(97 + (value % 26)) + code;
-    value = Math.floor(value / 26);
+    code = String.fromCharCode(97 + (value % 26)) + code
+    value = Math.floor(value / 26)
   }
 
-  return code;
+  return code
 }
 
 function screenshotFilename(withUniqSuffix = false) {
   const date = new Date()
 
-  const yyyy = date.getFullYear();
-  const mm = (date.getMonth() + 1).toString().padStart(2, '0');
-  const dd = (date.getDate()).toString().padStart(2, '0');
+  const yyyy = date.getFullYear()
+  const mm = (date.getMonth() + 1).toString().padStart(2, '0')
+  const dd = date.getDate().toString().padStart(2, '0')
 
-  const code = screenshotTimecode4(date);
-  const suffix = withUniqSuffix ? `-${Date.now()}` : '';
+  const code = screenshotTimecode4(date)
+  const suffix = withUniqSuffix ? `-${Date.now()}` : ''
 
-  return `DRWPN-${yyyy}${mm}${dd}-${code}${suffix}.png`;
+  return `DRWPN-${yyyy}${mm}${dd}-${code}${suffix}.png`
 }
 
 async function captureDisplayImage(display: Electron.Display) {
@@ -1732,9 +1896,9 @@ async function captureDisplayImage(display: Electron.Display) {
       try {
         await desktopCapturer.getSources({
           types: ['screen'],
-          thumbnailSize: { width: 1, height: 1 },
+          thumbnailSize: { width: 1, height: 1 }
         })
-      } catch (_) {}
+      } catch {}
 
       throw new Error('Screen Recording permission is not granted.')
     }
@@ -1742,12 +1906,12 @@ async function captureDisplayImage(display: Electron.Display) {
 
   const thumbnailSize = {
     width: Math.round(display.size.width * (display.scaleFactor || 1)),
-    height: Math.round(display.size.height * (display.scaleFactor || 1)),
+    height: Math.round(display.size.height * (display.scaleFactor || 1))
   }
 
   const sources = await desktopCapturer.getSources({
     types: ['screen'],
-    thumbnailSize,
+    thumbnailSize
   })
 
   if (sources.length === 0) {
@@ -1755,8 +1919,8 @@ async function captureDisplayImage(display: Electron.Display) {
   }
 
   const source =
-    sources.find(item => String(item.display_id ?? '') === String(display.id)) ||
-    sources.find(item => {
+    sources.find((item) => String(item.display_id ?? '') === String(display.id)) ||
+    sources.find((item) => {
       const { width, height } = item.thumbnail.getSize()
       return width === thumbnailSize.width && height === thumbnailSize.height
     }) ||
@@ -1783,19 +1947,21 @@ async function captureMainWindowImage() {
   const cropX = Math.round((windowBounds.x - currentDisplay.bounds.x) * scale)
   const cropY = Math.round((windowBounds.y - currentDisplay.bounds.y) * scale)
 
-  const cropWidth  = Math.round(windowBounds.width * scale)
+  const cropWidth = Math.round(windowBounds.width * scale)
   const cropHeight = Math.round(windowBounds.height * scale)
 
   return image.crop({
     x: cropX,
     y: cropY,
     width: cropWidth,
-    height: cropHeight,
+    height: cropHeight
   })
 }
 
 async function makeScreenshot() {
-  if (zoomMode || zoomModeStarting) return
+  if (zoomMode || zoomModeStarting) {
+    return
+  }
 
   if (!drawingMode) {
     enableDrawMode()
@@ -1825,28 +1991,28 @@ async function makeScreenshot() {
 
     try {
       clipboard.writeImage(nativeImage.createFromBuffer(imagePng))
-    } catch (_) {}
+    } catch {}
 
     sendNotification({
       title: `Click to open ${isMac ? 'in Finder' : 'folder'}`,
       body: savePath,
       button_label: 'Open',
       button_action: 'open_screenshot',
-      button_data: screenshotName,
-    });
+      button_data: screenshotName
+    })
   } catch (error) {
     sendNotification({
       title: 'Image export failed',
       body: (error as Error).message,
       button_label: isMac ? 'Settings' : null,
       button_action: isMac ? 'open_security_preferences' : null,
-      button_data: null,
-    });
+      button_data: null
+    })
   }
 }
 
 function sendNotification(data: Record<string, unknown>) {
-  mainWindow.webContents.send('show_notification', data);
+  mainWindow.webContents.send('show_notification', data)
 }
 
 function hideWindow(targetWindow: Electron.BrowserWindow) {
@@ -1874,7 +2040,9 @@ function showWindow(targetWindow: Electron.BrowserWindow, { inactive = false } =
 }
 
 function releaseFocusBack() {
-  if (!isMac) return;
+  if (!isMac) {
+    return
+  }
 
   if (settingsWindow) {
     settingsWindow.focus()
@@ -1891,27 +2059,36 @@ function releaseFocusBack() {
 
 function storeToolbarPositionFromExtendedWindow() {
   const currentDisplay = getLockedMonitor() || getUnderToolbarMonitor()
-  if (!currentDisplay) return;
+  if (!currentDisplay) {
+    return
+  }
 
   const { x: displayX, y: displayY } = currentDisplay.workArea
   const { x: extToolBarX, y: extToolBarY } = extendedToolbarWindow.getBounds()
 
-  const offset = getPointerToolbarOffset(store.get('tool_bar_orientation'), EXTENDED_TOOLBAR_WINDOW_MARGIN)
+  const offset = getPointerToolbarOffset(
+    store.get('tool_bar_orientation'),
+    EXTENDED_TOOLBAR_WINDOW_MARGIN
+  )
   const toolBarX = extToolBarX - displayX + offset.x
   const toolBarY = extToolBarY - displayY + offset.y
 
-  rawLog(`Update Toolbar: display: ${currentDisplay.id}, toolBarX: ${toolBarX}, toolBarY: ${toolBarY}`)
+  rawLog(
+    `Update Toolbar: display: ${currentDisplay.id}, toolBarX: ${toolBarX}, toolBarY: ${toolBarY}`
+  )
 
   store.set({
     tool_bar_x: toolBarX,
-    tool_bar_y: toolBarY,
-  });
+    tool_bar_y: toolBarY
+  })
 
   updateMainWindowPosition(currentDisplay)
 }
 
 function flushExtendedToolbarPosition() {
-  if (!extendedToolbarPositionStoreTimeout) return;
+  if (!extendedToolbarPositionStoreTimeout) {
+    return
+  }
 
   clearTimeout(extendedToolbarPositionStoreTimeout)
   extendedToolbarPositionStoreTimeout = null
@@ -1967,8 +2144,12 @@ function updateMainWindowPosition(display: Electron.Display) {
 // - Enable Toolbar from Tray
 // - Enable Pointer Mode (Click by Main Button or from Tray)
 function showExtendedToolbarWindow() {
-  if (store.get('disable_toolbar_in_pointer_mode')) return;
-  if (!store.get('show_tool_bar')) return;
+  if (store.get('disable_toolbar_in_pointer_mode')) {
+    return
+  }
+  if (!store.get('show_tool_bar')) {
+    return
+  }
 
   const currentDisplay = getLockedMonitor() || getActiveMonitor() || getUnderCursorMonitor()
 
@@ -1986,14 +2167,19 @@ function getExtendedToolbarWindowSize() {
 }
 
 function getExtendedToolbarDirection() {
-  const display = getLockedMonitor() || getUnderToolbarMonitor() || getActiveMonitor() || getUnderCursorMonitor()
+  const display =
+    getLockedMonitor() || getUnderToolbarMonitor() || getActiveMonitor() || getUnderCursorMonitor()
   const orientation = store.get('tool_bar_orientation')
   const offset = getPointerToolbarOffset(orientation, EXTENDED_TOOLBAR_WINDOW_MARGIN)
   const bounds = extendedToolbarWindow.getBounds()
-  return isToolbarReversed({
-    x: bounds.x - display.workArea.x + offset.x,
-    y: bounds.y - display.workArea.y + offset.y,
-  }, display.workArea, orientation)
+  return isToolbarReversed(
+    {
+      x: bounds.x - display.workArea.x + offset.x,
+      y: bounds.y - display.workArea.y + offset.y
+    },
+    display.workArea,
+    orientation
+  )
 }
 
 function updateExtendedToolbarDirection() {
@@ -2002,11 +2188,14 @@ function updateExtendedToolbarDirection() {
 
 function updateExtendedToolbarWindowPosition(display: Electron.Display) {
   const { x: displayX, y: displayY } = display.workArea
-  const offset = getPointerToolbarOffset(store.get('tool_bar_orientation'), EXTENDED_TOOLBAR_WINDOW_MARGIN)
+  const offset = getPointerToolbarOffset(
+    store.get('tool_bar_orientation'),
+    EXTENDED_TOOLBAR_WINDOW_MARGIN
+  )
 
   extendedToolbarWindow.setBounds({
     x: displayX + store.get('tool_bar_x') - offset.x,
-    y: displayY + store.get('tool_bar_y') - offset.y,
+    y: displayY + store.get('tool_bar_y') - offset.y
   })
   updateExtendedToolbarDirection()
 }
@@ -2015,7 +2204,9 @@ function getLockedMonitor() {
   const drawingMonitorOptions = store.get('drawing_monitor')
 
   if (drawingMonitorOptions.mode === 'fixed') {
-    return screen.getAllDisplays().find(display => String(display.id) === drawingMonitorOptions.display_id)
+    return screen
+      .getAllDisplays()
+      .find((display) => String(display.id) === drawingMonitorOptions.display_id)
   }
 
   return null
@@ -2024,7 +2215,7 @@ function getLockedMonitor() {
 function getActiveMonitor() {
   const activeMonitorId = store.get('active_monitor_id')
 
-  return screen.getAllDisplays().find(display => display.id === activeMonitorId)
+  return screen.getAllDisplays().find((display) => display.id === activeMonitorId)
 }
 
 function getUnderCursorMonitor() {
@@ -2042,13 +2233,13 @@ function getUnderToolbarMonitor() {
 function getAllDisplaysInfo() {
   const allDisplays = screen.getAllDisplays()
 
-  return allDisplays.map(display => {
+  return allDisplays.map((display) => {
     const displayName = display.label || `Display ${display.id}`
     const resolution = `${display.size.width}x${display.size.height}`
 
     return {
       id: String(display.id),
-      label: `${displayName} (${resolution})`,
+      label: `${displayName} (${resolution})`
     }
   })
 }
@@ -2070,23 +2261,27 @@ function logDisplays() {
       workArea: display.workArea,
       scaleFactor: display.scaleFactor,
       rotation: display.rotation,
-      displayFrequency: display.displayFrequency,
+      displayFrequency: display.displayFrequency
     })
   })
 }
 
 function normalizeAcceleratorForUI(value: string) {
-  if (!value) return value;
+  if (!value) {
+    return value
+  }
 
-  const target = (isMac) ? 'Meta' : 'Control';
-  return value.replace('CmdOrCtrl', target);
+  const target = isMac ? 'Meta' : 'Control'
+  return value.replace('CmdOrCtrl', target)
 }
 
 function deNormalizeAcceleratorFromUI(value: string) {
-  if (!value) return value;
+  if (!value) {
+    return value
+  }
 
-  const target = (isMac) ? 'Meta' : 'Control';
-  return value.replace(target, 'CmdOrCtrl');
+  const target = isMac ? 'Meta' : 'Control'
+  return value.replace(target, 'CmdOrCtrl')
 }
 
 function safeRegisterGlobalShortcut(accelerator: string, callback: (...args: any[]) => any) {
@@ -2096,41 +2291,45 @@ function safeRegisterGlobalShortcut(accelerator: string, callback: (...args: any
 
   try {
     if (globalShortcut.isRegistered(accelerator)) {
-      rawLog('Global shortcut already registered:', accelerator);
+      rawLog('Global shortcut already registered:', accelerator)
       return
     }
 
-    const success = globalShortcut.register(accelerator, callback);
+    const success = globalShortcut.register(accelerator, callback)
     if (!success) {
-      rawLog('Failed to register global shortcut:', accelerator);
+      rawLog('Failed to register global shortcut:', accelerator)
     }
   } catch (error) {
-    rawLog('Error registering global shortcut:', accelerator, error);
+    rawLog('Error registering global shortcut:', accelerator, error)
   }
 }
 
 function setApplicationName() {
   if (isWin) {
-    app.setAppUserModelId('im.runners.draw');
+    app.setAppUserModelId('im.runners.draw')
   }
 }
 
 function safeWasOpenedAtLogin() {
-  if (isLinux) return false; // Linux не підтримує login items
+  if (isLinux) {
+    return false
+  } // Linux не підтримує login items
 
   try {
-    return !!app.getLoginItemSettings().wasOpenedAtLogin;
-  } catch (error) {
-    return false;
+    return !!app.getLoginItemSettings().wasOpenedAtLogin
+  } catch {
+    return false
   }
 }
 
 function safeIsOpenAtLogin() {
-  if (isLinux) return false;
+  if (isLinux) {
+    return false
+  }
 
   try {
     return !!app.getLoginItemSettings().openAtLogin
-  } catch (error) {
+  } catch {
     return false
   }
 }
@@ -2138,38 +2337,46 @@ function safeIsOpenAtLogin() {
 // 직접 받는 판은 맥마다 처음 한 번 「로그인할 때 열기」를 스스로 켠다. 표시 파일을 남겨, 그 뒤에 사람이 끄면 다시 켜지 않는다.
 // 시험판은 지운 뒤에도 로그인 항목이 남으면 안 되므로 켜지 않는다.
 function applyLaunchOnLoginDefault() {
-  if (isLinux || !app.isPackaged || DRAW_TEST_BUILD) return;
+  if (isLinux || !app.isPackaged || DRAW_TEST_BUILD) {
+    return
+  }
 
-  const marker = path.join(app.getPath('userData'), LAUNCH_ON_LOGIN_APPLIED);
-  if (fs.existsSync(marker)) return;
+  const marker = path.join(app.getPath('userData'), LAUNCH_ON_LOGIN_APPLIED)
+  if (fs.existsSync(marker)) {
+    return
+  }
 
-  safeSetLoginItemSettings({ openAtLogin: true });
+  safeSetLoginItemSettings({ openAtLogin: true })
   store.set('launch_on_login', true)
   try {
-    fs.writeFileSync(marker, '');
-  } catch (error) {}
+    fs.writeFileSync(marker, '')
+  } catch {}
 }
 
 function safeSetLoginItemSettings(settings: Electron.Settings) {
-  if (isLinux) return;
+  if (isLinux) {
+    return
+  }
 
   try {
     app.setLoginItemSettings(settings)
-  } catch (error) {}
+  } catch {}
 }
 
 function rawLog(message: string, ...args: unknown[]) {
-  if (!isLoggingEnabled) { return }
+  if (!isLoggingEnabled) {
+    return
+  }
 
-  console.log(message, ...args);
+  console.log(message, ...args)
 }
 
 process.on('uncaughtException', (error) => {
   console.log('[DRAW:FATAL] uncaughtException', error)
-  app.quit();
+  app.quit()
 })
 
 process.on('unhandledRejection', (reason) => {
   console.log('[DRAW:FATAL] unhandledRejection', reason)
-  app.quit();
+  app.quit()
 })

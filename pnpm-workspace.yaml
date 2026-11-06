@@ -3,6 +3,6 @@ allowBuilds:
   electron: true
   esbuild: true
   electron-winstaller: false
-  "@parcel/watcher": false
+  '@parcel/watcher': false
 patchedDependencies:
   ntcjs: patches/ntcjs.patch

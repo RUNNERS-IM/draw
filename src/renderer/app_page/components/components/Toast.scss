@@ -79,10 +79,16 @@
 }
 
 @keyframes toastIn {
-  from { transform: translateX(-50%) translateY(-100%); }
-  to   { transform: translateX(-50%) translateY(25px); }
+  from {
+    transform: translateX(-50%) translateY(-100%);
+  }
+  to {
+    transform: translateX(-50%) translateY(25px);
+  }
 }
 
 @keyframes toastHide {
-  to { visibility: hidden; }
+  to {
+    visibility: hidden;
+  }
 }

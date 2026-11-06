@@ -212,7 +212,7 @@
 
             &::after {
               pointer-events: none;
-              content: "";
+              content: '';
               position: absolute;
               bottom: 2px;
               right: 2px;
@@ -249,11 +249,31 @@
           transform: rotate(45deg);
         }
 
-        &.thin { div { width: 2px; }}
-        &.light { div { width: 4px; }}
-        &.medium { div { width: 6px; }}
-        &.bold { div { width: 8px; }}
-        &.extra-bold { div { width: 10px; }}
+        &.thin {
+          div {
+            width: 2px;
+          }
+        }
+        &.light {
+          div {
+            width: 4px;
+          }
+        }
+        &.medium {
+          div {
+            width: 6px;
+          }
+        }
+        &.bold {
+          div {
+            width: 8px;
+          }
+        }
+        &.extra-bold {
+          div {
+            width: 10px;
+          }
+        }
       }
 
       .toolbar__color-picker {
@@ -262,9 +282,15 @@
           cursor: default;
         }
 
-        &.color-rainbow { background-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
-        &.color_tool_laser { background-image: radial-gradient(circle, white 0%, red 100%); }
-        &.color_tool_eraser { background-image: radial-gradient(circle, white 0%, dimgray 100%); }
+        &.color-rainbow {
+          background-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+        }
+        &.color_tool_laser {
+          background-image: radial-gradient(circle, white 0%, red 100%);
+        }
+        &.color_tool_eraser {
+          background-image: radial-gradient(circle, white 0%, dimgray 100%);
+        }
       }
 
       .toolbar__color-hint-wrapper {
@@ -285,15 +311,31 @@
           cursor: pointer;
           aspect-ratio: 1;
 
-          &.color-rainbow { background-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
-          &.color_tool_laser { background-image: radial-gradient(circle, white 0%, red 100%); }
-          &.color_tool_eraser { background-image: radial-gradient(circle, white 0%, dimgray 100%); }
+          &.color-rainbow {
+            background-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+          }
+          &.color_tool_laser {
+            background-image: radial-gradient(circle, white 0%, red 100%);
+          }
+          &.color_tool_eraser {
+            background-image: radial-gradient(circle, white 0%, dimgray 100%);
+          }
 
-          &.thin { width: 9px; }
-          &.light { width: 10px; }
-          &.medium { width: 11px; }
-          &.bold { width: 12px; }
-          &.extra-bold { width: 13px; }
+          &.thin {
+            width: 9px;
+          }
+          &.light {
+            width: 10px;
+          }
+          &.medium {
+            width: 11px;
+          }
+          &.bold {
+            width: 12px;
+          }
+          &.extra-bold {
+            width: 13px;
+          }
         }
       }
     }
@@ -515,16 +557,24 @@
   flex-direction: row-reverse;
   transform: translateX(calc(-100% + 80px));
 
-  .toolbar__slider { border-radius: 10px 0 0 10px; }
-  .toolbar__close { left: calc(100% - 85px); }
+  .toolbar__slider {
+    border-radius: 10px 0 0 10px;
+  }
+  .toolbar__close {
+    left: calc(100% - 85px);
+  }
 }
 
 #toolbar.toolbar--vertical.toolbar--reversed {
   flex-direction: column-reverse;
   transform: translateY(calc(-100% + var(--toolbar-icon-height)));
 
-  .toolbar__slider { border-radius: 10px 10px 0 0; }
-  .toolbar__close { top: calc(100% - var(--toolbar-icon-height) - 5px); }
+  .toolbar__slider {
+    border-radius: 10px 10px 0 0;
+  }
+  .toolbar__close {
+    top: calc(100% - var(--toolbar-icon-height) - 5px);
+  }
 }
 
 // Draw: 왼쪽 세로 막대 하나로 보이게 한다. 칸마다 있던 테두리를 걷고 막대 전체에 반경 14 · 그림자를 준다.
@@ -533,7 +583,9 @@
   color: var(--toolbar-icon-color);
   background-color: var(--toolbar-background-color);
   border-radius: 14px;
-  box-shadow: 0 0 0 0.5px var(--toolbar-border-color), 0 6px 24px rgba(0, 0, 0, 0.28);
+  box-shadow:
+    0 0 0 0.5px var(--toolbar-border-color),
+    0 6px 24px rgba(0, 0, 0, 0.28);
   font-family: var(--font-primary);
 
   .toolbar__close {
@@ -634,7 +686,7 @@
         &.active {
           border: 0;
           border-radius: 8px;
-          color: #FFFFFF;
+          color: #ffffff;
           background-color: var(--toolbar-accent-color);
         }
 
@@ -666,7 +718,7 @@
       }
 
       li.active .toolbar__color-picker {
-        box-shadow: 0 0 0 1.5px #FFFFFF;
+        box-shadow: 0 0 0 1.5px #ffffff;
       }
 
       .toolbar__color-hint-wrapper .toolbar__color-hint {

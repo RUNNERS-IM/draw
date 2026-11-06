@@ -1,6 +1,5 @@
-
 const FaMagicPencilAlt = ({ size, ...props }: { size?: number; [key: string]: any }) => {
-  const computedSize = size ?? "1em";
+  const computedSize = size ?? '1em'
 
   return (
     <svg
@@ -19,7 +18,7 @@ const FaMagicPencilAlt = ({ size, ...props }: { size?: number; [key: string]: an
       {/* ===== Magic stars from FaMagic ===== */}
       <path d="M224 96l16-32 32-16-32-16-16-32-16 32-32 16 32 16 16 32zM80 160l26.66-53.33L160 80l-53.34-26.67L80 0 53.34 53.33 0 80l53.34 26.67L80 160z" />
     </svg>
-  );
-};
+  )
+}
 
-export default FaMagicPencilAlt;
+export default FaMagicPencilAlt

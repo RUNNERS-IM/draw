@@ -62,7 +62,6 @@
     align-items: center;
     justify-content: center;
 
-
     &:hover {
       .whiteboard-resize-frame__snap-preview {
         border-color: var(--blue-500);
@@ -81,7 +80,9 @@
       border-radius: 5px;
       box-sizing: border-box;
 
-      transition: border-color 0.3s ease, background-color 0.3s ease;
+      transition:
+        border-color 0.3s ease,
+        background-color 0.3s ease;
 
       .whiteboard-resize-frame__snap-preview-fill {
         position: absolute;

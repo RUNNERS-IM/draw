@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
-import { IoCheckmark } from 'react-icons/io5';
-import { defaultColorPickerColors } from '../../app_page/components/constants';
-import './ColorPicker.scss';
+import { useEffect, useRef, useState } from 'react'
+import { IoCheckmark } from 'react-icons/io5'
+import { defaultColorPickerColors } from '../../app_page/components/constants'
+import './ColorPicker.scss'
 
-const DEFAULT_COLOR_PICKER_SHADE_INDEX = 3;
+const DEFAULT_COLOR_PICKER_SHADE_INDEX = 3
 
 const COLOR_PICKER_COLORS = [
   ['#F8F9FA', '#E9ECEF', '#CED4DA', '#868E96', '#343A40', '#212529'],
@@ -23,70 +23,79 @@ const COLOR_PICKER_COLORS = [
   ['#E7F5FF', '#A5D8FF', '#4DABF7', '#228BE6', '#1971C2', '#1864AB'],
   ['#EBFBEE', '#B2F2BB', '#69DB7C', '#40C057', '#2F9E44', '#2B8A3E'],
   ['#FFF9DB', '#FFEC99', '#FFD43B', '#FAB005', '#F08C00', '#E67700'],
-  ['#FFF4E6', '#FFD8A8', '#FFA94D', '#FD7E14', '#E8590C', '#D9480F'],
-];
+  ['#FFF4E6', '#FFD8A8', '#FFA94D', '#FD7E14', '#E8590C', '#D9480F']
+]
 
-const ColorSwatch = ({ color, isActive, onClick }: { color: string; isActive: boolean; onClick: (...args: any[]) => any }) => (
-  <div
-    className={`color-picker-swatch ${isActive ? 'active' : ''}`}
-    onClick={onClick}
-  >
-    <div
-      className="color-picker-swatch-color"
-      style={{ backgroundColor: color }}
-    />
+const ColorSwatch = ({
+  color,
+  isActive,
+  onClick
+}: {
+  color: string
+  isActive: boolean
+  onClick: (...args: any[]) => any
+}) => (
+  <div className={`color-picker-swatch ${isActive ? 'active' : ''}`} onClick={onClick}>
+    <div className="color-picker-swatch-color" style={{ backgroundColor: color }} />
   </div>
-);
+)
 
-const ColorPicker = ({ initialColor, onCancel, onSave }: { initialColor: string; onCancel: (...args: any[]) => any; onSave: (...args: any[]) => any }) => {
-  const pickerRef = useRef<any>(null);
-  const [draftColor, setDraftColor] = useState(initialColor);
+const ColorPicker = ({
+  initialColor,
+  onCancel,
+  onSave
+}: {
+  initialColor: string
+  onCancel: (...args: any[]) => any
+  onSave: (...args: any[]) => any
+}) => {
+  const pickerRef = useRef<any>(null)
+  const [draftColor, setDraftColor] = useState(initialColor)
 
-  const inputValue = draftColor.slice(1);
-  const isInputValid = /^[0-9A-F]{6}$/.test(inputValue);
-  const activeShades = COLOR_PICKER_COLORS.find((shades) => shades.includes(draftColor));
-  const activeShadeIndex = activeShades?.indexOf(draftColor);
+  const inputValue = draftColor.slice(1)
+  const isInputValid = /^[0-9A-F]{6}$/.test(inputValue)
+  const activeShades = COLOR_PICKER_COLORS.find((shades) => shades.includes(draftColor))
+  const activeShadeIndex = activeShades?.indexOf(draftColor)
 
   useEffect(() => {
     const handlePointerDown = (event: any) => {
       if (!pickerRef.current?.contains(event.target)) {
-        onCancel();
+        onCancel()
       }
-    };
+    }
 
     const handleKeyDown = (event: any) => {
       if (event.key === 'Escape') {
-        event.preventDefault();
-        onCancel();
+        event.preventDefault()
+        onCancel()
       }
-    };
+    }
 
-    document.addEventListener('mousedown', handlePointerDown);
-    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('mousedown', handlePointerDown)
+    document.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      document.removeEventListener('mousedown', handlePointerDown);
-      document.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [onCancel]);
+      document.removeEventListener('mousedown', handlePointerDown)
+      document.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [onCancel])
 
   const changeInput = (event: any) => {
-    const nextInput = event.target.value.toUpperCase();
+    const nextInput = event.target.value.toUpperCase()
 
-    setDraftColor(`#${nextInput}`);
-  };
+    setDraftColor(`#${nextInput}`)
+  }
 
   const saveColor = () => {
-    if (!isInputValid) return;
+    if (!isInputValid) {
+      return
+    }
 
-    onSave(draftColor);
-  };
+    onSave(draftColor)
+  }
 
   return (
-    <div
-      ref={pickerRef}
-      className="color-picker-popover"
-    >
+    <div ref={pickerRef} className="color-picker-popover">
       <div className="color-picker-section">
         <div className="color-picker-section-title">Defaults</div>
 
@@ -107,8 +116,8 @@ const ColorPicker = ({ initialColor, onCancel, onSave }: { initialColor: string;
 
         <div className="color-picker-grid">
           {COLOR_PICKER_COLORS.map((shades) => {
-            const displayedColor = shades[activeShadeIndex ?? DEFAULT_COLOR_PICKER_SHADE_INDEX];
-            const isActive = activeShades === shades;
+            const displayedColor = shades[activeShadeIndex ?? DEFAULT_COLOR_PICKER_SHADE_INDEX]
+            const isActive = activeShades === shades
 
             return (
               <ColorSwatch
@@ -117,7 +126,7 @@ const ColorPicker = ({ initialColor, onCancel, onSave }: { initialColor: string;
                 isActive={isActive}
                 onClick={() => setDraftColor(displayedColor)}
               />
-            );
+            )
           })}
         </div>
       </div>
@@ -137,9 +146,7 @@ const ColorPicker = ({ initialColor, onCancel, onSave }: { initialColor: string;
             ))}
           </div>
         ) : (
-          <div className="color-picker-empty-shades">
-            No shades available...
-          </div>
+          <div className="color-picker-empty-shades">No shades available...</div>
         )}
       </div>
 
@@ -149,12 +156,7 @@ const ColorPicker = ({ initialColor, onCancel, onSave }: { initialColor: string;
         <div className="color-picker-input-row">
           <div className="color-picker-input-wrapper">
             <span>#</span>
-            <input
-              value={inputValue}
-              maxLength={6}
-              spellCheck="false"
-              onChange={changeInput}
-            />
+            <input value={inputValue} maxLength={6} spellCheck="false" onChange={changeInput} />
           </div>
 
           <div
@@ -166,7 +168,7 @@ const ColorPicker = ({ initialColor, onCancel, onSave }: { initialColor: string;
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ColorPicker;
+export default ColorPicker

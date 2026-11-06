@@ -1,21 +1,26 @@
-import type { Callback } from '../types';
-import './ZoomBackground.scss';
+import type { Callback } from '../types'
+import './ZoomBackground.scss'
 
-import { zoomLevels } from '../constants';
+import { zoomLevels } from '../constants'
 
 const ZoomBackground = ({
   imageDataUrl,
   currentFocusPoint,
   currentZoomIndex,
-  onStartExitZoom,
-}: { imageDataUrl: string; currentFocusPoint: { x: number; y: number }; currentZoomIndex: number; onStartExitZoom: Callback }) => {
-  const zoom = zoomLevels[currentZoomIndex];
+  onStartExitZoom
+}: {
+  imageDataUrl: string
+  currentFocusPoint: { x: number; y: number }
+  currentZoomIndex: number
+  onStartExitZoom: Callback
+}) => {
+  const zoom = zoomLevels[currentZoomIndex]
 
   const handleHintClick = (event: any) => {
-    event.stopPropagation();
+    event.stopPropagation()
 
-    onStartExitZoom();
-  };
+    onStartExitZoom()
+  }
 
   return (
     <div id="zoom_background">
@@ -25,7 +30,7 @@ const ZoomBackground = ({
         style={{
           '--background-zoom': zoom,
           '--cursor-x': `${currentFocusPoint.x}px`,
-          '--cursor-y': `${currentFocusPoint.y}px`,
+          '--cursor-y': `${currentFocusPoint.y}px`
         }}
       />
 
@@ -39,7 +44,7 @@ const ZoomBackground = ({
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ZoomBackground;
+export default ZoomBackground

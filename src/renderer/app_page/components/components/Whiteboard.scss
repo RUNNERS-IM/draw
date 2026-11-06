@@ -4,17 +4,17 @@
   --pattern-size: 40px;
   --pattern-offset: -1px;
 
-  --whiteboard-theme-white: #F5FAFF;
-  --whiteboard-theme-cream: #FFF8E7;
-  --whiteboard-theme-blue: #EAF3FF;
-  --whiteboard-theme-slate: #1E293B;
+  --whiteboard-theme-white: #f5faff;
+  --whiteboard-theme-cream: #fff8e7;
+  --whiteboard-theme-blue: #eaf3ff;
+  --whiteboard-theme-slate: #1e293b;
   --whiteboard-theme-black: #282828;
 
-  --whiteboard-pattern-white: #9D9D9D;
-  --whiteboard-pattern-cream: #BFA47A;
-  --whiteboard-pattern-blue: #7EAEEF;
-  --whiteboard-pattern-slate: #94A3B8;
-  --whiteboard-pattern-black: #9D9D9D;
+  --whiteboard-pattern-white: #9d9d9d;
+  --whiteboard-pattern-cream: #bfa47a;
+  --whiteboard-pattern-blue: #7eaeef;
+  --whiteboard-pattern-slate: #94a3b8;
+  --whiteboard-pattern-black: #9d9d9d;
 }
 
 @mixin whiteboard-plain-pattern {
@@ -34,15 +34,16 @@
 }
 
 @mixin whiteboard-grid-pattern($color, $size, $position: 0 0) {
-  background-image: linear-gradient($color 1px, transparent 1px),
-                    linear-gradient(90deg, $color 1px, transparent 1px);
+  background-image:
+    linear-gradient($color 1px, transparent 1px),
+    linear-gradient(90deg, $color 1px, transparent 1px);
   background-size: $size $size;
   background-position: $position;
 }
 
 @mixin whiteboard-polka-pattern($color, $size, $first-position, $second-position) {
-  background-image: radial-gradient($color 1px, transparent 1px),
-                    radial-gradient($color 1px, transparent 1px);
+  background-image:
+    radial-gradient($color 1px, transparent 1px), radial-gradient($color 1px, transparent 1px);
   background-size: $size $size;
   background-position: $first-position, $second-position;
 }
@@ -108,8 +109,9 @@
     border-radius: 10px;
     pointer-events: auto;
 
-    transition: color 0.3s ease,
-                background-color 0.3s ease;
+    transition:
+      color 0.3s ease,
+      background-color 0.3s ease;
 
     &:hover {
       background-color: color-mix(in srgb, var(--gray-500) 20%, transparent);
@@ -158,7 +160,11 @@
 
 #whiteboard {
   .whiteboard-background {
-    background-color: color-mix(in srgb, var(--whiteboard-bg-color) var(--whiteboard-opacity), transparent);
+    background-color: color-mix(
+      in srgb,
+      var(--whiteboard-bg-color) var(--whiteboard-opacity),
+      transparent
+    );
     background-size: var(--pattern-size) var(--pattern-size);
 
     &.whiteboard-theme--white {
@@ -194,7 +200,8 @@
       @include whiteboard-dots-pattern(
         var(--whiteboard-pattern-color),
         var(--pattern-size),
-        calc(var(--pattern-size) / 2 + var(--pattern-offset)) calc(var(--pattern-size) / 2 + var(--pattern-offset))
+        calc(var(--pattern-size) / 2 + var(--pattern-offset))
+          calc(var(--pattern-size) / 2 + var(--pattern-offset))
       );
     }
 
@@ -219,7 +226,8 @@
         var(--whiteboard-pattern-color),
         calc(var(--pattern-size) * 2),
         var(--pattern-offset) var(--pattern-offset),
-        calc(var(--pattern-size) + var(--pattern-offset)) calc(var(--pattern-size) + var(--pattern-offset))
+        calc(var(--pattern-size) + var(--pattern-offset))
+          calc(var(--pattern-size) + var(--pattern-offset))
       );
     }
   }

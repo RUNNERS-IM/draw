@@ -1,47 +1,46 @@
-import type { ComponentType } from 'react';
-import type { Callback, ColorOption, Figure } from '../types';
-import { useCallback, useLayoutEffect, useRef, useState } from 'react';
-import './FigureToolbar.scss';
-import { MdRoundedCorner } from 'react-icons/md';
-import MdSharpCorner from './icons/MdSharpCorner';
-import { TbLineDashed, TbLineDotted, TbMinus } from 'react-icons/tb';
-import { toolbarViewportMargin, widthList } from '../constants';
-import { t } from '../../../../shared/i18n';
+import type { ComponentType } from 'react'
+import type { Callback, ColorOption, Figure } from '../types'
+import { useCallback, useLayoutEffect, useRef, useState } from 'react'
+import './FigureToolbar.scss'
+import { MdRoundedCorner } from 'react-icons/md'
+import MdSharpCorner from './icons/MdSharpCorner'
+import { TbLineDashed, TbLineDotted, TbMinus } from 'react-icons/tb'
+import { toolbarViewportMargin, widthList } from '../constants'
+import { t } from '../../../../shared/i18n'
 
-const strokeStyleFigureTypes = ['flat_arrow', 'rectangle', 'diamond', 'oval', 'line'];
-const edgeStyleFigureTypes = ['rectangle', 'diamond'];
+const strokeStyleFigureTypes = ['flat_arrow', 'rectangle', 'diamond', 'oval', 'line']
+const edgeStyleFigureTypes = ['rectangle', 'diamond']
 
 const clamp = (value: any, min: number, max: number) => {
-  return Math.min(
-    Math.max(value, min),
-    Math.max(min, max),
-  );
-};
+  return Math.min(Math.max(value, min), Math.max(min, max))
+}
 
 const getFigureBounds = (figure: Figure) => {
   if (figure.type === 'text') {
-    const [x, y] = figure.points[0];
+    const [x, y] = figure.points[0]
 
     return {
-      left:   x,
-      top:    y,
-      right:  x + figure.width * figure.scale,
-      bottom: y + figure.height * figure.scale,
-    };
+      left: x,
+      top: y,
+      right: x + figure.width * figure.scale,
+      bottom: y + figure.height * figure.scale
+    }
   }
 
-  const { points: [pointA, pointB] } = figure;
+  const {
+    points: [pointA, pointB]
+  } = figure
 
-  const [startX, startY] = pointA;
-  const [endX, endY] = pointB;
+  const [startX, startY] = pointA
+  const [endX, endY] = pointB
 
   return {
-    left:   Math.min(startX, endX),
-    top:    Math.min(startY, endY),
-    right:  Math.max(startX, endX),
-    bottom: Math.max(startY, endY),
-  };
-};
+    left: Math.min(startX, endX),
+    top: Math.min(startY, endY),
+    right: Math.max(startX, endX),
+    bottom: Math.max(startY, endY)
+  }
+}
 
 const FigureToolbar = ({
   figure,
@@ -51,97 +50,108 @@ const FigureToolbar = ({
   onChangeStroke,
   onChangeEdges,
   onDelete,
-  Icons,
-}: { figure: Figure; colorList: ColorOption[]; onChangeColor: Callback; onChangeWidth: Callback; onChangeStroke: Callback; onChangeEdges: Callback; onDelete: Callback; Icons: Record<string, ComponentType<any>> }) => {
-  const figureType        = figure.type;
-  const figureColorIndex  = figure.colorIndex;
-  const figureWidthIndex  = figure.widthIndex;
-  const figureEdgeIndex   = figure.edgeIndex ?? 1;
-  const figureStrokeIndex = figure.strokeIndex ?? 0;
+  Icons
+}: {
+  figure: Figure
+  colorList: ColorOption[]
+  onChangeColor: Callback
+  onChangeWidth: Callback
+  onChangeStroke: Callback
+  onChangeEdges: Callback
+  onDelete: Callback
+  Icons: Record<string, ComponentType<any>>
+}) => {
+  const figureType = figure.type
+  const figureColorIndex = figure.colorIndex
+  const figureWidthIndex = figure.widthIndex
+  const figureEdgeIndex = figure.edgeIndex ?? 1
+  const figureStrokeIndex = figure.strokeIndex ?? 0
 
-  const figureHasEdgeStyle   = edgeStyleFigureTypes.includes(figureType);
-  const figureHasStrokeStyle = strokeStyleFigureTypes.includes(figureType);
+  const figureHasEdgeStyle = edgeStyleFigureTypes.includes(figureType)
+  const figureHasStrokeStyle = strokeStyleFigureTypes.includes(figureType)
 
-  const [openMenu, setOpenMenu] = useState<any>(null);
-  const [position, setPosition] = useState({ left: 0, top: 0, placement: 'bottom' });
+  const [openMenu, setOpenMenu] = useState<any>(null)
+  const [position, setPosition] = useState({ left: 0, top: 0, placement: 'bottom' })
 
-  const toolbarRef = useRef<any>(null);
+  const toolbarRef = useRef<any>(null)
 
   const updatePosition = useCallback(() => {
-    const toolbarElement = toolbarRef.current;
-    if (!toolbarElement) return;
+    const toolbarElement = toolbarRef.current
+    if (!toolbarElement) {
+      return
+    }
 
-    const figureGap = 16;
-    const toolbarHeight = 36;
-    const submenuHeight = 32; // 36 - 4 (overlap)
+    const figureGap = 16
+    const toolbarHeight = 36
+    const submenuHeight = 32 // 36 - 4 (overlap)
 
-    const toolbarWidth = toolbarElement.offsetWidth;
-    const figureBounds = getFigureBounds(figure);
+    const toolbarWidth = toolbarElement.offsetWidth
+    const figureBounds = getFigureBounds(figure)
 
-    const topBoundary = toolbarViewportMargin;
-    const bottomBoundary = window.innerHeight - toolbarViewportMargin;
+    const topBoundary = toolbarViewportMargin
+    const bottomBoundary = window.innerHeight - toolbarViewportMargin
 
-    const topBelowFigure = figureBounds.bottom + figureGap;
-    const topAboveFigure = figureBounds.top - figureGap - toolbarHeight;
+    const topBelowFigure = figureBounds.bottom + figureGap
+    const topAboveFigure = figureBounds.top - figureGap - toolbarHeight
 
-    const canFitBelow = topBelowFigure + toolbarHeight + submenuHeight <= bottomBoundary;
-    const canFitAbove = topAboveFigure - submenuHeight >= topBoundary;
+    const canFitBelow = topBelowFigure + toolbarHeight + submenuHeight <= bottomBoundary
+    const canFitAbove = topAboveFigure - submenuHeight >= topBoundary
 
-    let placement;
+    let placement
 
     if (canFitBelow) {
-      placement = 'bottom';
+      placement = 'bottom'
     } else if (canFitAbove) {
-      placement = 'top';
+      placement = 'top'
     } else {
-      placement = 'middle';
+      placement = 'middle'
     }
 
-    let preferredTop;
-    let minTop;
-    let maxTop;
+    let preferredTop
+    let minTop
+    let maxTop
 
     if (placement === 'bottom') {
-      minTop = topBoundary;
-      maxTop = bottomBoundary - toolbarHeight - submenuHeight;
+      minTop = topBoundary
+      maxTop = bottomBoundary - toolbarHeight - submenuHeight
 
-      preferredTop = topBelowFigure;
+      preferredTop = topBelowFigure
     } else if (placement === 'top') {
-      minTop = topBoundary + submenuHeight;
-      maxTop = bottomBoundary - toolbarHeight;
+      minTop = topBoundary + submenuHeight
+      maxTop = bottomBoundary - toolbarHeight
 
-      preferredTop = topAboveFigure;
+      preferredTop = topAboveFigure
     } else {
-      preferredTop = figureBounds.bottom - figureGap - toolbarHeight;
+      preferredTop = figureBounds.bottom - figureGap - toolbarHeight
 
-      minTop = topBoundary;
-      maxTop = bottomBoundary - toolbarHeight - submenuHeight;
+      minTop = topBoundary
+      maxTop = bottomBoundary - toolbarHeight - submenuHeight
     }
 
-    const clampedTop = clamp(preferredTop, minTop, maxTop);
+    const clampedTop = clamp(preferredTop, minTop, maxTop)
 
-    const figureCenterX = (figureBounds.left + figureBounds.right) / 2;
-    const centeredLeft = figureCenterX - toolbarWidth / 2;
+    const figureCenterX = (figureBounds.left + figureBounds.right) / 2
+    const centeredLeft = figureCenterX - toolbarWidth / 2
 
-    const minLeft = toolbarViewportMargin;
-    const maxLeft = window.innerWidth - toolbarViewportMargin - toolbarWidth;
+    const minLeft = toolbarViewportMargin
+    const maxLeft = window.innerWidth - toolbarViewportMargin - toolbarWidth
 
-    const clampedLeft = clamp(centeredLeft, minLeft, maxLeft);
+    const clampedLeft = clamp(centeredLeft, minLeft, maxLeft)
 
     setPosition({
       top: clampedTop,
       left: clampedLeft,
-      placement: placement,
-    });
-  }, [figure]);
+      placement: placement
+    })
+  }, [figure])
 
   useLayoutEffect(() => {
-    updatePosition();
-  }, [updatePosition]);
+    updatePosition()
+  }, [updatePosition])
 
   const toggleMenu = (menuName: string) => {
-    setOpenMenu((currentMenu: any) => currentMenu === menuName ? null : menuName);
-  };
+    setOpenMenu((currentMenu: any) => (currentMenu === menuName ? null : menuName))
+  }
 
   const renderColorSubmenu = () => {
     return (
@@ -158,8 +168,8 @@ const FigureToolbar = ({
           </div>
         ))}
       </div>
-    );
-  };
+    )
+  }
 
   const renderWidthSubmenu = () => {
     return (
@@ -177,8 +187,8 @@ const FigureToolbar = ({
           </div>
         ))}
       </div>
-    );
-  };
+    )
+  }
 
   const renderEdgesSubmenu = () => {
     return (
@@ -195,8 +205,8 @@ const FigureToolbar = ({
           </button>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   const renderStrokeSubmenu = () => {
     return (
@@ -219,20 +229,21 @@ const FigureToolbar = ({
           </button>
         </div>
       </div>
-    );
-  };
+    )
+  }
 
   return (
     <div
       id="figure-toolbar"
       ref={toolbarRef}
-        className={[
-          position.placement === 'top' && 'above-figure',
-          openMenu && 'submenu-open',
-        ].filter(Boolean).join(' ')}
+      className={[position.placement === 'top' && 'above-figure', openMenu && 'submenu-open']
+        .filter(Boolean)
+        .join(' ')}
       style={{ left: position.left, top: position.top }}
     >
-      <div className={`figure-sub-item figure-sub-item--toolbar-centered ${openMenu === 'color' ? 'active' : ''}`}>
+      <div
+        className={`figure-sub-item figure-sub-item--toolbar-centered ${openMenu === 'color' ? 'active' : ''}`}
+      >
         <button
           tabIndex={-1}
           className={`toolbar__color-picker ${colorList[figureColorIndex].isRainbow ? 'color-rainbow' : ''}`}
@@ -257,40 +268,28 @@ const FigureToolbar = ({
         {openMenu === 'width' && renderWidthSubmenu()}
       </div>
 
-      {
-        figureHasEdgeStyle && (
-          <div className={`figure-sub-item ${openMenu === 'edges' ? 'active' : ''}`}>
-            <button
-              tabIndex={-1}
-              title={t('figure.edges')}
-              onClick={() => toggleMenu('edges')}
-            >
-              {figureEdgeIndex === 0 && <MdSharpCorner />}
-              {figureEdgeIndex === 1 && <MdRoundedCorner />}
-            </button>
+      {figureHasEdgeStyle && (
+        <div className={`figure-sub-item ${openMenu === 'edges' ? 'active' : ''}`}>
+          <button tabIndex={-1} title={t('figure.edges')} onClick={() => toggleMenu('edges')}>
+            {figureEdgeIndex === 0 && <MdSharpCorner />}
+            {figureEdgeIndex === 1 && <MdRoundedCorner />}
+          </button>
 
-            {openMenu === 'edges' && renderEdgesSubmenu()}
-          </div>
-        )
-      }
+          {openMenu === 'edges' && renderEdgesSubmenu()}
+        </div>
+      )}
 
-      {
-        figureHasStrokeStyle && (
-          <div className={`figure-sub-item ${openMenu === 'stroke' ? 'active' : ''}`}>
-            <button
-              tabIndex={-1}
-              title={t('figure.stroke')}
-              onClick={() => toggleMenu('stroke')}
-            >
-              {figureStrokeIndex === 0 && <TbMinus />}
-              {figureStrokeIndex === 1 && <TbLineDashed />}
-              {figureStrokeIndex === 2 && <TbLineDotted />}
-            </button>
+      {figureHasStrokeStyle && (
+        <div className={`figure-sub-item ${openMenu === 'stroke' ? 'active' : ''}`}>
+          <button tabIndex={-1} title={t('figure.stroke')} onClick={() => toggleMenu('stroke')}>
+            {figureStrokeIndex === 0 && <TbMinus />}
+            {figureStrokeIndex === 1 && <TbLineDashed />}
+            {figureStrokeIndex === 2 && <TbLineDotted />}
+          </button>
 
-            {openMenu === 'stroke' && renderStrokeSubmenu()}
-          </div>
-        )
-      }
+          {openMenu === 'stroke' && renderStrokeSubmenu()}
+        </div>
+      )}
 
       <div className="figure-sub-cross-line" />
 
@@ -305,7 +304,7 @@ const FigureToolbar = ({
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FigureToolbar;
+export default FigureToolbar

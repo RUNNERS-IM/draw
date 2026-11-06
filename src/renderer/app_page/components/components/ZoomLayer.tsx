@@ -1,11 +1,11 @@
-import type { Callback } from '../types';
-import './ZoomLayer.scss';
+import type { Callback } from '../types'
+import './ZoomLayer.scss'
 
-import { useCallback, useEffect, useRef, useState } from 'react';
-import { zoomLevels } from '../constants';
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { zoomLevels } from '../constants'
 
-const maxZoomIndex = zoomLevels.length - 1;
-const minZoomIndex = 0;
+const maxZoomIndex = zoomLevels.length - 1
+const minZoomIndex = 0
 
 const ZoomLayer = ({
   imageDataUrl,
@@ -18,117 +18,153 @@ const ZoomLayer = ({
   onExitZoom,
   onStartExitZoom,
   onLockZoom,
-  onResumeZoomEnd,
-}: { imageDataUrl: string; currentFocusPoint: { x: number; y: number }; resumeFocusPoint: { x: number; y: number }; currentZoomIndex: number; animateEntry: boolean; isResuming: boolean; isExiting: boolean; onExitZoom: Callback; onStartExitZoom: Callback; onLockZoom: Callback; onResumeZoomEnd: Callback }) => {
-  const [zoomIndex, setZoomIndex] = useState(currentZoomIndex);
-  const [focusPoint, setFocusPoint] = useState(resumeFocusPoint || currentFocusPoint);
+  onResumeZoomEnd
+}: {
+  imageDataUrl: string
+  currentFocusPoint: { x: number; y: number }
+  resumeFocusPoint: { x: number; y: number }
+  currentZoomIndex: number
+  animateEntry: boolean
+  isResuming: boolean
+  isExiting: boolean
+  onExitZoom: Callback
+  onStartExitZoom: Callback
+  onLockZoom: Callback
+  onResumeZoomEnd: Callback
+}) => {
+  const [zoomIndex, setZoomIndex] = useState(currentZoomIndex)
+  const [focusPoint, setFocusPoint] = useState(resumeFocusPoint || currentFocusPoint)
 
-  const lastWheelAtRef = useRef(0);
+  const lastWheelAtRef = useRef(0)
 
   const zoomIn = useCallback(() => {
-    if (zoomIndex === maxZoomIndex) return;
+    if (zoomIndex === maxZoomIndex) {
+      return
+    }
 
-    setZoomIndex((currentIndex: number) => Math.min(currentIndex + 1, maxZoomIndex));
-  }, [zoomIndex]);
+    setZoomIndex((currentIndex: number) => Math.min(currentIndex + 1, maxZoomIndex))
+  }, [zoomIndex])
 
   const zoomOut = useCallback(() => {
-    if (zoomIndex === minZoomIndex) return;
-
-    setZoomIndex((currentIndex: number) => Math.max(currentIndex - 1, minZoomIndex));
-  }, [zoomIndex]);
-
-  const handleKeyDown = useCallback((event: any) => {
-    if (isExiting) return;
-
-    if (event.key === 'Escape') {
-      event.preventDefault();
-      onStartExitZoom();
-      return;
+    if (zoomIndex === minZoomIndex) {
+      return
     }
 
-    if (event.key === 'ArrowUp' || event.key === '+') {
-      event.preventDefault();
-      zoomIn();
-      return;
-    }
+    setZoomIndex((currentIndex: number) => Math.max(currentIndex - 1, minZoomIndex))
+  }, [zoomIndex])
 
-    if (event.key === 'ArrowDown' || event.key === '-') {
-      event.preventDefault();
-      zoomOut();
-      return;
-    }
-  }, [isExiting, onStartExitZoom, zoomIn, zoomOut]);
+  const handleKeyDown = useCallback(
+    (event: any) => {
+      if (isExiting) {
+        return
+      }
+
+      if (event.key === 'Escape') {
+        event.preventDefault()
+        onStartExitZoom()
+        return
+      }
+
+      if (event.key === 'ArrowUp' || event.key === '+') {
+        event.preventDefault()
+        zoomIn()
+        return
+      }
+
+      if (event.key === 'ArrowDown' || event.key === '-') {
+        event.preventDefault()
+        zoomOut()
+      }
+    },
+    [isExiting, onStartExitZoom, zoomIn, zoomOut]
+  )
 
   useEffect(() => {
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', handleKeyDown)
 
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [handleKeyDown]);
+      window.removeEventListener('keydown', handleKeyDown)
+    }
+  }, [handleKeyDown])
 
   const handlePointerMove = (event: any) => {
-    if (isExiting) return;
+    if (isExiting) {
+      return
+    }
 
-    setFocusPoint({ x: event.clientX, y: event.clientY });
-  };
+    setFocusPoint({ x: event.clientX, y: event.clientY })
+  }
 
   const handleClick = () => {
-    if (isExiting) return;
-    if (isResuming) return;
+    if (isExiting) {
+      return
+    }
+    if (isResuming) {
+      return
+    }
 
     onLockZoom({
       zoomIndex: zoomIndex,
       focusPoint: {
         x: focusPoint.x,
-        y: focusPoint.y,
-      },
-    });
-  };
+        y: focusPoint.y
+      }
+    })
+  }
 
   const handleWheel = (event: any) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    if (isExiting) return;
-    if (event.deltaY === 0) return;
+    if (isExiting) {
+      return
+    }
+    if (event.deltaY === 0) {
+      return
+    }
 
-    const now = Date.now();
+    const now = Date.now()
 
-    if (now - lastWheelAtRef.current < 100) return;
-    lastWheelAtRef.current = now;
+    if (now - lastWheelAtRef.current < 100) {
+      return
+    }
+    lastWheelAtRef.current = now
 
     if (event.deltaY < 0) {
-      zoomIn();
+      zoomIn()
     } else {
-      zoomOut();
+      zoomOut()
     }
-  };
+  }
 
   const handleContextMenu = (event: any) => {
-    event.preventDefault();
+    event.preventDefault()
 
-    if (isExiting) return;
+    if (isExiting) {
+      return
+    }
 
-    onStartExitZoom();
-  };
+    onStartExitZoom()
+  }
 
   const handleHintClick = (event: any) => {
-    event.stopPropagation();
+    event.stopPropagation()
 
-    onStartExitZoom();
-  };
+    onStartExitZoom()
+  }
 
   const handleZoomTransitionEnd = () => {
-    if (!isExiting) return;
+    if (!isExiting) {
+      return
+    }
 
-    onExitZoom();
-  };
+    onExitZoom()
+  }
 
   const handleResumeAnimationEnd = () => {
-    onResumeZoomEnd();
-  };
+    onResumeZoomEnd()
+  }
 
-  const zoom = zoomLevels[zoomIndex];
+  const zoom = zoomLevels[zoomIndex]
 
   return (
     <div
@@ -149,7 +185,7 @@ const ZoomLayer = ({
           '--starting-cursor-x': `${currentFocusPoint.x}px`,
           '--starting-cursor-y': `${currentFocusPoint.y}px`,
           '--cursor-x': `${focusPoint.x}px`,
-          '--cursor-y': `${focusPoint.y}px`,
+          '--cursor-y': `${focusPoint.y}px`
         }}
       />
 
@@ -165,7 +201,7 @@ const ZoomLayer = ({
         </div>
       )}
     </div>
-  );
-};
+  )
+}
 
-export default ZoomLayer;
+export default ZoomLayer

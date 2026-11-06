@@ -1,9 +1,10 @@
 {
   "name": "draw",
-  "productName": "Draw",
   "version": "2.6.1106",
+  "private": true,
   "description": "Draw on your screen while you present, by RUNNERS",
-  "appId": "im.runners.draw",
+  "homepage": "https://runners.im/draw",
+  "license": "MIT",
   "author": {
     "name": "RUNNERS",
     "email": "sun@runners.im"
@@ -12,20 +13,30 @@
     "type": "git",
     "url": "https://github.com/RUNNERS-IM/draw"
   },
-  "private": true,
-  "license": "MIT",
-  "engines": {
-    "node": ">=24 <25"
-  },
   "main": "./out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
     "build": "pnpm check:account && electron-vite build",
     "test": "vitest run",
     "typecheck": "tsc --noEmit -p tsconfig.json",
+    "lint": "oxlint",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
     "check:account": "node src/runners-account/check.mjs",
     "notices": "node scripts/third-party-notices.mjs",
     "dist": "pnpm build && electron-builder --config electron-builder.config.cjs"
+  },
+  "dependencies": {
+    "electron-store": "^11.0.2",
+    "electron-updater": "^6.8.10",
+    "lazy-brush": "^2.0.2",
+    "lodash": "^4.18.1",
+    "lucide-react": "^1.69.0",
+    "ntcjs": "^1.1.3",
+    "perfect-freehand": "^1.2.3",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-icons": "5.7.0"
   },
   "devDependencies": {
     "@types/lodash": "^4.17.27",
@@ -43,18 +54,10 @@
     "vite": "^8.3.6",
     "vitest": "5.0.5"
   },
-  "dependencies": {
-    "electron-store": "^11.0.2",
-    "electron-updater": "^6.8.10",
-    "lazy-brush": "^2.0.2",
-    "lodash": "^4.18.1",
-    "lucide-react": "^1.69.0",
-    "ntcjs": "^1.1.3",
-    "perfect-freehand": "^1.2.3",
-    "react": "19.2.8",
-    "react-dom": "19.2.8",
-    "react-icons": "5.7.0"
+  "engines": {
+    "node": ">=24 <25"
   },
-  "homepage": "https://runners.im/draw",
-  "packageManager": "pnpm@12.14.0"
+  "packageManager": "pnpm@12.14.0",
+  "appId": "im.runners.draw",
+  "productName": "Draw"
 }

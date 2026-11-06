@@ -1,9 +1,9 @@
-import type { Callback, ColorOption, Figure, FigureInfo } from '../types';
-import './DrawDesk.scss';
+import type { Callback, ColorOption, Figure, FigureInfo } from '../types'
+import './DrawDesk.scss'
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react'
 import { palmMinContactArea, palmMinContactLength } from '../constants'
-import { getMouseCoordinates } from '../utils/general';
+import { getMouseCoordinates } from '../utils/general'
 import {
   drawPen,
   drawRainbowPen,
@@ -23,8 +23,8 @@ import {
   drawOvalActive,
   drawLaser,
   drawEraserTail,
-  drawText,
-} from './drawer/figures';
+  drawText
+} from './drawer/figures'
 
 const DrawDesk = ({
   allFigures,
@@ -41,51 +41,90 @@ const DrawDesk = ({
   updateRainbowColorDeg,
   activeTool,
   handleChangeTool,
-  colorList,
-}: { allFigures: Figure[]; allFadeFigures: Figure[]; allLaserFigures: Figure[]; allEraserFigures: Figure[]; fadeOpacity: number; activeFigureInfo: FigureInfo; cursorType: string; handleMouseDown: Callback; handleMouseMove: Callback; handleMouseUp: Callback; handleDoubleClick: Callback; updateRainbowColorDeg: Callback; activeTool: string; handleChangeTool: Callback; colorList: ColorOption[] }) => {
+  colorList
+}: {
+  allFigures: Figure[]
+  allFadeFigures: Figure[]
+  allLaserFigures: Figure[]
+  allEraserFigures: Figure[]
+  fadeOpacity: number
+  activeFigureInfo: FigureInfo
+  cursorType: string
+  handleMouseDown: Callback
+  handleMouseMove: Callback
+  handleMouseUp: Callback
+  handleDoubleClick: Callback
+  updateRainbowColorDeg: Callback
+  activeTool: string
+  handleChangeTool: Callback
+  colorList: ColorOption[]
+}) => {
+  const canvasRef = useRef<any>(null)
+  const offscreenCanvasRef = useRef<any>(null)
 
-  const canvasRef = useRef<any>(null);
-  const offscreenCanvasRef = useRef<any>(null);
+  const prevToolRef = useRef<any>(null)
+  const simulateKeyDown = useRef(false)
 
-  const prevToolRef = useRef<any>(null);
-  const simulateKeyDown = useRef(false);
-
-  const dpr = window.devicePixelRatio || 1;
+  const dpr = window.devicePixelRatio || 1
 
   useEffect(() => {
     // Main canvas layer setup
-    const canvas = canvasRef.current;
-    const ctx = canvas.getContext('2d');
+    const canvas = canvasRef.current
+    const ctx = canvas.getContext('2d')
 
-    canvas.width = Math.floor(window.innerWidth * dpr);
-    canvas.height = Math.floor(window.innerHeight * dpr);
+    canvas.width = Math.floor(window.innerWidth * dpr)
+    canvas.height = Math.floor(window.innerHeight * dpr)
 
-    ctx.scale(dpr, dpr);
+    ctx.scale(dpr, dpr)
 
-    canvas.style.width = `${window.innerWidth}px`;
-    canvas.style.height = `${window.innerHeight}px`;
+    canvas.style.width = `${window.innerWidth}px`
+    canvas.style.height = `${window.innerHeight}px`
 
     // Offscreen canvas layer setup
     if (!offscreenCanvasRef.current) {
-      offscreenCanvasRef.current = document.createElement('canvas');
+      offscreenCanvasRef.current = document.createElement('canvas')
     }
 
-    const offscreenCanvas = offscreenCanvasRef.current;
-    const offCtx = offscreenCanvas.getContext('2d');
+    const offscreenCanvas = offscreenCanvasRef.current
+    const offCtx = offscreenCanvas.getContext('2d')
 
-    offscreenCanvas.width = canvas.width;
-    offscreenCanvas.height = canvas.height;
+    offscreenCanvas.width = canvas.width
+    offscreenCanvas.height = canvas.height
 
-    offCtx.scale(dpr, dpr);
-  }, []);
+    offCtx.scale(dpr, dpr)
+  }, [])
 
   useEffect(() => {
-    draw(allFigures, allFadeFigures, allLaserFigures, allEraserFigures, activeFigureInfo, fadeOpacity, offscreenCanvasRef.current);
-  }, [allFigures, allFadeFigures, allLaserFigures, allEraserFigures, activeFigureInfo, fadeOpacity, colorList]);
+    draw(
+      allFigures,
+      allFadeFigures,
+      allLaserFigures,
+      allEraserFigures,
+      activeFigureInfo,
+      fadeOpacity,
+      offscreenCanvasRef.current
+    )
+  }, [
+    allFigures,
+    allFadeFigures,
+    allLaserFigures,
+    allEraserFigures,
+    activeFigureInfo,
+    fadeOpacity,
+    colorList
+  ])
 
-  const draw = (allFigures: Figure[], allFadeFigures: Figure[], allLaserFigures: Figure[], allEraserFigures: Figure[], activeFigureInfo: FigureInfo, fadeOpacity: number, offscreenCanvas: HTMLCanvasElement) => {
-    const ctx = canvasRef.current.getContext('2d');
-    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
+  const draw = (
+    allFigures: Figure[],
+    allFadeFigures: Figure[],
+    allLaserFigures: Figure[],
+    allEraserFigures: Figure[],
+    activeFigureInfo: FigureInfo,
+    fadeOpacity: number,
+    offscreenCanvas: HTMLCanvasElement
+  ) => {
+    const ctx = canvasRef.current.getContext('2d')
+    ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height)
 
     allFigures.forEach((figure: Figure) => {
       if (['brush', 'pen'].includes(figure.type)) {
@@ -153,12 +192,12 @@ const DrawDesk = ({
       }
 
       if (figure.type === 'text') {
-        let isActive = false;
-        let dotName = null;
+        let isActive = false
+        let dotName = null
 
         if (activeFigureInfo && figure.id === activeFigureInfo.id) {
-          isActive = true;
-          dotName = activeFigureInfo.hoveredDotName;
+          isActive = true
+          dotName = activeFigureInfo.hoveredDotName
         }
 
         drawText(ctx, figure, updateRainbowColorDeg, isActive, dotName, colorList)
@@ -182,75 +221,79 @@ const DrawDesk = ({
     allEraserFigures.forEach((figure: Figure) => {
       drawEraserTail(ctx, figure)
     })
-  };
+  }
 
   const isTemporaryEraser = (event: any) => {
-    const contactLength = Math.max(event.width, event.height);
-    const contactArea = event.width * event.height;
-    const isPalm = contactLength >= palmMinContactLength && contactArea >= palmMinContactArea;
+    const contactLength = Math.max(event.width, event.height)
+    const contactArea = event.width * event.height
+    const isPalm = contactLength >= palmMinContactLength && contactArea >= palmMinContactArea
 
-    return (event.pointerType === 'pen' && event.button === 5) ||
-           (event.pointerType === 'mouse' && event.button === 1) ||
-           (event.pointerType === 'touch' && isPalm);
+    return (
+      (event.pointerType === 'pen' && event.button === 5) ||
+      (event.pointerType === 'mouse' && event.button === 1) ||
+      (event.pointerType === 'touch' && isPalm)
+    )
   }
 
   const onPointerDown = (event: any) => {
-    event.preventDefault(); // NOTE: Required for Text figure
+    event.preventDefault() // NOTE: Required for Text figure
 
-    if(event.pointerType === 'mouse' && event.button === 2) return;
-
-    if (isTemporaryEraser(event) && activeTool !== 'eraser') {
-      // Hard Trick! Rethink!
-      prevToolRef.current = activeTool;
-      simulateKeyDown.current = true;
-
-      handleChangeTool('eraser');
+    if (event.pointerType === 'mouse' && event.button === 2) {
       return
     }
 
-    event.currentTarget.setPointerCapture(event.pointerId);
+    if (isTemporaryEraser(event) && activeTool !== 'eraser') {
+      // Hard Trick! Rethink!
+      prevToolRef.current = activeTool
+      simulateKeyDown.current = true
+
+      handleChangeTool('eraser')
+      return
+    }
+
+    event.currentTarget.setPointerCapture(event.pointerId)
 
     const coordinates = getMouseCoordinates(event)
-    handleMouseDown(coordinates);
+    handleMouseDown(coordinates)
   }
 
   const onPointerMove = (event: any) => {
     if (simulateKeyDown.current && activeTool === 'eraser') {
-      simulateKeyDown.current = false;
+      simulateKeyDown.current = false
 
-      event.currentTarget.setPointerCapture(event.pointerId);
+      event.currentTarget.setPointerCapture(event.pointerId)
 
       const coordinates = getMouseCoordinates(event)
-      handleMouseDown(coordinates);
+      handleMouseDown(coordinates)
 
-      return;
+      return
     }
 
     const coordinates = getMouseCoordinates(event)
 
-    handleMouseMove(coordinates);
+    handleMouseMove(coordinates)
   }
 
   const onPointerUp = (event: any) => {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
+      event.currentTarget.releasePointerCapture(event.pointerId)
     }
 
     const coordinates = getMouseCoordinates(event)
-    handleMouseUp(coordinates);
+    handleMouseUp(coordinates)
 
     if (prevToolRef.current) {
-      handleChangeTool(prevToolRef.current);
+      handleChangeTool(prevToolRef.current)
 
-      prevToolRef.current = null;
-      simulateKeyDown.current = false;
+      prevToolRef.current = null
+      simulateKeyDown.current = false
     }
   }
 
   const onDoubleClick = (event: any) => {
-    const coordinates = getMouseCoordinates(event);
+    const coordinates = getMouseCoordinates(event)
 
-    handleDoubleClick(coordinates);
+    handleDoubleClick(coordinates)
   }
 
   return (
@@ -264,7 +307,7 @@ const DrawDesk = ({
       onPointerCancel={onPointerUp}
       onDoubleClick={onDoubleClick}
     />
-  );
-};
+  )
+}
 
-export default DrawDesk;
+export default DrawDesk

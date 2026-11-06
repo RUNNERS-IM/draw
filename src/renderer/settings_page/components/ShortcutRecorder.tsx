@@ -1,49 +1,57 @@
-import { useState, useEffect, useRef } from 'react';
-import { debounce } from 'lodash';
+import { useState, useEffect, useRef } from 'react'
+import { debounce } from 'lodash'
 import {
   MdKeyboardCommandKey,
   MdOutlineKeyboardControlKey,
-  MdOutlineKeyboardOptionKey,
-} from "react-icons/md";
-import { ImShift } from "react-icons/im";
+  MdOutlineKeyboardOptionKey
+} from 'react-icons/md'
+import { ImShift } from 'react-icons/im'
 
 const HotkeyPill = ({ accelerator }: { accelerator: any }) => {
   const humanizedKey = (key: string) => {
     const keyMap: Record<string, any> = {
-      'Meta': <MdKeyboardCommandKey />,
-      'Control': <MdOutlineKeyboardControlKey />,
-      'Alt': <MdOutlineKeyboardOptionKey />,
-      'Shift': <ImShift />,
-    };
+      Meta: <MdKeyboardCommandKey />,
+      Control: <MdOutlineKeyboardControlKey />,
+      Alt: <MdOutlineKeyboardOptionKey />,
+      Shift: <ImShift />
+    }
 
-    return keyMap[key] || key;
-  };
+    return keyMap[key] || key
+  }
 
   return (
     <span className="hotkey-pill">
-      {
-        accelerator.map((key: string) => (
-          <span key={key} className="key">{humanizedKey(key)}</span>
-        ))
-      }
+      {accelerator.map((key: string) => (
+        <span key={key} className="key">
+          {humanizedKey(key)}
+        </span>
+      ))}
     </span>
-  );
-};
+  )
+}
 
-const ShortcutRecorder = ({ accelerator, onCheck, onChange }: { accelerator: any; onCheck: (...args: any[]) => any; onChange: (...args: any[]) => any }) => {
-  const isMac = window.electronAPI.isMac;
+const ShortcutRecorder = ({
+  accelerator,
+  onCheck,
+  onChange
+}: {
+  accelerator: any
+  onCheck: (...args: any[]) => any
+  onChange: (...args: any[]) => any
+}) => {
+  const isMac = window.electronAPI.isMac
 
-  const [isRecording, setIsRecording] = useState(false);
-  const [currentKeys, setCurrentKeys] = useState<any>([]);
-  const inputRef = useRef<any>(null);
+  const [isRecording, setIsRecording] = useState(false)
+  const [currentKeys, setCurrentKeys] = useState<any>([])
+  const inputRef = useRef<any>(null)
 
   const codeToKey = (code: string) => {
     if (code.startsWith('Key') && code.length === 4) {
-      return code.slice(3).toUpperCase(); // 'KeyA' -> 'A'
+      return code.slice(3).toUpperCase() // 'KeyA' -> 'A'
     }
 
     if (code.startsWith('Digit') && code.length === 6) {
-      return code.slice(5); // 'Digit1' -> '1'
+      return code.slice(5) // 'Digit1' -> '1'
     }
 
     const punctuation: Record<string, string> = {
@@ -55,26 +63,30 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }: { accelerator: any
       Quote: "'",
       Backquote: '`',
       Period: '.',
-      Slash: '/',
-    };
-    if (punctuation[code]) return punctuation[code];
+      Slash: '/'
+    }
+    if (punctuation[code]) {
+      return punctuation[code]
+    }
 
-    return null;
-  };
+    return null
+  }
 
   const validateShortcut = (keys: any) => {
-    if (!keys) return true;
+    if (!keys) {
+      return true
+    }
 
-    const modifiers = ['Meta', 'Control', 'Alt', 'Shift'];
-    const hasModifier = keys.some((part: string) => modifiers.includes(part));
-    const hasNonModifier = keys.some((part: string) => !modifiers.includes(part));
+    const modifiers = ['Meta', 'Control', 'Alt', 'Shift']
+    const hasModifier = keys.some((part: string) => modifiers.includes(part))
+    const hasNonModifier = keys.some((part: string) => !modifiers.includes(part))
 
     if (!hasModifier) {
-      return false;
+      return false
     }
 
     if (!hasNonModifier) {
-      return false;
+      return false
     }
 
     const systemShortcuts = [
@@ -95,26 +107,28 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }: { accelerator: any
       'Control+Q',
       // Main Window
       'Meta+W', // Close window
-      'Control+W',
-    ];
+      'Control+W'
+    ]
 
     if (systemShortcuts.includes(keys.join('+'))) {
-      return false;
+      return false
     }
 
-    return true;
-  };
+    return true
+  }
 
   const startRecording = () => {
-    if (isRecording) return;
+    if (isRecording) {
+      return
+    }
 
-    setIsRecording(true);
-    setCurrentKeys([]);
+    setIsRecording(true)
+    setCurrentKeys([])
 
     if (inputRef.current) {
-      inputRef.current.focus();
+      inputRef.current.focus()
     }
-  };
+  }
 
   const stopRecording = async (keys: any) => {
     if (validateShortcut(keys)) {
@@ -125,94 +139,114 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }: { accelerator: any
       }
     }
 
-    setIsRecording(false);
-    setCurrentKeys([]);
-  };
-  const debouncedStopRecording = useRef(
-    debounce((keys) => stopRecording(keys), 200)
-  ).current;
+    setIsRecording(false)
+    setCurrentKeys([])
+  }
+  const debouncedStopRecording = useRef(debounce((keys) => stopRecording(keys), 200)).current
 
   const handleKeyDown = (event: any) => {
-    event.preventDefault();
-    event.stopPropagation();
+    event.preventDefault()
+    event.stopPropagation()
 
-    if (event.repeat) return;
-    if (event.key === 'Dead') return;
-
-    const modifiers = [];
-
-    if (isMac) {
-      if (event.metaKey) modifiers.push('Meta');
-      if (event.ctrlKey && !event.metaKey) modifiers.push('Control');
-    } else {
-      if (event.ctrlKey) modifiers.push('Control');
+    if (event.repeat) {
+      return
+    }
+    if (event.key === 'Dead') {
+      return
     }
 
-    if (event.altKey) modifiers.push('Alt');
-    if (event.shiftKey) modifiers.push('Shift');
+    const modifiers = []
 
-    const mainKey = codeToKey(event.code);
-    if (mainKey) modifiers.push(mainKey);
+    if (isMac) {
+      if (event.metaKey) {
+        modifiers.push('Meta')
+      }
+      if (event.ctrlKey && !event.metaKey) {
+        modifiers.push('Control')
+      }
+    } else {
+      if (event.ctrlKey) {
+        modifiers.push('Control')
+      }
+    }
 
-    setCurrentKeys(modifiers);
-  };
+    if (event.altKey) {
+      modifiers.push('Alt')
+    }
+    if (event.shiftKey) {
+      modifiers.push('Shift')
+    }
+
+    const mainKey = codeToKey(event.code)
+    if (mainKey) {
+      modifiers.push(mainKey)
+    }
+
+    setCurrentKeys(modifiers)
+  }
 
   const handleKeyUp = (event: any) => {
-    event.preventDefault();
-    event.stopPropagation();
+    event.preventDefault()
+    event.stopPropagation()
 
-    debouncedStopRecording(currentKeys);
-  };
+    debouncedStopRecording(currentKeys)
+  }
 
   const handleBlur = () => {
-    debouncedStopRecording(currentKeys);
-  };
+    debouncedStopRecording(currentKeys)
+  }
 
   useEffect(() => {
-    if (!isRecording) return;
+    if (!isRecording) {
+      return
+    }
 
-    document.addEventListener('keydown', handleKeyDown, { capture: true });
-    document.addEventListener('keyup', handleKeyUp, { capture: true });
-    document.addEventListener('blur', handleBlur, { capture: true });
+    document.addEventListener('keydown', handleKeyDown, { capture: true })
+    document.addEventListener('keyup', handleKeyUp, { capture: true })
+    document.addEventListener('blur', handleBlur, { capture: true })
 
     return () => {
-      document.removeEventListener('keydown', handleKeyDown, { capture: true });
-      document.removeEventListener('keyup', handleKeyUp, { capture: true });
-      document.removeEventListener('blur', handleBlur, { capture: true });
+      document.removeEventListener('keydown', handleKeyDown, { capture: true })
+      document.removeEventListener('keyup', handleKeyUp, { capture: true })
+      document.removeEventListener('blur', handleBlur, { capture: true })
 
-      debouncedStopRecording.cancel();
-    };
-  }, [isRecording, currentKeys]);
+      debouncedStopRecording.cancel()
+    }
+  }, [isRecording, currentKeys])
 
-  const recordingContent = (currentKeys.length > 0)
-    ? <HotkeyPill accelerator={currentKeys} />
-    : <div className="placeholder">Recording...</div>;
+  const recordingContent =
+    currentKeys.length > 0 ? (
+      <HotkeyPill accelerator={currentKeys} />
+    ) : (
+      <div className="placeholder">Recording...</div>
+    )
 
-  const idleContent = (!accelerator || accelerator === '[NULL]')
-    ? <div className="placeholder">Record shortcut</div>
-    : <HotkeyPill accelerator={accelerator.split('+')} />;
+  const idleContent =
+    !accelerator || accelerator === '[NULL]' ? (
+      <div className="placeholder">Record shortcut</div>
+    ) : (
+      <HotkeyPill accelerator={accelerator.split('+')} />
+    )
 
   return (
     <div className="shortcut-recorder">
-      {
-        isRecording && (
-          <input
-            ref={inputRef}
-            type="text"
-            onChange={() => {}}
-            onBlur={handleBlur}
-            className="shortcut-input"
-            readOnly
-            autoFocus
-          />
-        )
-      }
+      {isRecording && (
+        <input
+          ref={inputRef}
+          type="text"
+          onChange={() => {}}
+          onBlur={handleBlur}
+          className="shortcut-input"
+          readOnly
+          autoFocus
+        />
+      )}
 
       <div onClick={startRecording} className={`record-block${isRecording ? ' recording' : ''}`}>
         {isRecording ? recordingContent : idleContent}
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default ShortcutRecorder;
+export default ShortcutRecorder

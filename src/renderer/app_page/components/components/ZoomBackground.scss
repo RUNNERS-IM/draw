@@ -2,8 +2,12 @@
 @mixin zoom-background-offset($axis, $viewport-size) {
   --edge-area-#{$axis}: calc(#{$viewport-size} / var(--zoom-move-regions));
   --default-offset-#{$axis}: calc(var(--cursor-#{$axis}) * (var(--background-zoom) - 1));
-  --start-edge-offset-#{$axis}: calc(var(--cursor-#{$axis}) * var(--background-zoom) - var(--edge-area-#{$axis}));
-  --end-edge-offset-#{$axis}: calc(var(--cursor-#{$axis}) * var(--background-zoom) + var(--edge-area-#{$axis}) - #{$viewport-size});
+  --start-edge-offset-#{$axis}: calc(
+    var(--cursor-#{$axis}) * var(--background-zoom) - var(--edge-area-#{$axis})
+  );
+  --end-edge-offset-#{$axis}: calc(
+    var(--cursor-#{$axis}) * var(--background-zoom) + var(--edge-area-#{$axis}) - #{$viewport-size}
+  );
 
   // Reveal the image boundaries before the cursor reaches the screen edge.
   --edge-offset-#{$axis}: clamp(
