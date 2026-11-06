@@ -22,12 +22,13 @@
     "build": "node tools/build/build.cjs",
     "build:dev": "NODE_ENV=development node tools/build/build.cjs",
     "start": "npm run build:dev && NODE_ENV=development electron .",
-    "test": "node --test tests/",
+    "test": "node --test \"tests/*.test.mjs\" && node src/runners-account/check.mjs",
     "dist": "npm run build && electron-builder --config builder.config.cjs"
   },
   "devDependencies": {
     "@babel/core": "^8.0.1",
     "@babel/preset-react": "^8.0.1",
+    "@babel/preset-typescript": "^8.0.7",
     "babel-loader": "^10.1.1",
     "copy-webpack-plugin": "^14.0.0",
     "css-loader": "^7.1.4",

@@ -1,0 +1,27 @@
+.panel {
+  box-sizing: border-box;
+  padding: var(--rm-pad-y) 0;
+  user-select: none;
+  cursor: default;
+}
+
+.panel-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: var(--rm-row);
+  margin: 0 var(--rm-inset);
+  color: var(--rm-text-secondary);
+}
+
+.panel-dot {
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--rm-track);
+}
+
+.panel-dot.on {
+  background: var(--rm-ok);
+}

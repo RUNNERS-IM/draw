@@ -1,77 +1,34 @@
-<p align="center">
-  <img src="https://github.com/DmytroVasin/DrawPen/blob/main/assets/static/icon.png?raw=true" height="200">
-  <h3 align="center">Draw Pen</h3>
-  <p align="center">An open-source screen annotation tool</p>
-</p>
+# Draw
 
-<p align="center">
-  <a href='https://github.com/DmytroVasin/DrawPen/releases/latest/download/DrawPen.Setup.exe'>
-    <img alt='Get it on Windows' width="134px" src='https://github.com/DmytroVasin/DrawPen/blob/main/assets/static/BadgeWindows.png?raw=true'/>
-  </a>
-  <a href='https://github.com/DmytroVasin/DrawPen/releases/latest/download/DrawPen-0.0.60-arm64.dmg'>
-    <img alt='Get it on macOS' width="134px" src='https://github.com/DmytroVasin/DrawPen/blob/main/assets/static/BadgeMacOS.png?raw=true'/>
-  </a>
-  <a href='https://github.com/DmytroVasin/DrawPen/releases/latest/download/drawpen_0.0.60_amd64.deb'>
-    <img alt='Get it on Linux' width="134px" src='https://github.com/DmytroVasin/DrawPen/blob/main/assets/static/BadgeLinux.png?raw=true'/>
-  </a>
-</p>
+발표하거나 화면을 공유할 때 화면 위에 바로 그리는 맥 앱입니다. 메뉴 막대에 살고, 왼쪽 세로 막대에서 도구를 고릅니다.
 
----
+- 도구: 펜 · 형광펜 · 화살표 · 네모 · 동그라미 · 글자 · 지우개
+- 되돌리기 · 전체 지우기 · 색 고르기
+- 그리기를 끄면 클릭이 아래 앱으로 그대로 갑니다(클릭 모드). 이때 그림판 창은 숨겨지므로 그린 그림도 함께 사라졌다가, 다시 켜면 돌아옵니다
+- 한국어 · 영어, 다크 · 라이트
 
-![DrawPen](https://github.com/DmytroVasin/DrawPen/blob/main/assets/static/main.png?raw=true)
+Draw on your screen while you present. Draw is a macOS menu bar app with a vertical toolbar on the left.
 
-![DrawPen - Usage](https://github.com/DmytroVasin/DrawPen/blob/main/assets/static/main.gif?raw=true)
+## 내려받기
 
-![DrawPen - Pointer Mode](https://github.com/DmytroVasin/DrawPen/blob/main/assets/static/pointer-mode.gif?raw=true)
+[GitHub Releases](https://github.com/RUNNERS-IM/draw/releases/latest) 에서 받습니다.
 
-### Installation
+- Apple 실리콘: `draw-macos-arm64.dmg`
+- Intel: `draw-macos-x64.dmg`
 
-You can download DrawPen for **free** from [releases](https://github.com/DmytroVasin/DrawPen/releases)
+## 개발
 
-Or install via **package managers**:
+노드 22 가 필요합니다.
 
-```bash
-# macOS (Homebrew)
-brew install --cask drawpen
-
-# Windows (Scoop)
-scoop bucket add extras
-scoop install extras/drawpen
+```sh
+npm ci
+npm test          # 단위 테스트와 공용 키트 확인
+npm start         # 개발 판 실행
+npm run dist      # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
 ```
 
-### Known issues
+기본 가지는 `master` 입니다. `release` 가지에 올리면 GitHub Actions 가 버전을 올리고, 서명 · 공증한 판을 GitHub Releases 에 냅니다(`.github/workflows/release.yml`). 버전 번호는 `scripts/bump-release.sh` 가 고르므로 손으로 고치지 않습니다. 출시 전에 `RELEASE_NOTES.md` 를 이번 판 내용으로 고칩니다.
 
-On some Linux setups running **Wayland** (e.g. [Fedora KDE Plasma](https://github.com/DmytroVasin/DrawPen/issues/82), [Zorin](https://github.com/DmytroVasin/DrawPen/issues/81)), DrawPen may start with a **segmentation fault**. [Explanation In Details](https://github.com/IsmaelMartinez/teams-for-linux/blob/1c28e146ca78bcb0ec4df317d7f0684984adf205/docs-site/docs/development/research/wayland-x11-ozone-platform-investigation.md)
+## 원본과 라이선스
 
-#### Workaround:
-
-- Run DrawPen with X11 backend: `drawpen --ozone-platform=x11`
-- Use DrawPen `drawpen-x11` package available in [releases](https://github.com/DmytroVasin/DrawPen/releases/latest/)
-
-### Keybindings
-
-| Command                                    | Keybindings                                              | Comment           |
-| ------------------------------------------ | -------------------------------------------------------- | ----------------- |
-| Enable Draw/Pointer Mode                   | <kbd>CMD/CTRL + SHIFT + A</kbd>                          | Global shortcut   |
-| Activate Brush                             | <kbd>B</kbd> or <kbd>1</kbd>                             |                   |
-| Activate Pen (Fade Pen)                    | <kbd>P</kbd>                                             |                   |
-| Activate/Switch Shapes (Arrow/Square/etc.) | <kbd>A</kbd>, <kbd>R</kbd>, <kbd>O</kbd> or <kbd>2</kbd> |                   |
-| Activate Text                              | <kbd>T</kbd> or <kbd>3</kbd>                             |                   |
-| Activate Highlighter                       | <kbd>H</kbd> or <kbd>4</kbd>                             |                   |
-| Activate Laser                             | <kbd>L</kbd> or <kbd>5</kbd>                             |                   |
-| Activate Eraser                            | <kbd>E</kbd> or <kbd>6</kbd>                             |                   |
-| Switch Color                               | <kbd>7</kbd>                                             |                   |
-| Switch Thickness (Width)                   | <kbd>8</kbd>                                             |                   |
-| Show/Hide ToolBar                          | <kbd>CMD/CTRL + T</kbd>                                  | In-app shortcut   |
-| Show/Hide Whiteboard                       | <kbd>CMD/CTRL + E</kbd>                                  | In-app shortcut   |
-| Clear Desk                                 | <kbd>CMD/CTRL + K</kbd>                                  | In-app shortcut   |
-| Settings Page                              | <kbd>CMD/CTRL + ,</kbd>                                  |                   |
-
-### Contributing
-
-Please read our [Contributing Guidelines](CONTRIBUTING.md) for more information.
-
-### License
-
-DrawPen is licensed under the MIT Open Source license.
-For more information, see [LICENSE](LICENSE).
+Draw 는 Dmytro Vasin 의 [DrawPen](https://github.com/DmytroVasin/DrawPen)(MIT 라이선스)을 바탕으로 만들었습니다. 원본의 저작권 표시와 라이선스 전문은 [LICENSE](LICENSE) 에 그대로 있고, 원본의 변경 기록은 [CHANGELOG.md](CHANGELOG.md) 에 있습니다.

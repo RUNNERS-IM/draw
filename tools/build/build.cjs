@@ -13,7 +13,7 @@ const mode = isDev ? 'development' : 'production';
 const mainBase = require('../webpack/main.js');
 const rendererBase = require('../webpack/renderer.js');
 
-const windows = ['app_window', 'extended_toolbar_window', 'about_window', 'settings_window'];
+const windows = ['app_window', 'extended_toolbar_window', 'about_window', 'settings_window', 'panel_window', 'update_window'];
 const pageDir = (name) => path.join(rootDir, 'src/renderer', name.replace(/_window$/, '_page'));
 
 // 메인 프로세스가 쓰는 <창>_WEBPACK_ENTRY · <창>_PRELOAD_WEBPACK_ENTRY 값. 실행 중의 __dirname(.webpack/main) 기준.
@@ -25,6 +25,9 @@ for (const name of windows) {
   entryDefines[`${upper}_PRELOAD_WEBPACK_ENTRY`] =
     `require('path').join(__dirname, '../renderer/${name}/preload.js')`;
 }
+
+// 시험판 화면 찍기 코드(src/main/testShots.js)는 출시 빌드(DRAW_RELEASE=1)에 들어가지 않는다.
+entryDefines.DRAW_TEST_BUILD = JSON.stringify(process.env.DRAW_RELEASE !== '1');
 
 const mainConfig = {
   ...mainBase,

@@ -4,11 +4,13 @@ import { randomUUID } from 'crypto';
 import { isDeepStrictEqual } from 'util';
 import fs from 'fs';
 import path from 'path';
-import os from 'os';
 import { getPointerToolbarOffset, isToolbarReversed } from '../shared/toolbarPosition.js';
+import { t, setLocale, currentLocale } from '../shared/i18n.js';
+import { startUpdates, checkNow } from './updates.js';
+import { runTestShots } from './testShots.js';
 
 const isDevelopment = process.env.NODE_ENV === 'development'
-const isDebugLoggingEnabled = process.env.DRAWPEN_DEBUG === '1'
+const isDebugLoggingEnabled = process.env.DRAW_DEBUG === '1'
 const isLoggingEnabled = isDevelopment || isDebugLoggingEnabled
 
 const isMac = process.platform === 'darwin'
@@ -17,18 +19,20 @@ const isWin = process.platform === 'win32'
 
 const KEY_SHOW_HIDE_APP        = 'CmdOrCtrl+Shift+A'
 const KEY_SHOW_HIDE_TOOLBAR    = 'CmdOrCtrl+T'
-const KEY_SHOW_HIDE_WHITEBOARD = 'CmdOrCtrl+E'
 const KEY_CLEAR_DESK           = 'CmdOrCtrl+K'
 const KEY_SETTINGS             = 'CmdOrCtrl+,'
-const KEY_MAKE_SCREENSHOT      = 'CmdOrCtrl+Shift+P'
-const KEY_START_ZOOM           = 'CmdOrCtrl+Shift+M'
 const KEY_Q                    = 'CmdOrCtrl+Q'
 const KEY_NULL                 = '[NULL]'
 
+// 첫 판은 그리기만 한다. 화이트보드 · 화면 저장 · 확대는 코드만 두고 단축키를 비워 꺼 둔다.
+const KEY_SHOW_HIDE_WHITEBOARD = KEY_NULL
+const KEY_MAKE_SCREENSHOT      = KEY_NULL
+const KEY_START_ZOOM           = KEY_NULL
+
 const EXTENDED_TOOLBAR_WINDOW_MARGIN = 10
 const EXTENDED_TOOLBAR_WINDOW_PADDING = 5
-const EXTENDED_TOOLBAR_MODE_SWITCHER_WIDTH = 80
-const EXTENDED_TOOLBAR_MODE_SWITCHER_HEIGHT = 72
+const EXTENDED_TOOLBAR_MODE_SWITCHER_WIDTH = 44
+const EXTENDED_TOOLBAR_MODE_SWITCHER_HEIGHT = 56
 const EXTENDED_TOOLBAR_SLIDER_SIZE = 17
 
 // Reserve an arrow slot on both sides so flipping it never moves the native window or icon.
@@ -40,6 +44,14 @@ const EXTENDED_TOOLBAR_VERTICAL_WINDOW_SIZE = {
   width: EXTENDED_TOOLBAR_WINDOW_MARGIN + EXTENDED_TOOLBAR_MODE_SWITCHER_WIDTH + EXTENDED_TOOLBAR_WINDOW_PADDING,
   height: EXTENDED_TOOLBAR_WINDOW_MARGIN + EXTENDED_TOOLBAR_MODE_SWITCHER_HEIGHT + 2 * EXTENDED_TOOLBAR_SLIDER_SIZE + EXTENDED_TOOLBAR_WINDOW_PADDING,
 }
+
+const PANEL_WIDTH = 300
+const PANEL_GAP = 4
+const PANEL_BLUR_GUARD_MS = 300
+const PANEL_REOPEN_GUARD_MS = 300
+const HELP_URL = 'https://github.com/RUNNERS-IM/draw/issues'
+const ABOUT_WIDTH = 520
+const ABOUT_HEIGHT = 560
 
 let lastShortcutTime = 0;
 const throttleDelay = 250;
@@ -90,19 +102,19 @@ const schema = {
   tool_bar_orientation: {
     type: 'string',
     enum: ['horizontal', 'vertical'],
-    default: 'horizontal'
+    default: 'vertical'
   },
   tool_bar_x: {
     type: 'number',
-    default: 10
+    default: 16
   },
   tool_bar_y: {
     type: 'number',
-    default: 10
+    default: 120
   },
   tool_bar_active_tool: {
     type: 'string',
-    default: 'brush'
+    default: 'pen'
   },
   tool_bar_active_color_index: {
     type: 'number',
@@ -125,7 +137,7 @@ const schema = {
   },
   tool_bar_default_brush: {
     type: 'string',
-    default: 'brush'
+    default: 'pen'
   },
   tool_bar_default_figure: {
     type: 'string',
@@ -158,6 +170,18 @@ const schema = {
   launch_on_login: {
     type: 'boolean',
     default: false
+  },
+  auto_check_updates: {
+    type: 'boolean',
+    default: true
+  },
+  update_checked_at: {
+    type: 'number',
+    default: 0
+  },
+  update_later_on: {
+    type: 'string',
+    default: ''
   },
   key_binding_show_hide_app: {
     type: 'string',
@@ -209,7 +233,7 @@ const schema = {
   },
   screenshot_directory: {
     type: 'string',
-    default: path.join(app.getPath('pictures'), 'drawpen'),
+    default: path.join(app.getPath('pictures'), 'draw'),
   },
 };
 
@@ -243,6 +267,9 @@ let mainWindow
 let extendedToolbarWindow
 let aboutWindow
 let settingsWindow
+let panelWindow
+let panelOpenedAt = 0
+let panelClosedAt = 0
 
 let isQuitting = false
 let startAsHidden = false
@@ -279,12 +306,8 @@ function updateContextMenu() {
 
   if (!tray) return;
 
-  const show_tool_bar   = store.get('show_tool_bar')
-  const show_whiteboard = store.get('show_whiteboard')
-
   const key_show_hide_app        = store.get('key_binding_show_hide_app')
   const key_show_hide_toolbar    = store.get('key_binding_show_hide_toolbar')
-  const key_show_hide_whiteboard = store.get('key_binding_show_hide_whiteboard')
   const key_clear_desk           = store.get('key_binding_clear_desk')
 
   const accelForTray = (accel) => {
@@ -307,55 +330,40 @@ function updateContextMenu() {
     return label;
   }
 
+  sendPanelState()
+
+  // 맥은 메뉴 막대 패널을 쓴다. 윈도우 · 리눅스는 패널을 옮기기 전까지 기본 메뉴를 쓴다.
+  if (isMac) return;
+
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: withAccelHint((drawingMode ? 'Enable Pointer Mode' : 'Enable Draw Mode'), key_show_hide_app),
+      label: withAccelHint(t('menu.toggleDraw'), key_show_hide_app),
       accelerator: accelForTray(key_show_hide_app),
       click: toggleDrawOrPointerMode
     },
     {
-      label: withAccelHint((show_tool_bar ? 'Hide Toolbar' : 'Show Toolbar'), key_show_hide_toolbar),
+      label: withAccelHint(t('menu.toolbar'), key_show_hide_toolbar),
       accelerator: accelForTray(key_show_hide_toolbar),
       click: toggleToolbar
     },
     {
-      label: withAccelHint((show_whiteboard ? 'Hide Whiteboard' : 'Show Whiteboard'), key_show_hide_whiteboard),
-      accelerator: accelForTray(key_show_hide_whiteboard),
-      click: toggleWhiteboard
-    },
-    {
-      label: withAccelHint('Clear desk', key_clear_desk),
+      label: withAccelHint(t('menu.clear'), key_clear_desk),
       accelerator: accelForTray(key_clear_desk),
       click: resetScreen
     },
     { type: 'separator' },
     {
-      label: 'Reset to original',
-      click: resetApp
-    },
-    {
-      label: withAccelHint('Settings', KEY_SETTINGS),
+      label: withAccelHint(t('panel.settings'), KEY_SETTINGS),
       accelerator: accelForTray(KEY_SETTINGS),
       click: showSettingsWindow
     },
     { type: 'separator' },
     {
-      label: withAccelHint('Capture Screen (Beta)', KEY_MAKE_SCREENSHOT),
-      accelerator: accelForTray(KEY_MAKE_SCREENSHOT),
-      click: makeScreenshot
-    },
-    {
-      label: withAccelHint(zoomMode ? 'Exit Zoom' : 'Zoom Screen (Beta)', KEY_START_ZOOM),
-      accelerator: accelForTray(KEY_START_ZOOM),
-      click: toggleZoomMode
-    },
-    { type: 'separator' },
-    {
-      label: 'About DrawPen',
+      label: t('panel.about'),
       click: showAboutWindow
     },
     {
-      label: withAccelHint('Quit', KEY_Q),
+      label: withAccelHint(t('panel.quit'), KEY_Q),
       accelerator: accelForTray(KEY_Q),
       click: quitApp
     }
@@ -371,11 +379,164 @@ function registerTrayActions() {
     tray.setImage(getTrayIconPath())
   })
 
+  if (isMac) {
+    tray.on('click', togglePanel)
+    tray.on('right-click', togglePanel)
+  }
+
   if (isWin || isLinux) {
     tray.on('click', () => {
       toggleDrawOrPointerMode()
     })
   }
+}
+
+function createPanelWindow() {
+  panelWindow = new BrowserWindow({
+    type: isMac ? 'panel' : undefined, // 맥 패널 창: 눌러도 맨 앞 앱이 바뀌지 않는다
+    width: PANEL_WIDTH,
+    height: 480,
+    useContentSize: true,
+    show: false,
+    frame: false,
+    resizable: false,
+    movable: false,
+    minimizable: false,
+    maximizable: false,
+    fullscreenable: false,
+    skipTaskbar: true,
+    alwaysOnTop: true,
+    hasShadow: true,
+    roundedCorners: true,
+    title: 'Draw',
+    vibrancy: 'menu',
+    visualEffectState: 'active',
+    backgroundColor: '#00000000',
+    webPreferences: {
+      nodeIntegration: false,
+      backgroundThrottling: false,
+      preload: PANEL_WINDOW_PRELOAD_WEBPACK_ENTRY,
+    }
+  })
+
+  panelWindow.setAlwaysOnTop(true, 'pop-up-menu')
+  panelWindow.setVisibleOnAllWorkspaces(true, { visibleOnFullScreen: true, skipTransformProcessType: true })
+  panelWindow.loadURL(PANEL_WINDOW_WEBPACK_ENTRY)
+
+  panelWindow.on('blur', () => {
+    rawLog('Panel blur', Date.now() - panelOpenedAt)
+
+    // 패널을 여는 클릭이 곧바로 포커스 잃음을 보내는 일이 있어 잠깐은 무시한다.
+    if (Date.now() - panelOpenedAt < PANEL_BLUR_GUARD_MS) return;
+
+    hidePanel()
+  })
+
+  panelWindow.on('closed', () => {
+    panelWindow = null
+  })
+}
+
+function placePanelUnderTray() {
+  const [width, height] = panelWindow.getSize()
+  const icon = tray.getBounds()
+  const display = screen.getDisplayNearestPoint({ x: icon.x, y: icon.y })
+  const area = display.workArea
+  const x = Math.round(icon.x + icon.width / 2 - width / 2)
+  const y = icon.y + icon.height + PANEL_GAP
+
+  panelWindow.setPosition(
+    Math.min(Math.max(x, area.x + PANEL_GAP), area.x + area.width - width - PANEL_GAP),
+    Math.min(Math.max(y, area.y), area.y + area.height - height),
+    false
+  )
+}
+
+function togglePanel() {
+  if (!panelWindow) return;
+
+  if (panelWindow.isVisible()) {
+    hidePanel()
+    return
+  }
+
+  // 패널이 열려 있을 때 아이콘을 누르면 먼저 포커스를 잃어 닫히므로, 그 클릭으로 다시 열지 않는다.
+  if (Date.now() - panelClosedAt < PANEL_REOPEN_GUARD_MS) return;
+
+  showPanel()
+}
+
+function showPanel() {
+  // 클릭 모드로 돌아올 때 앱을 숨기므로(releaseFocusBack), 먼저 숨김을 풀어야 패널이 보인다.
+  if (isMac && app.isHidden()) {
+    app.show()
+  }
+
+  sendPanelState()
+  placePanelUnderTray()
+  panelOpenedAt = Date.now()
+  panelWindow.show()
+  panelWindow.focus()
+}
+
+function hidePanel() {
+  if (!panelWindow || !panelWindow.isVisible()) return;
+
+  panelClosedAt = Date.now()
+  panelWindow.hide()
+
+  // 그리는 중이었다면 키 입력이 다시 그림판으로 가게 한다.
+  if (drawingMode && mainWindow) {
+    mainWindow.focus()
+  }
+}
+
+function getPanelState() {
+  return {
+    version: app.getVersion(),
+    drawing: drawingMode,
+    showToolbar: store.get('show_tool_bar'),
+    launchOnLogin: store.get('launch_on_login'),
+    autoCheckUpdates: store.get('auto_check_updates'),
+    keys: {
+      draw: normalizeKeyForPanel(store.get('key_binding_show_hide_app')),
+      toolbar: normalizeKeyForPanel(store.get('key_binding_show_hide_toolbar')),
+      clear: normalizeKeyForPanel(store.get('key_binding_clear_desk')),
+      settings: normalizeKeyForPanel(KEY_SETTINGS),
+      quit: normalizeKeyForPanel(KEY_Q),
+    },
+  }
+}
+
+function normalizeKeyForPanel(accelerator) {
+  if (!accelerator || accelerator === KEY_NULL) return undefined;
+
+  if (!isMac) return accelerator.replace('CmdOrCtrl', 'Ctrl');
+
+  return accelerator
+    .replace('CmdOrCtrl', '⌘')
+    .replace('Command', '⌘')
+    .replace('Shift', '⇧')
+    .replace('Alt', '⌥')
+    .replace('Control', '⌃')
+    .replaceAll('+', '')
+}
+
+function sendPanelState() {
+  if (!panelWindow || panelWindow.isDestroyed()) return;
+
+  panelWindow.webContents.send('panel_state_changed', getPanelState())
+}
+
+const panelActions = {
+  toggle_draw: () => toggleDrawOrPointerMode(),
+  toggle_toolbar: () => toggleToolbar(),
+  clear: () => resetScreen(),
+  about: () => showAboutWindow(),
+  check_update: () => checkNow(),
+  settings: () => showSettingsWindow(),
+  help: () => shell.openExternal(HELP_URL),
+  quit: () => quitApp(),
 }
 
 function createMainWindow() {
@@ -554,13 +715,18 @@ function createAboutWindow() {
 
   aboutWindow = new BrowserWindow({
     show: false,
-    width: 250,
-    height: 220,
+    width: ABOUT_WIDTH,
+    height: ABOUT_HEIGHT,
     useContentSize: true,
     resizable: false,
     minimizable: false,
     maximizable: false,
+    fullscreenable: false,
     autoHideMenuBar: true,
+    title: t('about.title'),
+    vibrancy: 'under-window',
+    visualEffectState: 'active',
+    backgroundColor: '#00000000',
     webPreferences: {
       devTools: hasDevTools,
       nodeIntegration: false,
@@ -568,6 +734,7 @@ function createAboutWindow() {
     }
   })
   aboutWindow.center();
+  aboutWindow.on('page-title-updated', (event) => event.preventDefault())
 
   aboutWindow.loadURL(ABOUT_WINDOW_WEBPACK_ENTRY)
 
@@ -580,7 +747,10 @@ function createAboutWindow() {
   })
 
   aboutWindow.webContents.on('did-finish-load', () => {
+    aboutWindow.center()
+    if (isMac) app.focus({ steal: true })
     aboutWindow.show()
+    aboutWindow.focus()
   })
 
   aboutWindow.webContents.setWindowOpenHandler((details) => {
@@ -631,6 +801,7 @@ function createSettingsWindow() {
     minimizable: false,
     maximizable: false,
     autoHideMenuBar: true,
+    title: t('settings.title'),
     webPreferences: {
       devTools: hasDevTools,
       nodeIntegration: false,
@@ -650,7 +821,9 @@ function createSettingsWindow() {
   })
 
   settingsWindow.webContents.on('did-finish-load', () => {
+    if (isMac) app.focus({ steal: true })
     settingsWindow.show()
+    settingsWindow.focus()
   })
 
   settingsWindow.webContents.setVisualZoomLevelLimits(1, 1);
@@ -676,6 +849,8 @@ app.on('second-instance', () => {
 app.commandLine.appendSwitch('disable-pinch');
 
 app.whenReady().then(() => {
+  setLocale(testLanguage() || app.getPreferredSystemLanguages()[0] || app.getLocale())
+
   hideDock()
 
   startAsHiddenCheck()
@@ -684,10 +859,28 @@ app.whenReady().then(() => {
 
   createMainWindow()
   createExtendedToolbarWindow()
+  createPanelWindow()
 
   tray = new Tray(getTrayIconPath())
   updateContextMenu()
   registerTrayActions()
+
+  startUpdates({ store, beforeInstall: () => { isQuitting = true; flushExtendedToolbarPosition() } })
+
+  if (DRAW_TEST_BUILD && process.env.DRAW_TEST_SHOTS) {
+    runTestShots({
+      dir: process.env.DRAW_TEST_SHOTS,
+      enableDrawMode,
+      enablePointerMode,
+      showPanel,
+      hidePanel,
+      showAboutWindow,
+      showSettingsWindow,
+      getWindows: () => ({ mainWindow, extendedToolbarWindow, panelWindow, aboutWindow, settingsWindow }),
+      isDrawing: () => drawingMode,
+      quit: quitApp,
+    })
+  }
 
   registerGlobalShortcuts()
 
@@ -720,6 +913,10 @@ app.on('window-all-closed', () => {
   app.quit()
 })
 
+function testLanguage() {
+  return DRAW_TEST_BUILD ? process.env.DRAW_TEST_LANG : undefined
+}
+
 function startAsHiddenCheck() {
   if (safeWasOpenedAtLogin()) {
     startAsHidden = true
@@ -737,6 +934,52 @@ function hideDock() {
     app.dock.hide();
   }
 }
+
+ipcMain.on('get_locale', (event) => {
+  event.returnValue = currentLocale()
+});
+
+ipcMain.handle('panel_state', () => getPanelState());
+
+ipcMain.handle('panel_action', (_event, name) => {
+  hidePanel()
+  panelActions[name]?.()
+
+  return null
+});
+
+ipcMain.handle('fit_window_height', (event, height) => {
+  const window = BrowserWindow.fromWebContents(event.sender)
+  if (!window) return null
+
+  const [width] = window.getContentSize()
+  window.setContentSize(width, height)
+
+  return null
+});
+
+ipcMain.handle('close_window', (event) => {
+  BrowserWindow.fromWebContents(event.sender)?.close()
+
+  return null
+});
+
+// https 주소만 연다. 잘못된 값이 다른 프로그램을 띄우지 못하게 한다.
+ipcMain.handle('open_external', (_event, url) => {
+  try {
+    if (new URL(url).protocol === 'https:') shell.openExternal(url)
+  } catch {
+    rawLog('Bad url:', url)
+  }
+
+  return null
+});
+
+ipcMain.handle('set_auto_check_updates', (_event, value) => {
+  store.set('auto_check_updates', value)
+
+  return null
+});
 
 ipcMain.handle('get_app_version', () => {
   return app.getVersion();
@@ -908,6 +1151,7 @@ ipcMain.handle('get_configuration', () => {
     drawing_monitor:                          store.get('drawing_monitor'),
     app_icon_color:                           store.get('app_icon_color'),
     launch_on_login:                          store.get('launch_on_login'),
+    auto_check_updates:                       store.get('auto_check_updates'),
     starts_hidden:                            store.get('starts_hidden'),
     clear_drawings_on_hide:                   store.get('clear_drawings_on_hide'),
     disable_toolbar_in_pointer_mode:          store.get('disable_toolbar_in_pointer_mode'),
@@ -1937,11 +2181,11 @@ function rawLog(message, ...args) {
 }
 
 process.on('uncaughtException', (error) => {
-  console.log('[DRAWPEN:FATAL] uncaughtException', error)
+  console.log('[DRAW:FATAL] uncaughtException', error)
   app.quit();
 })
 
 process.on('unhandledRejection', (reason) => {
-  console.log('[DRAWPEN:FATAL] unhandledRejection', reason)
+  console.log('[DRAW:FATAL] unhandledRejection', reason)
   app.quit();
 })

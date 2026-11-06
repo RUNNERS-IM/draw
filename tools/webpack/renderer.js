@@ -4,14 +4,21 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const rules = [
   {
-    test: /\.jsx?$/,
+    test: /\.[jt]sx?$/,
     exclude: /node_modules/,
     use: {
       loader: 'babel-loader',
       options: {
-        presets: [['@babel/preset-react', { development: inDev() }]],
+        presets: [['@babel/preset-react', { development: inDev() }], '@babel/preset-typescript'],
       },
     },
+  },
+  {
+    test: /\.css$/i,
+    use: [
+      { loader: 'style-loader' },
+      { loader: 'css-loader', options: { url: false } },
+    ],
   },
   {
     test: /\.s[ac]ss$/i,
@@ -44,6 +51,9 @@ const plugins = [
 ];
 
 module.exports = {
+  resolve: {
+    extensions: ['.js', '.jsx', '.ts', '.tsx', '.json'],
+  },
   module: {
     rules,
   },
