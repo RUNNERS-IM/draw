@@ -1,6 +1,5 @@
 import { app, Tray, Menu, BrowserWindow, screen, globalShortcut, shell, ipcMain, nativeTheme, systemPreferences, desktopCapturer, autoUpdater, dialog, clipboard, ClipboardItem } from 'electron';
 import Store from 'electron-store';
-import { randomUUID } from 'crypto';
 import { isDeepStrictEqual } from 'util';
 import fs from 'fs';
 import path from 'path';
@@ -58,10 +57,6 @@ const throttleDelay = 250;
 const updateStoreDelay = 300;
 
 const schema = {
-  user_id: {
-    type: 'string',
-    default: randomUUID()
-  },
   show_whiteboard: {
     type: 'boolean',
     default: false
@@ -1602,13 +1597,7 @@ function resetApp() {
 
     unRegisterGlobalShortcuts()
 
-    const preservedUserId = store.get('user_id')
-
     store.clear()
-
-    if (preservedUserId) {
-      store.set('user_id', preservedUserId)
-    }
 
     registerGlobalShortcuts()
 
