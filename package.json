@@ -23,12 +23,14 @@
     "format": "oxfmt",
     "format:check": "oxfmt --check",
     "check:account": "node src/runners-account/check.mjs",
+    "check:locales": "node scripts/check-locales.mjs",
     "notices": "node scripts/third-party-notices.mjs",
     "dist": "pnpm build && electron-builder --config electron-builder.config.cjs"
   },
   "dependencies": {
     "electron-store": "^11.0.2",
     "electron-updater": "^6.8.10",
+    "i18next": "^26.7.1",
     "lazy-brush": "^2.0.2",
     "lodash": "^4.18.1",
     "lucide-react": "^1.69.0",
@@ -36,6 +38,7 @@
     "perfect-freehand": "^1.2.3",
     "react": "19.2.8",
     "react-dom": "19.2.8",
+    "react-i18next": "^17.1.12",
     "react-icons": "5.7.0"
   },
   "devDependencies": {

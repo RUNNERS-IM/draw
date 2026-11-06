@@ -6,7 +6,7 @@ import { MdRoundedCorner } from 'react-icons/md'
 import MdSharpCorner from './icons/MdSharpCorner'
 import { TbLineDashed, TbLineDotted, TbMinus } from 'react-icons/tb'
 import { toolbarViewportMargin, widthList } from '../constants'
-import { t } from '../../../../shared/i18n'
+import { useTranslation } from 'react-i18next'
 
 const strokeStyleFigureTypes = ['flat_arrow', 'rectangle', 'diamond', 'oval', 'line']
 const edgeStyleFigureTypes = ['rectangle', 'diamond']
@@ -61,6 +61,7 @@ const FigureToolbar = ({
   onDelete: Callback
   Icons: Record<string, ComponentType<any>>
 }) => {
+  const { t } = useTranslation()
   const figureType = figure.type
   const figureColorIndex = figure.colorIndex
   const figureWidthIndex = figure.widthIndex

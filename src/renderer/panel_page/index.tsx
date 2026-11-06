@@ -15,14 +15,18 @@ import {
   Power
 } from 'lucide-react'
 import { MenuHead, MenuItem, MenuSeparator, MenuSwitch } from '../../runners-account/runners-menu'
-import { t } from '../../shared/i18n'
+import { useTranslation } from 'react-i18next'
 import './panel.css'
+import { applyTextDirection } from '../i18n'
+
+applyTextDirection()
 
 const icon = (Icon: ComponentType<any>) => <Icon strokeWidth={1.5} />
 const api = window.electronAPI
 
 // 메뉴 막대 아이콘을 누르면 뜨는 패널. 줄 값은 runners-menu.css(글자 13 · 줄 32 · 폭 300)를 그대로 쓴다.
 const Panel = () => {
+  const { t } = useTranslation()
   const [state, setState] = useState<any>(null)
   const root = useRef<any>(null)
 

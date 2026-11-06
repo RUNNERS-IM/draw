@@ -949,7 +949,8 @@ app.on('second-instance', () => {
 app.commandLine.appendSwitch('disable-pinch')
 
 app.whenReady().then(() => {
-  setLocale(testLanguage() || app.getPreferredSystemLanguages()[0] || app.getLocale())
+  const testing = testLanguage()
+  setLocale(testing ? [testing] : [...app.getPreferredSystemLanguages(), app.getLocale()])
 
   hideDock()
 

@@ -1,5 +1,5 @@
 // 시험판 전용(DRAW_TEST_BUILD): 키보드 · 마우스를 흉내 내지 않고, 앱의 처리 함수를 불러 상태를 띄워 창마다 그림을 저장한다.
-// 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=ko|en] Draw 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
+// 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=<언어 코드>] Draw 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
 import { app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'

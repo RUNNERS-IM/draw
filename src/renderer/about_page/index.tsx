@@ -1,9 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
 import RunnersApps from '../runners/RunnersApps'
-import { t } from '../../shared/i18n'
+import { useTranslation } from 'react-i18next'
 import '../runners/runners-window.css'
 import './About.css'
+import { applyTextDirection } from '../i18n'
+
+applyTextDirection()
 
 const WEBSITE = 'https://runners.im/draw'
 const GITHUB = 'https://github.com/RUNNERS-IM/draw'
@@ -17,6 +20,7 @@ const openNotices = async (show: any) => {
 
 // Split 의 고지 시트와 같은 꼴: 제목, 「#」 줄을 굵게 한 스크롤 본문, 닫기 단추.
 const NoticesSheet = ({ text, onClose }: { text: string; onClose: (...args: any[]) => any }) => {
+  const { t } = useTranslation()
   const blocks = useMemo(() => text.split(/\n(?=# )/), [text])
   return (
     <div className="notices-backdrop" onClick={onClose}>
@@ -53,6 +57,7 @@ const NoticesSheet = ({ text, onClose }: { text: string; onClose: (...args: any[
 
 // Split 의 정보 창과 같은 꼴: 아이콘 96, 이름, 「판 · 무료 오픈소스」, 웹사이트 · GitHub, 다른 앱 카드, 원본 크레딧 · 고지 줄.
 const About = () => {
+  const { t } = useTranslation()
   const [version, setVersion] = useState('')
   const [notices, setNotices] = useState<any>(null)
   const root = useRef<any>(null)

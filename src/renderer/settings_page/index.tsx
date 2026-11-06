@@ -1,5 +1,8 @@
 import { createRoot } from 'react-dom/client'
 import Settings from './components/Settings'
+import { applyTextDirection } from '../i18n'
+
+applyTextDirection()
 
 console.log('[DRAW]: Settings page loading...')
 

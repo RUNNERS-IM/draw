@@ -1,14 +1,18 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { t } from '../../shared/i18n'
+import { useTranslation } from 'react-i18next'
 import '../runners/runners-window.css'
 import './Update.css'
+import { applyTextDirection } from '../i18n'
+
+applyTextDirection()
 
 const { answerUpdate, fitHeight, onUpdateOffer, updateOffer } = window.electronAPI
 
 // Split · Monitor 의 업데이트 창과 같은 꼴: 아이콘 64, 제목, 질문, 「새로워진 점」, 내려받는 동안은 진행 막대, 끝나면 [나중에] [지금 설치].
 // Enter 는 설치, Escape 는 나중에(내려받는 중이면 창만 닫고, 끝나면 창이 다시 뜬다).
 const Update = () => {
+  const { t } = useTranslation()
   const [offer, setOffer] = useState<any>(null)
   const [installing, setInstalling] = useState(false)
   const [more, setMore] = useState(false)

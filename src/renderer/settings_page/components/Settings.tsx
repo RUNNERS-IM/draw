@@ -2,7 +2,7 @@ import { useState } from 'react'
 import './Settings.scss'
 import ShortcutRecorder from './ShortcutRecorder'
 import ColorPicker from './ColorPicker'
-import { t } from '../../../shared/i18n'
+import { useTranslation } from 'react-i18next'
 import {
   createApplicationColorList,
   timeStep,
@@ -50,6 +50,7 @@ const ShortcutRow = ({
   onReset: (...args: any[]) => any
   onRemove: (...args: any[]) => any
 }) => {
+  const { t } = useTranslation()
   const canReset = !!shortcut.init && shortcut.init !== shortcut.accelerator
   const canRemove = (shortcut.accelerator || shortcut.init) && shortcut.accelerator !== '[NULL]'
 
@@ -93,6 +94,7 @@ const ShortcutRow = ({
 }
 
 const Settings = (config: any) => {
+  const { t } = useTranslation()
   const [showDrawingBorder, setShowDrawingBorder] = useState(config.show_drawing_border)
   const [cuteCursorMode, setCuteCursorMode] = useState(config.cute_cursor_mode)
   const [penSmoothing, setPenSmoothing] = useState(config.pen_smoothing)

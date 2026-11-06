@@ -107,7 +107,7 @@ body {
             background-color: var(--gray-300);
             border: 1px solid var(--gray-500);
             border-radius: 5px;
-            margin-right: 8px;
+            margin-inline-end: 8px;
             padding: 2px 4px;
           }
         }
@@ -489,7 +489,7 @@ body {
                 display: flex;
                 justify-content: center;
                 width: 25px;
-                margin-right: 5px;
+                margin-inline-end: 5px;
                 pointer-events: none;
 
                 .icon {

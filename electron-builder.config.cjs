@@ -1,6 +1,6 @@
 // Draw 묶기(electron-builder). Monitor · Split 과 같은 도구 · 같은 방식이다.
 //
-//   npm run dist                  이 맥에서 열어 볼 판(서명 없음, 임시 서명), dist.noindex/ 에
+//   pnpm dist                     이 맥에서 열어 볼 판(서명 없음, 임시 서명), dist.noindex/ 에
 //   DRAW_RELEASE=1 ...            출시 판: hardened runtime, Developer ID 서명과 공증(CI)
 //   DRAW_TAG=2.6.110601 ...       파일 이름에 태그를 쓴다(CI)
 //
@@ -24,7 +24,7 @@ module.exports = {
     'out/**',
     'package.json',
     '!**/*.map',
-    '!node_modules/{react,react-dom,scheduler,lucide-react,react-icons,lazy-brush,perfect-freehand,ntcjs,lodash}/**'
+    '!node_modules/{react,react-dom,react-i18next,html-parse-stringify,void-elements,use-sync-external-store,scheduler,lucide-react,react-icons,lazy-brush,perfect-freehand,ntcjs,lodash}/**'
   ],
   // Why: 원본 DrawPen 의 MIT 라이선스는 사본에 함께 넣어야 한다(앱 안 Contents/Resources/LICENSE).
   extraResources: [

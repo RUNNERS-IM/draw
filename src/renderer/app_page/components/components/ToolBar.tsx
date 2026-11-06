@@ -9,7 +9,7 @@ import {
   updateStoreDelay
 } from '../constants'
 
-import { t } from '../../../../shared/i18n'
+import { useTranslation } from 'react-i18next'
 import {
   toolbarIconSize,
   isToolbarReversed,
@@ -87,6 +87,7 @@ const ToolBar = ({
   Icons: Record<string, ComponentType<any>>
   colorList: ColorOption[]
 }) => {
+  const { t } = useTranslation()
   const toolConfig: Record<string, any> = {
     brush: { title: t('tool.brush'), alias: 'B', mainPanel: '1', subPanel: '1' },
     pen: { title: t('tool.pen'), alias: 'P', mainPanel: '1', subPanel: '2' },
