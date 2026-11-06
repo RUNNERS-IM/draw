@@ -1,0 +1,8 @@
+# 설치 스크립트를 돌려도 되는 패키지만 적는다: electron 은 실행 파일을 받고, esbuild 는 자기 네이티브 빌드를 고른다.
+allowBuilds:
+  electron: true
+  esbuild: true
+  electron-winstaller: false
+  "@parcel/watcher": false
+minimumReleaseAgeExclude:
+  - lucide-react@1.70.0

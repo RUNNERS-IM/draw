@@ -39,7 +39,7 @@ jobs:
       version: ${{ steps.bump.outputs.version || steps.current.outputs.version }}
       sha: ${{ steps.bump.outputs.sha || github.sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ env.PUBLISH == 'true' && 'release' || github.ref }}
           fetch-depth: 0  # 태그로 같은 날 낸 버전이 있는지 본다
@@ -76,18 +76,21 @@ jobs:
       # 시험판 전용 코드(src/main/testShots.js)를 빼고, hardened runtime · 서명 · 공증을 켠다
       DRAW_RELEASE: "1"
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.version.outputs.sha }}
 
-      - uses: actions/setup-node@v4
+      # pnpm 판은 package.json 의 packageManager 칸을 읽는다
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
         with:
-          node-version: 22
-          cache: npm
+          node-version: 24
+          cache: pnpm
 
-      - run: npm ci
-      - run: npm test
-      - run: npm run build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm test
+
+      - run: pnpm build
 
       - name: 임시 서명 키체인 준비
         env:
@@ -126,9 +129,9 @@ jobs:
         run: |
           set -euo pipefail
           export APPLE_API_KEY="$APPLE_API_KEY_PATH"
-          npx electron-builder --config builder.config.cjs --mac --publish never
+          pnpm exec electron-builder --config builder.config.cjs --mac --publish never
 
-      # 앱은 electron-builder 가 공증했지만 DMG 자체도 공증 · 스테이플해야 오프라인에서도 경고 없이 열린다
+      # 앱은 electron-builder 가 공증했지만 DMG 자체도 서명 · 공증 · 스테이플해야 오프라인에서도 경고 없이 열린다
       - name: DMG 공증
         env:
           ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
@@ -136,8 +139,17 @@ jobs:
         run: |
           set -euo pipefail
           for DMG in dist.noindex/*.dmg; do
+            # electron-builder 는 안의 앱만 서명하고 DMG 는 서명하지 않는다. Gatekeeper 는 DMG 서명도 본다.
+            codesign --sign "Runners Co., Ltd (RGWVXJ8URP)" --timestamp "$DMG"
             xcrun notarytool submit "$DMG" --key "$APPLE_API_KEY_PATH" --key-id "$ASC_API_KEY_ID" --issuer "$ASC_API_ISSUER_ID" --wait
-            xcrun stapler staple "$DMG"
+            # Apple 티켓 서버가 연결을 끊는 일이 있어 스테이플은 세 번까지 해 본다.
+            for TRY in 1 2 3; do
+              xcrun stapler staple "$DMG" && break
+              [ "$TRY" = 3 ] && exit 1
+              echo "::warning::stapler 실패($TRY 번째), 30초 뒤 다시 합니다"
+              sleep 30
+            done
+            spctl -a -t open --context context:primary-signature -v "$DMG"
           done
 
       - name: 파일 모으기
@@ -151,7 +163,7 @@ jobs:
           done
           ls -la $OUT
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         with:
           name: draw-macos
           path: dist-release/*
@@ -175,7 +187,7 @@ jobs:
       VERSION: ${{ needs.version.outputs.version }}
       GH_TOKEN: ${{ github.token }}
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@v8
         with:
           path: files
           merge-multiple: true
@@ -183,7 +195,7 @@ jobs:
       # 릴리스 본문은 저장소의 RELEASE_NOTES.md("## 한국어" · "## English" 두 칸의 "- " 목록)다. 앱의 업데이트 창이
       # 이 본문에서 자기 언어 칸의 목록만 읽어 "바뀐 점"으로 보여 준다. 버전 올리기(scripts/bump-release.sh)가
       # 비었거나 지난 판 그대로인 파일을 막는다.
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
         with:
           ref: ${{ needs.version.outputs.sha }}
           path: repo
