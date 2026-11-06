@@ -1,4 +1,5 @@
-import React from "react";
+import type { ComponentType } from 'react';
+import type { ColorOption } from '../types';
 import "./CuteCursor.scss";
 import {
   eraserTailColor,
@@ -19,7 +20,7 @@ const CuteCursor = ({
   colorList,
   rainbowColorDeg,
   cuteCursorMode,
-}) => {
+}: { mouseCoordinates: any; activeColorIndex: number; activeWidthIndex: number; activeTool: string; Icons: Record<string, ComponentType<any>>; colorList: ColorOption[]; rainbowColorDeg: number; cuteCursorMode: any }) => {
   if (mouseCoordinates.x === 0 && mouseCoordinates.y === 0) {
     return null;
   }
@@ -44,7 +45,7 @@ const CuteCursor = ({
     return getCursorColor(colorList, activeColorIndex, rainbowColorDeg);
   };
 
-  const renderIconByToolName = (toolName) => {
+  const renderIconByToolName = (toolName: string) => {
     const iconColor = colorList[activeColorIndex].color;
     const iconSize = widthList[activeWidthIndex].icon_size;
 

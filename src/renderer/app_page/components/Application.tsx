@@ -1,6 +1,8 @@
+import type { ComponentType } from 'react';
+import type { Figure, Point } from './types';
 import './Application.scss';
 
-import React, { useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react';
+import { useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react';
 import { throttle, debounce } from 'lodash';
 import DrawDesk from './components/DrawDesk';
 import ToolBar from './components/ToolBar';
@@ -55,7 +57,7 @@ import {
   initialZoomIndex,
 } from './constants';
 
-const lucide = (Icon) => (props) => <Icon strokeWidth={1.5} {...props} />;
+const lucide = (Icon: ComponentType<any>) => (props: any) => <Icon strokeWidth={1.5} {...props} />;
 
 const Icons = {
   DrawModeEnabled: lucide(MousePointer2),
@@ -79,7 +81,7 @@ const Icons = {
   AngleRight: lucide(ChevronRight),
 };
 
-const Application = (settings) => {
+const Application = (settings: any) => {
   // console.log('App render');
 
   const initialColorDeg = Math.random() * 360
@@ -116,7 +118,7 @@ const Application = (settings) => {
   const key_binding_make_screenshot = settings.key_binding_make_screenshot
   const key_binding_start_zoom      = settings.key_binding_start_zoom
 
-  let initialFigures = []
+  let initialFigures: any[] = []
 
   if (process.env.NODE_ENV === 'development') {
     initialFigures = [
@@ -128,7 +130,7 @@ const Application = (settings) => {
     ]
   }
 
-  const testActionRef = useRef(null);
+  const testActionRef = useRef<any>(null);
 
   useEffect(() => {
     if (!window.electronAPI.onTestAction) return;
@@ -143,7 +145,7 @@ const Application = (settings) => {
       if (action.type === 'clear') handleReset();
       if (action.type === 'figures') {
         setAllFigures(action.figures);
-        setUndoStackFigures(action.figures.map((figure) => ({ type: 'add', figures: [figure] })));
+        setUndoStackFigures(action.figures.map((figure: Figure) => ({ type: 'add', figures: [figure] })));
       }
     });
   }, []);
@@ -152,15 +154,15 @@ const Application = (settings) => {
   const [rainbowColorDeg, updateRainbowColorDeg] = useState(initialColorDeg);
   const [mouseCoordinates, setMouseCoordinates] = useState({ x: 0, y: 0 });
   const [allFigures, setAllFigures] = useState(initialFigures);
-  const [allLaserFigures, setLaserFigure] = useState([]);
-  const [allEraserFigures, setEraserFigure] = useState([]);
-  const [allFadeFigures, setFadeFigures] = useState([]);
+  const [allLaserFigures, setLaserFigure] = useState<any>([]);
+  const [allEraserFigures, setEraserFigure] = useState<any>([]);
+  const [allFadeFigures, setFadeFigures] = useState<any>([]);
   const [activeTool, setActiveTool] = useState(initialActiveTool);
-  const [activeFigureInfo, setActiveFigureInfo] = useState(null);
+  const [activeFigureInfo, setActiveFigureInfo] = useState<any>(null);
   const [activeColorIndex, setActiveColorIndex] = useState(initialActiveColor);
   const [activeWidthIndex, setActiveWidthIndex] = useState(initialActiveWidth);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [textEditorContainer, setTextEditorContainer] = useState(null);
+  const [textEditorContainer, setTextEditorContainer] = useState<any>(null);
   const [cursorType, setCursorType] = useState('crosshair');
   const [showToolbar, setShowToolbar] = useState(initialShowToolbar);
   const [showWhiteboard, setShowWhiteboard] = useState(initialShowWhiteboard);
@@ -176,10 +178,10 @@ const Application = (settings) => {
   const [toolbarCollapsed, setToolbarCollapsed] = useState(initialToolbarCollapsed);
   const [toolbarPosition, setToolbarPosition] = useState(initialToolbarPosition);
   const [toolbarSlide, setToolbarSlide] = useState('main-slide');
-  const [rippleEffects, setRippleEffects] = useState([]);
-  const [undoStackFigures, setUndoStackFigures] = useState([]);
-  const [redoStackFigures, setRedoStackFigures] = useState([]);
-  const [clipboardFigure, setClipboardFigure] = useState(null);
+  const [rippleEffects, setRippleEffects] = useState<any>([]);
+  const [undoStackFigures, setUndoStackFigures] = useState<any>([]);
+  const [redoStackFigures, setRedoStackFigures] = useState<any>([]);
+  const [clipboardFigure, setClipboardFigure] = useState<any>(null);
   const [isShiftPressed, setIsShiftPressed] = useState(false);
   const [isSpacePressed, setIsSpacePressed] = useState(false);
   const [isFadeDrawing, setIsFadeDrawing] = useState(false);
@@ -191,8 +193,8 @@ const Application = (settings) => {
   const [mainColorIndex, setMainColorIndex] = useState(initialMainColorIndex);
   const [secondaryColorIndex, setSecondaryColorIndex] = useState(initialSecondaryColorIndex);
   const [showScreenshotFlash, setShowScreenshotFlash] = useState(false);
-  const [zoomInfo, setZoomInfo] = useState({ status: 'inactive' }); // 'inactive', 'capturing', 'zooming', 'drawing', 'resuming', 'exiting'
-  const [toastInfo, setToastInfo] = useState(null);
+  const [zoomInfo, setZoomInfo] = useState<any>({ status: 'inactive' }); // 'inactive', 'capturing', 'zooming', 'drawing', 'resuming', 'exiting'
+  const [toastInfo, setToastInfo] = useState<any>(null);
   const [fadeOpacity, setFadeOpacity] = useState(1.0);
 
   const drawingInProgressRef = useRef(false);
@@ -233,7 +235,7 @@ const Application = (settings) => {
     };
   }, [zoomInfo.status]);
 
-  const handleKeyDown = useCallback((event) => {
+  const handleKeyDown = useCallback((event: any) => {
     if (zoomInfo.status === 'capturing' || zoomInfo.status === 'exiting') {
       event.preventDefault();
       return;
@@ -247,7 +249,7 @@ const Application = (settings) => {
 
     const direction = shiftKey ? -1 : 1;
 
-    const getNextVariant = (variantList, activeVariant, direction = 1) => {
+    const getNextVariant = (variantList: string[], activeVariant: string, direction = 1) => {
       const activeVariantIndex = variantList.indexOf(activeVariant);
 
       if (activeVariantIndex === -1) {
@@ -349,9 +351,9 @@ const Application = (settings) => {
             };
 
             setActiveFigureInfo({ id: newFigure.id, x, y });
-            setAllFigures(prevAllFigures => [...prevAllFigures, newFigure]);
+            setAllFigures(prevAllFigures => [...prevAllFigures, newFigure as Figure]);
 
-            setUndoStackFigures(prevUndoStack => [...prevUndoStack, { type: 'add', figures: [newFigure] }]);
+            setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'add', figures: [newFigure] }]);
             setRedoStackFigures([]);
           }
         }
@@ -365,7 +367,7 @@ const Application = (settings) => {
 
             setClipboardFigure({
               ...activeFigure,
-              points: activeFigure.points.map(p => [...p]) // Avoid mutation
+              points: activeFigure!.points.map((p: Point) => [...p]) // Avoid mutation
             });
           }
         }
@@ -446,7 +448,7 @@ const Application = (settings) => {
           let offset = 2;
           if (shiftKey) { offset *= 5 }
 
-          const directionMap = {
+          const directionMap: Record<string, number[]> = {
             arrowleft:  [-offset, 0],
             arrowright: [offset, 0],
             arrowup:    [0, -offset],
@@ -455,7 +457,7 @@ const Application = (settings) => {
 
           const [dx, dy] = directionMap[eventKey];
 
-          activeFigure.points.forEach((point) => {
+          activeFigure!.points.forEach((point: Point) => {
             point[0] += dx;
             point[1] += dy;
           });
@@ -473,7 +475,7 @@ const Application = (settings) => {
         if (activeFigureInfo) {
           const activeFigure = findActiveFigure()
 
-          if (activeFigure.type === 'text') {
+          if (activeFigure!.type === 'text') {
             activateTextEditor(activeFigure);
 
             event.preventDefault();
@@ -600,7 +602,7 @@ const Application = (settings) => {
     }
   }, [allFigures, undoStackFigures, redoStackFigures, clipboardFigure, isDrawing, activeFigureInfo, activeTool, activeColorIndex, activeWidthIndex, toolbarLastActiveBrush, toolbarLastActiveFigure, lastActivePen, lastActiveArrow, toolbarSlide, textEditorContainer, mouseCoordinates, mainColorIndex, secondaryColorIndex, colorList, zoomInfo]);
 
-  const handleKeyUp = useCallback((event) => {
+  const handleKeyUp = useCallback((event: any) => {
     const eventKey = (event.key || '').toLowerCase();
     const eventCode = (event.code || '').toLowerCase();
 
@@ -619,7 +621,7 @@ const Application = (settings) => {
     }
   }, [textEditorContainer]);
 
-  const parseAccelerator = (shortcut) => {
+  const parseAccelerator = (shortcut: string) => {
     if (!shortcut) return null
     if (shortcut === '[NULL]') return null
 
@@ -639,7 +641,7 @@ const Application = (settings) => {
     };
   }
 
-  const eventMatches = (event, shortcut) => {
+  const eventMatches = (event: any, shortcut: string) => {
     const eventKey = (event.key || '').toUpperCase()
     const eventCode = (event.code || '').toUpperCase()
     const ctrlKey = event.ctrlKey
@@ -720,19 +722,19 @@ const Application = (settings) => {
     };
   }, [showWhiteboard, showToolbar, activeTool, activeColorIndex, activeWidthIndex, toolbarLastActiveBrush, toolbarLastActiveFigure, toolbarCollapsed]);
 
-  const allLasersFiguresByRef = useRef(null)
+  const allLasersFiguresByRef = useRef<any>(null)
   useEffect(() => {
     allLasersFiguresByRef.current = allLaserFigures;
   }, [allLaserFigures]);
 
-  const allErasersFiguresByRef = useRef(null)
+  const allErasersFiguresByRef = useRef<any>(null)
   useEffect(() => {
     allErasersFiguresByRef.current = allEraserFigures;
   }, [allEraserFigures]);
 
-  const idleTimerRef = useRef(null);
-  const fadeRafRef = useRef(null);
-  const allFadeFiguresByRef = useRef(null)
+  const idleTimerRef = useRef<any>(null);
+  const fadeRafRef = useRef<any>(null);
+  const allFadeFiguresByRef = useRef<any>(null)
   useEffect(() => {
     allFadeFiguresByRef.current = allFadeFigures;
   }, [allFadeFigures]);
@@ -772,7 +774,7 @@ const Application = (settings) => {
     }
   }
 
-  const getFadeOpacity = (elapsedMs, opacityDuration) => {
+  const getFadeOpacity = (elapsedMs: number, opacityDuration: number) => {
     let progress = 1 - (elapsedMs / opacityDuration);
 
     if (progress < 0) progress = 0; // clamp to 0..1
@@ -783,7 +785,7 @@ const Application = (settings) => {
 
   const startFading = () => {
     const fadeStartAt = Date.now();
-    let memoLastOpacity = null;
+    let memoLastOpacity: number | null = null;
 
     const tick = () => {
       if (!fadeRafRef.current) return;
@@ -815,11 +817,11 @@ const Application = (settings) => {
     return activeFigureInfo && (activeFigureInfo.dragging || activeFigureInfo.resizing)
   }
 
-  const findActiveFigure = () => {
+  const findActiveFigure = (): any => {
     return allFigures.find((figure) => figure.id === activeFigureInfo.id);
   }
 
-  const scheduleClearLaserTail = (id) => {
+  const scheduleClearLaserTail = (id: number) => {
     // https://felixgerschau.com/react-hooks-settimeout/
     setTimeout(() => {
       const updatedLaserFigures = clearTail(id, allLasersFiguresByRef.current);
@@ -828,7 +830,7 @@ const Application = (settings) => {
     }, initialLaserTime)
   }
 
-  const scheduleClearEraserTail = (id) => {
+  const scheduleClearEraserTail = (id: number) => {
     setTimeout(() => {
       const updatedEraserFigures = clearTail(id, allErasersFiguresByRef.current);
 
@@ -836,8 +838,8 @@ const Application = (settings) => {
     }, eraserTime)
   }
 
-  const clearTail = (id, figures) => {
-    const figure = figures.find(figure => figure.id === id);
+  const clearTail = (id: number, figures: Figure[]) => {
+    const figure = figures.find((figure: Figure) => figure.id === id);
     if (figure) {
       figure.points.shift();
     }
@@ -845,25 +847,25 @@ const Application = (settings) => {
     return figures
   }
 
-  const handleChangeColor = (newColorIndex) => {
+  const handleChangeColor = (newColorIndex: number) => {
     setActiveColorIndex(newColorIndex);
   };
 
-  const handleChangeWidth = (newWidthIndex) => {
+  const handleChangeWidth = (newWidthIndex: number) => {
     setActiveWidthIndex(newWidthIndex);
   };
 
-  const handleChangeFigureColor = (newColorIndex) => {
+  const handleChangeFigureColor = (newColorIndex: number) => {
     if (!activeFigureInfo) return;
 
     const activeFigure = findActiveFigure()
 
-    activeFigure.colorIndex = newColorIndex
+    activeFigure!.colorIndex = newColorIndex
 
     setAllFigures([...allFigures]);
   };
 
-  const handleChangeFigureWidth = (newWidthIndex) => {
+  const handleChangeFigureWidth = (newWidthIndex: number) => {
     if (!activeFigureInfo) return;
 
     setAllFigures(prevAllFigures => {
@@ -891,22 +893,22 @@ const Application = (settings) => {
     });
   };
 
-  const handleChangeFigureStroke = (newStrokeIndex) => {
+  const handleChangeFigureStroke = (newStrokeIndex: number) => {
     if (!activeFigureInfo) return;
 
     const activeFigure = findActiveFigure()
 
-    activeFigure.strokeIndex = newStrokeIndex
+    activeFigure!.strokeIndex = newStrokeIndex
 
     setAllFigures([...allFigures]);
   };
 
-  const handleChangeFigureEdges = (newEdgeIndex) => {
+  const handleChangeFigureEdges = (newEdgeIndex: number) => {
     if (!activeFigureInfo) return;
 
     const activeFigure = findActiveFigure()
 
-    activeFigure.edgeIndex = newEdgeIndex
+    activeFigure!.edgeIndex = newEdgeIndex
 
     setAllFigures([...allFigures]);
   };
@@ -918,7 +920,7 @@ const Application = (settings) => {
 
     setActiveFigureInfo(null);
     setAllFigures(allFigures.filter((figure) => figure.id !== activeFigureInfo.id));
-    setUndoStackFigures((prevUndoStack) => [...prevUndoStack, { type: 'remove', figures: [activeFigure] }]);
+    setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'remove', figures: [activeFigure] }]);
     setRedoStackFigures([]);
   };
 
@@ -934,16 +936,16 @@ const Application = (settings) => {
     let newActiveFigures
 
     if (lastAction.type === 'add') {
-      newActiveFigures = allFigures.filter(figure => !lastAction.figures.some(f => f.id === figure.id))
+      newActiveFigures = allFigures.filter(figure => !lastAction.figures.some((f: Figure) => f.id === figure.id))
     }
 
     if (lastAction.type === 'remove') {
       newActiveFigures = [...allFigures, ...lastAction.figures];
     }
 
-    setAllFigures(newActiveFigures);
-    setUndoStackFigures(prevUndoStack => prevUndoStack.slice(0, -1));
-    setRedoStackFigures(prevRedoStack => [...prevRedoStack, lastAction]);
+    setAllFigures(newActiveFigures!);
+    setUndoStackFigures((prevUndoStack: any[]) => prevUndoStack.slice(0, -1));
+    setRedoStackFigures((prevRedoStack: any[]) => [...prevRedoStack, lastAction]);
   };
 
   const handleRedo = () => {
@@ -957,15 +959,15 @@ const Application = (settings) => {
     }
 
     if (lastAction.type === 'remove') {
-      newActiveFigures = allFigures.filter(figure => !lastAction.figures.some(f => f.id === figure.id))
+      newActiveFigures = allFigures.filter(figure => !lastAction.figures.some((f: Figure) => f.id === figure.id))
     }
 
-    setAllFigures(newActiveFigures);
-    setUndoStackFigures(prevUndoStack => [...prevUndoStack, lastAction]);
-    setRedoStackFigures(prevRedoStack => prevRedoStack.slice(0, -1));
+    setAllFigures(newActiveFigures!);
+    setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, lastAction]);
+    setRedoStackFigures((prevRedoStack: any[]) => prevRedoStack.slice(0, -1));
   };
 
-  const handleChangeTool = (toolName) => {
+  const handleChangeTool = (toolName: string) => {
     if (activeTool === toolName || !enabledToolList.includes(toolName)) {
       return
     }
@@ -990,7 +992,7 @@ const Application = (settings) => {
     }
   };
 
-  const moveFigureToTop = (figureId) => {
+  const moveFigureToTop = (figureId: number) => {
     setAllFigures(figures => {
       const target = figures.find(figure => figure.id === figureId);
       if (!target) return figures;
@@ -1001,12 +1003,12 @@ const Application = (settings) => {
     });
   };
 
-  const getFigureAtMousePosition = (x, y) => {
+  const getFigureAtMousePosition = (x: number, y: number) => {
     return allFigures.findLast((figure) => isOnFigure(x, y, figure))
   };
 
-  const setActiveHoveredDotName = (hoveredDotName) => {
-    setActiveFigureInfo(prev => {
+  const setActiveHoveredDotName = (hoveredDotName: string | null) => {
+    setActiveFigureInfo((prev: any) => {
       if (!prev) return prev;
       if (prev.hoveredDotName === hoveredDotName) return prev;
 
@@ -1014,14 +1016,14 @@ const Application = (settings) => {
     });
   }
 
-  const getResizeCursorByFigure = (figure, resizingDotName) => {
+  const getResizeCursorByFigure = (figure: Figure, resizingDotName: string) => {
     if (['line', 'arrow', 'flat_arrow'].includes(figure.type)) {
       return 'pointer';
     }
 
     if (['rectangle', 'diamond', 'oval'].includes(figure.type)) {
       const [pointA, pointB] = figure.points;
-      const cornersByDotName = {
+      const cornersByDotName: Record<string, Point> = {
         pointA,
         pointB,
         pointC: [pointA[0], pointB[1]],
@@ -1047,14 +1049,14 @@ const Application = (settings) => {
     return 'crosshair';
   }
 
-  const getResizeCursorBySide = (resizingSideName) => {
+  const getResizeCursorBySide = (resizingSideName: string) => {
     if (['TopSide', 'BottomSide'].includes(resizingSideName)) return 'ns-resize';
     if (['LeftSide', 'RightSide'].includes(resizingSideName)) return 'ew-resize';
 
     return 'crosshair';
   }
 
-  const setMouseCursor = (x, y) => {
+  const setMouseCursor = (x: number, y: number) => {
     if (activeFigureInfo) {
       const activeFigure = findActiveFigure()
 
@@ -1101,10 +1103,10 @@ const Application = (settings) => {
   };
   const setMouseCursorThrottle = throttle(setMouseCursor, 100);
 
-  const eraseOnIntersection = (eraserFigure) => (prevFigures) => {
+  const eraseOnIntersection = (eraserFigure: Figure) => (prevFigures: Figure[]) => {
     let hasChanges = false;
 
-    const updatedFigures = prevFigures.map((figure) => {
+    const updatedFigures = prevFigures.map((figure: Figure) => {
       if (!figure.erased && areFiguresIntersecting(eraserFigure, figure)) {
         hasChanges = true;
         return { ...figure, erased: true };
@@ -1115,12 +1117,12 @@ const Application = (settings) => {
     return hasChanges ? updatedFigures : prevFigures;
   };
 
-  const eraseFiguresOnIntersection = (eraserFigure) => {
+  const eraseFiguresOnIntersection = (eraserFigure: Figure) => {
     setAllFigures(eraseOnIntersection(eraserFigure));
     setFadeFigures(eraseOnIntersection(eraserFigure));
   }
 
-  const handleMouseDown = ({ x, y }) => {
+  const handleMouseDown = ({ x, y }: { x: number; y: number }) => {
     // Diactivate text editor
     if (textEditorContainer) {
       setTextEditorContainer({ ...textEditorContainer, isActive: false });
@@ -1137,7 +1139,7 @@ const Application = (settings) => {
       if (resizingDotName) {
         const resizingPointerOffset = getDotOffsetCoordinates(activeFigure, resizingDotName, x, y);
 
-        setActiveFigureInfo(prev => {
+        setActiveFigureInfo((prev: any) => {
           if (!prev) return prev;
 
           return {
@@ -1155,7 +1157,7 @@ const Application = (settings) => {
         const resizingSidePointName = getSidePointName(activeFigure, resizingSideName);
         const resizingPointerOffset = getSideOffsetCoordinates(activeFigure, resizingSideName, resizingSidePointName, x, y);
 
-        setActiveFigureInfo(prev => {
+        setActiveFigureInfo((prev: any) => {
           if (!prev) return prev;
 
           return {
@@ -1171,7 +1173,7 @@ const Application = (settings) => {
       }
 
       if (isOverFigure(x, y, activeFigure)) {
-        setActiveFigureInfo(prev => {
+        setActiveFigureInfo((prev: any) => {
           if (!prev) return prev;
 
           return {
@@ -1187,7 +1189,7 @@ const Application = (settings) => {
       }
 
       if (isOnTextAutoResizeHandle(x, y, activeFigure)) {
-        const [width, height] = calculateCanvasTextWidth(activeFigure.text, activeFigure.widthIndex);
+        const [width, height] = calculateCanvasTextWidth(activeFigure!.text, activeFigure!.widthIndex);
 
         setAllFigures(prevAllFigures => {
           return prevAllFigures.map((figure) => {
@@ -1242,7 +1244,7 @@ const Application = (settings) => {
         points: [[x, y]],
       };
 
-      eraseFiguresOnIntersection(eraserFigure);
+      eraseFiguresOnIntersection(eraserFigure as Figure);
       setEraserFigure([...allEraserFigures, eraserFigure]);
       scheduleClearEraserTail(eraserFigure.id)
       setIsDrawing(true);
@@ -1287,16 +1289,16 @@ const Application = (settings) => {
 
     if (activeTool === 'fadepen') {
       setIsFadeDrawing(true);
-      setFadeFigures(prevFadeFigures => [...prevFadeFigures, newFigure]);
+      setFadeFigures((prevFadeFigures: Figure[]) => [...prevFadeFigures, newFigure]);
       setIsDrawing(true);
       return;
     }
 
-    setAllFigures(prevAllFigures => [...prevAllFigures, newFigure]);
+    setAllFigures(prevAllFigures => [...prevAllFigures, newFigure as Figure]);
     setIsDrawing(true);
   };
 
-  const handleMouseMove = ({ x, y }) => {
+  const handleMouseMove = ({ x, y }: { x: number; y: number }) => {
     if (isActiveFigureMoving()) {
       const activeFigure = findActiveFigure()
 
@@ -1308,7 +1310,7 @@ const Application = (settings) => {
         resizeFigure(activeFigure, activeFigureInfo, { x, y, isShiftPressed })
       }
 
-      setActiveFigureInfo(prev => ({ ...prev, x, y }));
+      setActiveFigureInfo((prev: any) => ({ ...prev, x, y }));
       setAllFigures([...allFigures]);
       return
     }
@@ -1384,7 +1386,7 @@ const Application = (settings) => {
     setMouseCursorThrottle(x, y)
   };
 
-  const handleMouseUp = ({ x, y }) => {
+  const handleMouseUp = ({ x, y }: { x: number; y: number }) => {
     if (isDrawing) {
       const upPoint = [x, y];
 
@@ -1394,7 +1396,7 @@ const Application = (settings) => {
 
         let laserDistance = 0;
         if (amountOfPoints > 0) {
-          laserDistance = distanceBetweenPoints(currentLaser.points[0], upPoint);
+          laserDistance = distanceBetweenPoints(currentLaser.points[0], (upPoint as Point));
         }
 
         if (laserDistance < minObjectDistance && amountOfPoints < 10) {
@@ -1412,24 +1414,24 @@ const Application = (settings) => {
 
       if (activeTool === 'eraser') {
         const figuresToRemove = allFigures.filter(figure => figure.erased).map(figure => ({ ...figure, erased: false }));
-        const fadeFiguresToRemove = allFadeFigures.filter(figure => figure.erased).map(figure => ({ ...figure, erased: false }));
+        const fadeFiguresToRemove = allFadeFigures.filter((figure: Figure) => figure.erased).map((figure: Figure) => ({ ...figure, erased: false }));
 
         if (figuresToRemove.length > 0) {
-          setUndoStackFigures(prevUndoStack => [...prevUndoStack, { type: 'remove', figures: figuresToRemove }]);
+          setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'remove', figures: figuresToRemove }]);
           setRedoStackFigures([]);
 
           setAllFigures(allFigures.filter(figure => !figure.erased));
         }
 
         if (fadeFiguresToRemove.length > 0) {
-          setFadeFigures(allFadeFigures.filter(figure => !figure.erased));
+          setFadeFigures(allFadeFigures.filter((figure: Figure) => !figure.erased));
         }
       }
 
       if (activeTool === 'highlighter') {
         const currentFigure = allFigures.at(-1);
 
-        setUndoStackFigures(prevUndoStack => [...prevUndoStack, { type: 'add', figures: [currentFigure] }]);
+        setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'add', figures: [currentFigure] }]);
         setRedoStackFigures([]);
       }
 
@@ -1447,11 +1449,11 @@ const Application = (settings) => {
       if (['brush', 'pen'].includes(activeTool)) {
         const currentFigure = allFigures.at(-1);
 
-        if (penSmoothing && !colorList[currentFigure.colorIndex].isRainbow) {
-          currentFigure.points = [...filterClosePoints(currentFigure.points, currentFigure.widthIndex)];
+        if (penSmoothing && !colorList[currentFigure!.colorIndex].isRainbow) {
+          currentFigure!.points = [...filterClosePoints(currentFigure!.points, currentFigure!.widthIndex)];
         }
 
-        setUndoStackFigures(prevUndoStack => [...prevUndoStack, { type: 'add', figures: [currentFigure] }]);
+        setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'add', figures: [currentFigure] }]);
         setRedoStackFigures([]);
 
         setAllFigures([...allFigures]);
@@ -1459,16 +1461,16 @@ const Application = (settings) => {
 
       if (shapeList.includes(activeTool)) {
         const currentFigure = allFigures.at(-1);
-        const shapeDistance = distanceBetweenPoints(currentFigure.points[0], upPoint);
+        const shapeDistance = distanceBetweenPoints(currentFigure!.points[0], (upPoint as Point));
 
-        if (['rectangle', 'diamond', 'oval'].includes(currentFigure.type)) {
-          currentFigure.ratio = calculateAspectRatio(currentFigure);
+        if (['rectangle', 'diamond', 'oval'].includes(currentFigure!.type)) {
+          currentFigure!.ratio = calculateAspectRatio(currentFigure);
         }
 
         if (shapeDistance < minObjectDistance) {
           setAllFigures(allFigures => allFigures.slice(0, -1));
         } else {
-          setUndoStackFigures(prevUndoStack => [...prevUndoStack, { type: 'add', figures: [currentFigure] }]);
+          setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'add', figures: [currentFigure] }]);
           setRedoStackFigures([]);
           setAllFigures([...allFigures]);
         }
@@ -1479,8 +1481,8 @@ const Application = (settings) => {
       const activeFigure = findActiveFigure()
 
       if (activeFigureInfo.resizing) {
-        if (['rectangle', 'diamond', 'oval'].includes(activeFigure.type)) {
-          activeFigure.ratio = calculateAspectRatio(activeFigure);
+        if (['rectangle', 'diamond', 'oval'].includes(activeFigure!.type)) {
+          activeFigure!.ratio = calculateAspectRatio(activeFigure);
 
           setAllFigures([...allFigures]);
         }
@@ -1492,21 +1494,21 @@ const Application = (settings) => {
     setIsDrawing(false);
   };
 
-  const handleDoubleClick = ({ x, y }) => {
+  const handleDoubleClick = () => {
     if (activeFigureInfo) {
       const activeFigure = findActiveFigure()
 
-      if (activeFigure.type === 'text') {
+      if (activeFigure!.type === 'text') {
         activateTextEditor(activeFigure);
       }
     }
   };
 
-  const handleMousePosition = (event) => {
+  const handleMousePosition = (event: any) => {
     setMouseCoordinates(getMouseCoordinates(event));
   }
 
-  const handleContextMenu = (event) => {
+  const handleContextMenu = (event: any) => {
     event.preventDefault();
 
     if (isDrawing) return;
@@ -1544,7 +1546,7 @@ const Application = (settings) => {
   }
 
   const handleStartExitZoom = () => {
-    setZoomInfo((currentZoomInfo) => {
+    setZoomInfo((currentZoomInfo: any) => {
       if (currentZoomInfo.status === 'zooming' || currentZoomInfo.status === 'drawing' || currentZoomInfo.status === 'resuming') {
         return {
           ...currentZoomInfo,
@@ -1557,7 +1559,7 @@ const Application = (settings) => {
     });
   };
 
-  const handleLockZoom = ({ zoomIndex, focusPoint }) => {
+  const handleLockZoom = ({ zoomIndex, focusPoint }: { zoomIndex: number; focusPoint: any }) => {
     setMouseCoordinates(focusPoint);
 
     setZoomInfo({
@@ -1570,7 +1572,7 @@ const Application = (settings) => {
     });
   };
 
-  const handleResumeZoom = (event) => {
+  const handleResumeZoom = (event: any) => {
     event.preventDefault();
 
     if (isDrawing) return;
@@ -1591,7 +1593,7 @@ const Application = (settings) => {
   };
 
   const handleResumeZoomEnd = () => {
-    setZoomInfo((currentZoomInfo) => {
+    setZoomInfo((currentZoomInfo: any) => {
       if (currentZoomInfo.status === 'resuming') {
         return {
           ...currentZoomInfo,
@@ -1648,7 +1650,7 @@ const Application = (settings) => {
     window.electronAPI.invokeMakeScreenshot();
   }
 
-  const invokeOpenNotification = (info) => {
+  const invokeOpenNotification = (info: any) => {
     console.log('Renderer -> Main: Invoke Open Notification');
 
     window.electronAPI.invokeOpenNotification(info);
@@ -1689,16 +1691,16 @@ const Application = (settings) => {
   const handleToggleToolbar = () => {
     console.log('Main -> Renderer: Toggle Toolbar');
 
-    setShowToolbar((prevShowToolbar) => !prevShowToolbar);
+    setShowToolbar((prevShowToolbar: boolean) => !prevShowToolbar);
   };
 
   const handleToggleWhiteboard = () => {
     console.log('Main -> Renderer: Toggle Whiteboard');
 
-    setShowWhiteboard((prevShowWhiteboard) => !prevShowWhiteboard);
+    setShowWhiteboard((prevShowWhiteboard: boolean) => !prevShowWhiteboard);
   };
 
-  const handleRefreshSettings = (newSettings) => {
+  const handleRefreshSettings = (newSettings: any) => {
     console.log('Main -> Renderer: Refresh Settings');
 
     setColorList(createApplicationColorList(newSettings.tool_bar_color_palette));
@@ -1715,7 +1717,7 @@ const Application = (settings) => {
     setSecondaryColorIndex(newSettings.swap_colors_indexes[1]);
   };
 
-  const handleUpdateToolbarPosition = (newSettings) => {
+  const handleUpdateToolbarPosition = (newSettings: any) => {
     console.log('Main -> Renderer: Update Toolbar Position');
 
     setToolbarPosition({
@@ -1734,7 +1736,7 @@ const Application = (settings) => {
     setShowScreenshotFlash(false);
   };
 
-  const handleShowNotification = (data) => {
+  const handleShowNotification = (data: any) => {
     console.log('Main -> Renderer: Show Notification');
 
     setToastInfo({
@@ -1746,7 +1748,7 @@ const Application = (settings) => {
     });
   };
 
-  const handleShowZoom = (info) => {
+  const handleShowZoom = (info: any) => {
     console.log('Main -> Renderer: Show Zoom');
 
     setShowScreenshotFlash(false);
@@ -1789,13 +1791,13 @@ const Application = (settings) => {
     setZoomInfo({ status: 'inactive' });
   };
 
-  const invokeSetSettings = (settings) => {
+  const invokeSetSettings = (settings: any) => {
     console.log('Renderer -> Main: Invoke Set Settings');
 
     window.electronAPI.invokeSetSettings(settings);
   };
 
-  const invokeCommitToolbarPosition = useCallback((position) => {
+  const invokeCommitToolbarPosition = useCallback((position: any) => {
     console.log('Renderer -> Main: Invoke Commit Toolbar Position');
 
     window.electronAPI.invokeCommitToolbarPosition({
@@ -1804,27 +1806,27 @@ const Application = (settings) => {
     });
   }, []);
 
-  const handleChangeWhiteboardTheme = (theme) => {
+  const handleChangeWhiteboardTheme = (theme: string) => {
     setWhiteboardTheme(theme);
     invokeSetSettings({ whiteboard_color: theme });
   };
 
-  const handleChangeWhiteboardOpacity = (opacity) => {
+  const handleChangeWhiteboardOpacity = (opacity: number) => {
     setWhiteboardOpacity(opacity);
     invokeSetSettings({ whiteboard_opacity: opacity });
   };
 
-  const handleChangeWhiteboardPatternStyle = (style) => {
+  const handleChangeWhiteboardPatternStyle = (style: any) => {
     setWhiteboardPatternStyle(style);
     invokeSetSettings({ whiteboard_style: style });
   };
 
-  const handleChangeWhiteboardSpacing = (spacing) => {
+  const handleChangeWhiteboardSpacing = (spacing: number) => {
     setWhiteboardSpacing(spacing);
     invokeSetSettings({ whiteboard_spacing: spacing });
   };
 
-  const handleChangeWhiteboardLayout = (layout, saveToStore = false) => {
+  const handleChangeWhiteboardLayout = (layout: string, saveToStore = false) => {
     setWhiteboardLayout(layout);
 
     if (saveToStore) {
@@ -1845,7 +1847,7 @@ const Application = (settings) => {
     setToastInfo(null);
   };
 
-  const handleTextEditorBlur = (text) => {
+  const handleTextEditorBlur = (text: string) => {
     const cleanedText = text.replace(/[\s\u200B\u200C\u200D\uFEFF]+$/g, ''); // прибираємо сміття з кінця
 
     if (cleanedText === '') {
@@ -1874,14 +1876,14 @@ const Application = (settings) => {
       autoResize: textEditorContainer.autoResize,
     };
 
-    setAllFigures([...allFigures, textFigure]);
+    setAllFigures([...allFigures, textFigure as unknown as Figure]);
     setTextEditorContainer(null);
 
-    setUndoStackFigures(prevUndoStack => [...prevUndoStack, { type: 'add', figures: [textFigure] }]);
+    setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'add', figures: [textFigure] }]);
     setRedoStackFigures([]);
   };
 
-  const activateTextEditor = (pickedFigure) => {
+  const activateTextEditor = (pickedFigure: Figure) => {
     const newTextEditor = {
       isActive: true,
       startAt: pickedFigure.points[0],
@@ -1898,7 +1900,7 @@ const Application = (settings) => {
     setActiveFigureInfo(null);
     setAllFigures(allFigures.filter(figure => figure.id !== pickedFigure.id));
 
-    setUndoStackFigures(prevUndoStack => [...prevUndoStack, { type: 'remove', figures: [pickedFigure] }]);
+    setUndoStackFigures((prevUndoStack: any[]) => [...prevUndoStack, { type: 'remove', figures: [pickedFigure] }]);
     setRedoStackFigures([]);
   }
 
@@ -2028,8 +2030,6 @@ const Application = (settings) => {
             setIsCollapsed={setToolbarCollapsed}
             shortcutHintsDisabled={Boolean(textEditorContainer)}
             clearDeskShortcut={key_clear_desk}
-            lastActiveBrush={toolbarLastActiveBrush}
-            lastActiveFigure={toolbarLastActiveFigure}
             activeTool={activeTool}
             activeColorIndex={activeColorIndex}
             activeWidthIndex={activeWidthIndex}

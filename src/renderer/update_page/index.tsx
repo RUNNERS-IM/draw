@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { t } from '../../shared/i18n';
 import '../runners/runners-window.css';
@@ -9,12 +9,12 @@ const { answerUpdate, fitHeight, onUpdateOffer, updateOffer } = window.electronA
 // Split · Monitor 의 업데이트 창과 같은 꼴: 아이콘 64, 제목, 질문, 「새로워진 점」, 내려받는 동안은 진행 막대, 끝나면 [나중에] [지금 설치].
 // Enter 는 설치, Escape 는 나중에(내려받는 중이면 창만 닫고, 끝나면 창이 다시 뜬다).
 const Update = () => {
-  const [offer, setOffer] = useState(null);
+  const [offer, setOffer] = useState<any>(null);
   const [installing, setInstalling] = useState(false);
   const [more, setMore] = useState(false);
-  const root = useRef(null);
-  const installButton = useRef(null);
-  const list = useRef(null);
+  const root = useRef<any>(null);
+  const installButton = useRef<any>(null);
+  const list = useRef<any>(null);
 
   const ready = useRef(false);
   ready.current = offer !== null && !offer.downloading && !installing;
@@ -33,9 +33,9 @@ const Update = () => {
   };
 
   useEffect(() => {
-    updateOffer().then((first) => setOffer((now) => now ?? first));
+    updateOffer().then((first) => setOffer((now: number) => now ?? first));
     const stop = onUpdateOffer(setOffer);
-    const keys = (event) => {
+    const keys = (event: any) => {
       if (event.key === 'Escape' && !busy.current) answerUpdate('later');
       if (event.key === 'Enter') {
         event.preventDefault();
@@ -82,7 +82,7 @@ const Update = () => {
         <section className="update-notes">
           <h2 className="update-notes-title">{t('update.notes')}</h2>
           <ul ref={list} className={`update-list${more ? ' more' : ''}`} onScroll={measure}>
-            {offer.notes.map((line, index) => <li key={index}>{line}</li>)}
+            {offer.notes.map((line: string, index: number) => <li key={index}>{line}</li>)}
           </ul>
         </section>
       )}
@@ -105,4 +105,4 @@ const Update = () => {
   );
 };
 
-createRoot(document.getElementById('root')).render(<Update />);
+createRoot(document.getElementById('root')!).render(<Update />);

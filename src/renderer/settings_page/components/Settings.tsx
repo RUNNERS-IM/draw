@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import './Settings.scss';
 import ShortcutRecorder from './ShortcutRecorder';
 import ColorPicker from './ColorPicker';
@@ -31,7 +31,7 @@ import { FaPlus, FaMinus } from "react-icons/fa";
 // 첫 판(그리기만)에 없는 설정. 코드는 두고 화면에서만 뺀다.
 const HIDDEN_FEATURES = false;
 
-const ShortcutRow = ({ title, description, hint, shortcut, onCheck, onChange, onReset, onRemove }) => {
+const ShortcutRow = ({ title, description, hint, shortcut, onCheck, onChange, onReset, onRemove }: { title: string; description: string; hint?: string; shortcut: any; onCheck: (...args: any[]) => any; onChange: (...args: any[]) => any; onReset: (...args: any[]) => any; onRemove: (...args: any[]) => any }) => {
   const canReset  = !!shortcut.init && shortcut.init !== shortcut.accelerator;
   const canRemove = (shortcut.accelerator || shortcut.init) && shortcut.accelerator !== '[NULL]';
 
@@ -56,7 +56,7 @@ const ShortcutRow = ({ title, description, hint, shortcut, onCheck, onChange, on
   );
 };
 
-const Settings = (config) => {
+const Settings = (config: any) => {
   const [showDrawingBorder, setShowDrawingBorder] = useState(config.show_drawing_border);
   const [cuteCursorMode, setCuteCursorMode] = useState(config.cute_cursor_mode);
   const [penSmoothing, setPenSmoothing] = useState(config.pen_smoothing);
@@ -81,7 +81,7 @@ const Settings = (config) => {
   const [secondaryColor, setSecondaryColor]           = useState(config.swap_colors_indexes[1]);
   const [drawingMonitor, setDrawingMonitor]           = useState(config.drawing_monitor);
   const [toolbarColorPalette, setToolbarColorPalette] = useState(config.tool_bar_color_palette);
-  const [editingColorId, setEditingColorId]           = useState(null);
+  const [editingColorId, setEditingColorId]           = useState<any>(null);
 
   const colorList = createApplicationColorList(toolbarColorPalette);
   const mainColorInfo = colorList[mainColor];
@@ -96,23 +96,23 @@ const Settings = (config) => {
     window.electronAPI.resetToOriginals();
   }
 
-  const selectTab = (tab) => {
+  const selectTab = (tab: string) => {
     setEditingColorId(null);
     setActiveTab(tab);
   }
 
-  const saveToolbarColor = (colorId, color) => {
+  const saveToolbarColor = (colorId: string, color: string) => {
     setToolbarColorPalette({...toolbarColorPalette, [colorId]: color });
     setEditingColorId(null);
 
     window.electronAPI.setToolbarColor(colorId, color);
   }
 
-  const canRegisterShortcut = async (accelerator) => {
+  const canRegisterShortcut = async (accelerator: string) => {
     return await window.electronAPI.canRegisterShortcut(accelerator);
   }
 
-  const applyShortcut = (key, accelerator) => {
+  const applyShortcut = (key: string, accelerator: string) => {
     window.electronAPI.setShortcut(key, accelerator);
 
     switch (key) {
@@ -131,7 +131,7 @@ const Settings = (config) => {
     }
   };
 
-  const resetShortcut = (key) => {
+  const resetShortcut = (key: string) => {
     window.electronAPI.setShortcut(key, null);
 
     switch (key) {
@@ -150,7 +150,7 @@ const Settings = (config) => {
     }
   };
 
-  const removeShortcut = (key) => {
+  const removeShortcut = (key: string) => {
     window.electronAPI.setShortcut(key, '[NULL]');
 
     switch (key) {
@@ -176,7 +176,7 @@ const Settings = (config) => {
     window.electronAPI.setShowDrawingBorder(nextState);
   };
 
-  const selectCuteCursorMode = (event) => {
+  const selectCuteCursorMode = (event: any) => {
     const mode = event.target.value;
     setCuteCursorMode(mode);
 
@@ -225,21 +225,21 @@ const Settings = (config) => {
     window.electronAPI.setDisableToolbarInPointerMode(nextState);
   };
 
-  const selectAppIconColor = (event) => {
+  const selectAppIconColor = (event: any) => {
     const iconColor = event.target.value;
     setAppIconColor(iconColor);
 
     window.electronAPI.setAppIconColor(iconColor);
   }
 
-  const selectToolbarOrientation = (event) => {
+  const selectToolbarOrientation = (event: any) => {
     const orientation = event.target.value;
     setToolbarOrientation(orientation);
 
     window.electronAPI.setToolbarOrientation(orientation);
   }
 
-  const applyLaserTime = (value) => {
+  const applyLaserTime = (value: any) => {
     const newLaserTimeMs = Math.min(laserTimeMax, Math.max(laserTimeMin, Number(value)))
 
     if (newLaserTimeMs === laserTimeMs) return
@@ -248,7 +248,7 @@ const Settings = (config) => {
     window.electronAPI.setLaserTimeMs(newLaserTimeMs)
   }
 
-  const applyFadeDisappearAfter = (value) => {
+  const applyFadeDisappearAfter = (value: any) => {
     const ms = Math.min(fadeDisappearAfterMax, Math.max(fadeDisappearAfterMin, Number(value)))
 
     if (ms === fadeDisappearAfterMs) return
@@ -257,7 +257,7 @@ const Settings = (config) => {
     window.electronAPI.setFadeDisappearAfterMs(ms)
   }
 
-  const applyFadeOutDurationTimeMs = (value) => {
+  const applyFadeOutDurationTimeMs = (value: any) => {
     const ms = Math.min(fadeOutDurationTimeMsMax, Math.max(fadeOutDurationTimeMsMin, Number(value)))
 
     if (ms === fadeOutDurationTimeMs) return
@@ -280,7 +280,7 @@ const Settings = (config) => {
     window.electronAPI.setSwapColors([mainColor, nextColor]);
   }
 
-  const selectDrawingMonitor = (event) => {
+  const selectDrawingMonitor = (event: any) => {
     const value = event.target.value;
     let newMonitor = {
       mode: 'auto' ,
@@ -288,7 +288,7 @@ const Settings = (config) => {
       label: null
     };
 
-    const display = displays.find(display => display.id === value);
+    const display = displays.find((display: Electron.Display) => display.id === value);
     if (display) {
       newMonitor = {
         mode: 'fixed',
@@ -371,7 +371,7 @@ const Settings = (config) => {
                   hint={t('settings.globalHint')}
                   shortcut={showHideApp}
                   onCheck={canRegisterShortcut}
-                  onChange={(acc) => applyShortcut('key_binding_show_hide_app', acc)}
+                  onChange={(acc: any) => applyShortcut('key_binding_show_hide_app', acc)}
                   onReset={() => resetShortcut('key_binding_show_hide_app')}
                   onRemove={() => removeShortcut('key_binding_show_hide_app')}
                 />
@@ -381,7 +381,7 @@ const Settings = (config) => {
                   description={t('settings.showHideToolbarDesc')}
                   shortcut={showHideToolbar}
                   onCheck={canRegisterShortcut}
-                  onChange={(acc) => applyShortcut('key_binding_show_hide_toolbar', acc)}
+                  onChange={(acc: any) => applyShortcut('key_binding_show_hide_toolbar', acc)}
                   onReset={() => resetShortcut('key_binding_show_hide_toolbar')}
                   onRemove={() => removeShortcut('key_binding_show_hide_toolbar')}
                 />
@@ -392,7 +392,7 @@ const Settings = (config) => {
                   description={t('settings.showHideWhiteboardDesc')}
                   shortcut={showHideWhiteboard}
                   onCheck={canRegisterShortcut}
-                  onChange={(acc) => applyShortcut('key_binding_show_hide_whiteboard', acc)}
+                  onChange={(acc: any) => applyShortcut('key_binding_show_hide_whiteboard', acc)}
                   onReset={() => resetShortcut('key_binding_show_hide_whiteboard')}
                   onRemove={() => removeShortcut('key_binding_show_hide_whiteboard')}
                 />
@@ -403,7 +403,7 @@ const Settings = (config) => {
                   description={t('settings.clearDeskDesc')}
                   shortcut={clearDesk}
                   onCheck={canRegisterShortcut}
-                  onChange={(acc) => applyShortcut('key_binding_clear_desk', acc)}
+                  onChange={(acc: any) => applyShortcut('key_binding_clear_desk', acc)}
                   onReset={() => resetShortcut('key_binding_clear_desk')}
                   onRemove={() => removeShortcut('key_binding_clear_desk')}
                 />
@@ -459,7 +459,7 @@ const Settings = (config) => {
                     <ul className="toolbar-colors-control">
                       {toolbarColorIds.map((colorId) => {
                         const color = toolbarColorPalette[colorId];
-                        const colorTitle = colorList.find((colorInfo) => colorInfo.id === colorId).title;
+                        const colorTitle = colorList.find((colorInfo) => colorInfo.id === colorId)!.title;
                         const isEditing = editingColorId === colorId;
 
                         return (
@@ -479,7 +479,7 @@ const Settings = (config) => {
                               <ColorPicker
                                 initialColor={color}
                                 onCancel={() => setEditingColorId(null)}
-                                onSave={(nextColor) => saveToolbarColor(colorId, nextColor)}
+                                onSave={(nextColor: string) => saveToolbarColor(colorId, nextColor)}
                               />
                             )}
                           </li>
@@ -716,14 +716,14 @@ const Settings = (config) => {
                       >
                         <option value="auto">{t('settings.monitorAuto')}</option>
                         {
-                          displays.map(display => (
+                          displays.map((display: Electron.Display) => (
                             <option key={display.id} value={display.id}>{display.label}</option>
                           ))
                         }
 
                         {
                           drawingMonitor.mode === 'fixed' &&
-                          !displays.find(display => display.id === drawingMonitor.display_id) &&
+                          !displays.find((display: Electron.Display) => display.id === drawingMonitor.display_id) &&
                             (
                               <option disabled value={drawingMonitor.display_id}>
                                 {drawingMonitor.label} ({t('settings.disconnected')})

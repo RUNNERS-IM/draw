@@ -1,5 +1,5 @@
 import { pageUrl, preloadPath } from './pages';
-import { app, Tray, Menu, BrowserWindow, screen, globalShortcut, shell, ipcMain, nativeTheme, systemPreferences, desktopCapturer, autoUpdater, dialog, clipboard, ClipboardItem } from 'electron';
+import { app, nativeImage, Tray, Menu, BrowserWindow, screen, globalShortcut, shell, ipcMain, nativeTheme, systemPreferences, desktopCapturer, autoUpdater, dialog, clipboard } from 'electron';
 import Store from 'electron-store';
 import { isDeepStrictEqual } from 'util';
 import fs from 'fs';
@@ -237,15 +237,15 @@ const schema = {
 };
 
 // rawLog('[STORE PATH]:', app.getPath('userData') + '/config.json');
-const store = new Store({
-  schema
+const store = new Store<Record<string, any>>({
+  schema: schema as any
 });
 
-store.onDidChange('show_tool_bar', (newValue, oldValue) => {
+store.onDidChange('show_tool_bar', () => {
   updateExternalToolbarVisibility()
   updateContextMenu()
 })
-store.onDidChange('show_whiteboard', (newValue, oldValue) => {
+store.onDidChange('show_whiteboard', () => {
   updateContextMenu()
 })
 
@@ -254,19 +254,19 @@ if (isLoggingEnabled) {
 
   store.onDidAnyChange((newStore, oldStore) => {
     const storeDiff = Object.fromEntries(
-      Object.entries(newStore).filter(([key, value]) => !isDeepStrictEqual(value, oldStore[key]))
+      Object.entries(newStore).filter(([key, value]) => !isDeepStrictEqual(value, oldStore?.[key]))
     )
 
     rawLog('Updated store: ', storeDiff)
   })
 }
 
-let tray
-let mainWindow
-let extendedToolbarWindow
-let aboutWindow
-let settingsWindow
-let panelWindow
+let tray: Tray
+let mainWindow: BrowserWindow
+let extendedToolbarWindow: BrowserWindow
+let aboutWindow: BrowserWindow | null = null
+let settingsWindow: BrowserWindow | null = null
+let panelWindow: BrowserWindow
 let panelOpenedAt = 0
 let panelClosedAt = 0
 
@@ -276,7 +276,7 @@ let drawingMode = false
 let zoomMode = false
 let zoomModeStarting = false
 
-let extendedToolbarPositionStoreTimeout = null
+let extendedToolbarPositionStoreTimeout: ReturnType<typeof setTimeout> | null = null
 
 const iconSrc = {
   WHITE:           path.resolve(__dirname, '../renderer/assets/trayIconWhite.png'),
@@ -309,7 +309,7 @@ function updateContextMenu() {
   const key_show_hide_toolbar    = store.get('key_binding_show_hide_toolbar')
   const key_clear_desk           = store.get('key_binding_clear_desk')
 
-  const accelForTray = (accel) => {
+  const accelForTray = (accel: string) => {
     if (!accel) return undefined;
     if (accel === KEY_NULL) return undefined;
 
@@ -318,7 +318,7 @@ function updateContextMenu() {
     return accel
   };
 
-  const withAccelHint = (label, accel) => {
+  const withAccelHint = (label: string, accel: string) => {
     if (!accel) return label;
     if (accel === KEY_NULL) return label;
 
@@ -432,7 +432,7 @@ function createPanelWindow() {
   })
 
   panelWindow.on('closed', () => {
-    panelWindow = null
+    panelWindow = null!
   })
 }
 
@@ -507,7 +507,7 @@ function getPanelState() {
   }
 }
 
-function normalizeKeyForPanel(accelerator) {
+function normalizeKeyForPanel(accelerator: string) {
   if (!accelerator || accelerator === KEY_NULL) return undefined;
 
   if (!isMac) return accelerator.replace('CmdOrCtrl', 'Ctrl');
@@ -596,7 +596,7 @@ function createMainWindow() {
   })
 
   mainWindow.on('closed', function () {
-    mainWindow = null
+    mainWindow = null!
 
     app.quit()
   })
@@ -665,7 +665,7 @@ function createExtendedToolbarWindow() {
       extendedToolbarPositionStoreTimeout = null
     }
 
-    extendedToolbarWindow = null
+    extendedToolbarWindow = null!
 
     app.quit()
   })
@@ -737,19 +737,16 @@ function createAboutWindow() {
 
   aboutWindow.loadURL(pageUrl('about_page'))
 
-  aboutWindow.on('minimize', (event) => {
-    event.preventDefault()
-  })
 
   aboutWindow.on('closed', () => {
     aboutWindow = null
   })
 
   aboutWindow.webContents.on('did-finish-load', () => {
-    aboutWindow.center()
+    aboutWindow?.center()
     if (isMac) app.focus({ steal: true })
-    aboutWindow.show()
-    aboutWindow.focus()
+    aboutWindow?.show()
+    aboutWindow?.focus()
   })
 
   aboutWindow.webContents.setWindowOpenHandler((details) => {
@@ -811,9 +808,6 @@ function createSettingsWindow() {
 
   settingsWindow.loadURL(pageUrl('settings_page'))
 
-  settingsWindow.on('minimize', (event) => {
-    event.preventDefault()
-  })
 
   settingsWindow.on('closed', () => {
     settingsWindow = null
@@ -821,8 +815,8 @@ function createSettingsWindow() {
 
   settingsWindow.webContents.on('did-finish-load', () => {
     if (isMac) app.focus({ steal: true })
-    settingsWindow.show()
-    settingsWindow.focus()
+    settingsWindow?.show()
+    settingsWindow?.focus()
   })
 
   settingsWindow.webContents.setVisualZoomLevelLimits(1, 1);
@@ -932,7 +926,7 @@ function startAsHiddenCheck() {
 
 function hideDock() {
   if (isMac) {
-    app.dock.hide();
+    app.dock?.hide();
   }
 }
 
@@ -944,7 +938,7 @@ ipcMain.handle('panel_state', () => getPanelState());
 
 ipcMain.handle('panel_action', (_event, name) => {
   hidePanel()
-  panelActions[name]?.()
+  panelActions[name as keyof typeof panelActions]?.()
 
   return null
 });
@@ -1178,7 +1172,7 @@ ipcMain.handle('get_configuration', () => {
 ipcMain.handle('choose_screenshot_directory', async () => {
   const screenshotDirectory = store.get('screenshot_directory')
   const fallbackDirrectory = app.getPath('pictures')
-  const dialogOptions = {
+  const dialogOptions: Electron.OpenDialogOptions = {
     title: 'Choose screenshot folder',
     buttonLabel: 'Choose',
     properties: isMac ? ['openDirectory', 'createDirectory'] : ['openDirectory'],
@@ -1191,7 +1185,7 @@ ipcMain.handle('choose_screenshot_directory', async () => {
   }
 
   try {
-    const result = await dialog.showOpenDialog(settingsWindow, dialogOptions)
+    const result = await dialog.showOpenDialog(settingsWindow!, dialogOptions)
     if (result.canceled) return null
 
     const selectedDirectory = result.filePaths[0]
@@ -1203,7 +1197,7 @@ ipcMain.handle('choose_screenshot_directory', async () => {
       isDefault: selectedDirectory === schema.screenshot_directory.default,
     }
   } catch (error) {
-    dialog.showErrorBox('Unable to select screenshot folder', error.message)
+    dialog.showErrorBox('Unable to select screenshot folder', (error as Error).message)
     return null
   }
 });
@@ -1224,7 +1218,7 @@ ipcMain.handle('open_screenshot_directory', async () => {
 
     shell.openPath(screenshotDirectory)
   } catch (error) {
-    dialog.showErrorBox('Unable to open screenshot folder', error.message)
+    dialog.showErrorBox('Unable to open screenshot folder', (error as Error).message)
   }
 
   return null
@@ -1472,7 +1466,7 @@ function unRegisterGlobalShortcuts() {
   globalShortcut.unregisterAll();
 }
 
-function withThrottle(callback) {
+function withThrottle(callback: (...args: any[]) => any) {
   rawLog('withThrottle called...')
 
   const now = Date.now();
@@ -1586,15 +1580,6 @@ function toggleToolbar() {
   });
 }
 
-function toggleWhiteboard() {
-  withThrottle(() => {
-    rawLog('Toggling whiteboard...')
-
-    store.set('show_whiteboard', !store.get('show_whiteboard'));
-    mainWindow.webContents.send('toggle_whiteboard') // Roundtrip request ...
-  });
-}
-
 function resetApp() {
   if (zoomModeStarting) return
 
@@ -1635,15 +1620,6 @@ function sendResetScreen() {
   rawLog('Resetting screen...')
 
   mainWindow.webContents.send('reset_screen');
-}
-
-function toggleZoomMode() {
-  if (zoomMode) {
-    mainWindow.webContents.send('request_exit_zoom')
-    return
-  }
-
-  startZoomMode()
 }
 
 function startZoomMode() {
@@ -1697,7 +1673,7 @@ async function captureZoomImage() {
 
     sendNotification({
       title: 'Zoom capture failed',
-      body: error.message,
+      body: (error as Error).message,
       button_label: isMac ? 'Settings' : null,
       button_action: isMac ? 'open_security_preferences' : null,
       button_data: null,
@@ -1720,7 +1696,7 @@ function quitApp() {
   });
 }
 
-function screenshotTimecode4(date) {
+function screenshotTimecode4(date: Date) {
   let value = date.getHours() * 3600 +
               date.getMinutes() * 60 +
               date.getSeconds(); // 0..86399
@@ -1747,7 +1723,7 @@ function screenshotFilename(withUniqSuffix = false) {
   return `DRWPN-${yyyy}${mm}${dd}-${code}${suffix}.png`;
 }
 
-async function captureDisplayImage(display) {
+async function captureDisplayImage(display: Electron.Display) {
   if (isMac) {
     const status = systemPreferences.getMediaAccessStatus('screen')
 
@@ -1779,7 +1755,7 @@ async function captureDisplayImage(display) {
   }
 
   const source =
-    sources.find(item => String(item.display_id ?? item.displayId ?? '') === String(display.id)) ||
+    sources.find(item => String(item.display_id ?? '') === String(display.id)) ||
     sources.find(item => {
       const { width, height } = item.thumbnail.getSize()
       return width === thumbnailSize.width && height === thumbnailSize.height
@@ -1848,9 +1824,7 @@ async function makeScreenshot() {
     await fs.promises.writeFile(savePath, imagePng)
 
     try {
-      await clipboard.write([
-        new ClipboardItem({ 'image/png': new Blob([imagePng], { type: 'image/png' }) }),
-      ])
+      clipboard.writeImage(nativeImage.createFromBuffer(imagePng))
     } catch (_) {}
 
     sendNotification({
@@ -1863,7 +1837,7 @@ async function makeScreenshot() {
   } catch (error) {
     sendNotification({
       title: 'Image export failed',
-      body: error.message,
+      body: (error as Error).message,
       button_label: isMac ? 'Settings' : null,
       button_action: isMac ? 'open_security_preferences' : null,
       button_data: null,
@@ -1871,11 +1845,11 @@ async function makeScreenshot() {
   }
 }
 
-function sendNotification(data) {
+function sendNotification(data: Record<string, unknown>) {
   mainWindow.webContents.send('show_notification', data);
 }
 
-function hideWindow(targetWindow) {
+function hideWindow(targetWindow: Electron.BrowserWindow) {
   targetWindow.setOpacity(0)
   try {
     targetWindow.hide()
@@ -1884,7 +1858,7 @@ function hideWindow(targetWindow) {
   }
 }
 
-function showWindow(targetWindow, { inactive = false } = {}) {
+function showWindow(targetWindow: Electron.BrowserWindow, { inactive = false } = {}) {
   targetWindow.setOpacity(0)
 
   try {
@@ -1969,7 +1943,7 @@ function showMainWindow() {
   showWindow(mainWindow)
 }
 
-function updateMainWindowPosition(display) {
+function updateMainWindowPosition(display: Electron.Display) {
   if (store.get('active_monitor_id') === display.id) {
     updateToolbarPositionInRenderer()
     return
@@ -2026,7 +2000,7 @@ function updateExtendedToolbarDirection() {
   extendedToolbarWindow.webContents.send('toolbar_direction', getExtendedToolbarDirection())
 }
 
-function updateExtendedToolbarWindowPosition(display) {
+function updateExtendedToolbarWindowPosition(display: Electron.Display) {
   const { x: displayX, y: displayY } = display.workArea
   const offset = getPointerToolbarOffset(store.get('tool_bar_orientation'), EXTENDED_TOOLBAR_WINDOW_MARGIN)
 
@@ -2101,21 +2075,21 @@ function logDisplays() {
   })
 }
 
-function normalizeAcceleratorForUI(value) {
+function normalizeAcceleratorForUI(value: string) {
   if (!value) return value;
 
   const target = (isMac) ? 'Meta' : 'Control';
   return value.replace('CmdOrCtrl', target);
 }
 
-function deNormalizeAcceleratorFromUI(value) {
+function deNormalizeAcceleratorFromUI(value: string) {
   if (!value) return value;
 
   const target = (isMac) ? 'Meta' : 'Control';
   return value.replace(target, 'CmdOrCtrl');
 }
 
-function safeRegisterGlobalShortcut(accelerator, callback) {
+function safeRegisterGlobalShortcut(accelerator: string, callback: (...args: any[]) => any) {
   if (!accelerator || accelerator === KEY_NULL) {
     return
   }
@@ -2176,7 +2150,7 @@ function applyLaunchOnLoginDefault() {
   } catch (error) {}
 }
 
-function safeSetLoginItemSettings(settings) {
+function safeSetLoginItemSettings(settings: Electron.Settings) {
   if (isLinux) return;
 
   try {
@@ -2184,7 +2158,7 @@ function safeSetLoginItemSettings(settings) {
   } catch (error) {}
 }
 
-function rawLog(message, ...args) {
+function rawLog(message: string, ...args: unknown[]) {
   if (!isLoggingEnabled) { return }
 
   console.log(message, ...args);

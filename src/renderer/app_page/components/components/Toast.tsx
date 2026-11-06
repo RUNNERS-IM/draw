@@ -1,8 +1,8 @@
-import React from 'react';
+import type { Callback } from '../types';
 import './Toast.scss';
 
-const Toast = ({ info, handleToastClicked, handleToastHidden }) => {
-  const handleAnimationEnd = (event) => {
+const Toast = ({ info, handleToastClicked, handleToastHidden }: { info: any; handleToastClicked: Callback; handleToastHidden: Callback }) => {
+  const handleAnimationEnd = (event: any) => {
     if (event.animationName !== 'toastHide') return;
 
     handleToastHidden();

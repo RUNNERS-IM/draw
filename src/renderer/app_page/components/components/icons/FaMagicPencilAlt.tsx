@@ -1,6 +1,5 @@
-import React from "react";
 
-const FaMagicPencilAlt = ({ size, ...props }) => {
+const FaMagicPencilAlt = ({ size, ...props }: { size?: number; [key: string]: any }) => {
   const computedSize = size ?? "1em";
 
   return (

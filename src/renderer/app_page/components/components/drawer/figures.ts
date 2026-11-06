@@ -1,3 +1,4 @@
+import type { Callback, ColorOption, Figure, Point } from '../../types';
 import {
   getPerfectPath2D,
   getLazyPoints,
@@ -27,11 +28,11 @@ import {
   lineHeightMultiplier,
 } from '../../constants';
 
-const hslColor = (degree) => {
+const hslColor = (degree: number) => {
   return `hsl(${degree % 360}, 70%, 60%)`
 }
 
-const strokeSettings = (stroke, width) => {
+const strokeSettings = (stroke: number, width: number) => {
   // [довжина штриха, довжина проміжку]
   if (stroke === 1) return [width * 3, width * 2];
   if (stroke === 2) return [0,         width * 2];
@@ -39,11 +40,11 @@ const strokeSettings = (stroke, width) => {
   return [];
 };
 
-function fadeAlpha(opacity) {
+function fadeAlpha(opacity: number) {
   return Math.round(opacity * 255).toString(16).padStart(2, '0');
 }
 
-const drawDot = (ctx, point, isHovered) => {
+const drawDot = (ctx: CanvasRenderingContext2D, point: Point, isHovered: boolean) => {
   const [x, y] = point;
 
   if (isHovered) {
@@ -62,24 +63,24 @@ const drawDot = (ctx, point, isHovered) => {
   ctx.stroke();
 }
 
-const createGradient = (ctx, pointA, pointB, rainbowColorDeg, updateRainbowColorDeg, scale) => {
-  const [distance, hslStops] = hslTextGradientStops(pointA, pointB, rainbowColorDeg, scale)
+const createGradient = (ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point, rainbowColorDeg: number, updateRainbowColorDeg: Callback, scale?: number) => {
+  const [distance, hslStops] = hslTextGradientStops(pointA, pointB, rainbowColorDeg, scale as number)
 
   if (hslStops.length === 1) {
     return hslStops[0]
   }
 
-  const gradient = ctx.createLinearGradient(...pointA, ...pointB);
+  const gradient = ctx.createLinearGradient(...(pointA as [number, number]), ...(pointB as [number, number]));
 
-  hslStops.forEach((color, index) => {
+  hslStops.forEach((color: any, index: number) => {
     gradient.addColorStop(index / (hslStops.length - 1), color)
   })
 
-  updateRainbowColorDeg(currentDeg => Math.max(currentDeg, rainbowColorDeg + distance))
+  updateRainbowColorDeg((currentDeg: number) => Math.max(currentDeg, rainbowColorDeg + distance))
   return gradient
 }
 
-export const hslTextGradientStops = (pointA, pointB, colorDeg, scale) => {
+export const hslTextGradientStops = (pointA: Point, pointB: Point, colorDeg: number, scale: number): [number, string[]] => {
   const actualScale = scale ?? 1;
 
   const distance = distanceBetweenPoints(pointA, pointB) * rainbowScaleFactor / actualScale
@@ -100,10 +101,10 @@ export const hslTextGradientStops = (pointA, pointB, colorDeg, scale) => {
   return [distance, hslStops];
 }
 
-const detectColorAndWidth = (ctx, figure, updateRainbowColorDeg, colorList) => {
+const detectColorAndWidth = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]): [any, number] => {
   const { points: [pointA, pointB], colorIndex, widthIndex, rainbowColorDeg, erased } = figure
 
-  let color = colorList[colorIndex].color
+  let color: any = colorList[colorIndex].color
   const width = widthList[widthIndex].figure_width
 
   if (colorList[colorIndex].isRainbow) {
@@ -117,10 +118,10 @@ const detectColorAndWidth = (ctx, figure, updateRainbowColorDeg, colorList) => {
   return [color, width]
 }
 
-const detectColorAndFontSize = (ctx, figure, updateRainbowColorDeg, colorList) => {
+const detectColorAndFontSize = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]) => {
   const { points: [pointA], colorIndex, widthIndex, rainbowColorDeg, height, scale, erased } = figure;
 
-  let color = colorList[colorIndex].color
+  let color: any = colorList[colorIndex].color
   const fontSize = widthList[widthIndex].font_size
   let font_y_offset_compensation = widthList[widthIndex].font_y_offset_compensation
 
@@ -132,7 +133,7 @@ const detectColorAndFontSize = (ctx, figure, updateRainbowColorDeg, colorList) =
   if (colorList[colorIndex].isRainbow) {
     const pointB = [pointA[0], pointA[1] + height * scale] // Vertical Gradient
 
-    color = createGradient(ctx, pointA, pointB, rainbowColorDeg, updateRainbowColorDeg, scale)
+    color = createGradient(ctx, pointA, (pointB as Point), rainbowColorDeg, updateRainbowColorDeg, scale)
   }
 
   if (erased) {
@@ -142,7 +143,7 @@ const detectColorAndFontSize = (ctx, figure, updateRainbowColorDeg, colorList) =
   return [color, fontSize, font_y_offset_compensation]
 }
 
-export const getCursorColor = (colorList, colorIndex, rainbowColorDeg) => {
+export const getCursorColor = (colorList: ColorOption[], colorIndex: number, rainbowColorDeg: number) => {
   const colorInfo = colorList[colorIndex]
 
   if (colorInfo.isRainbow) {
@@ -152,7 +153,7 @@ export const getCursorColor = (colorList, colorIndex, rainbowColorDeg) => {
   return colorInfo.color
 }
 
-export const drawPen = (ctx, figure, colorList, options = {}) => {
+export const drawPen = (ctx: CanvasRenderingContext2D, figure: Figure, colorList: ColorOption[], options: { fadeOpacity?: number; [key: string]: any } = {}) => {
   const { points, colorIndex, widthIndex } = figure;
   const { fadeOpacity = 1 } = options;
 
@@ -167,7 +168,7 @@ export const drawPen = (ctx, figure, colorList, options = {}) => {
     penColor = colorInfo.color + fadeAlpha(fadeOpacity);
   }
 
-  const strokeOptions = {
+  const strokeOptions: Record<string, any> = {
     size: widthInfo.pen_pressure_width
   };
 
@@ -183,11 +184,11 @@ export const drawPen = (ctx, figure, colorList, options = {}) => {
   ctx.fill(path2DData);
 }
 
-export const drawRainbowPen = (ctx, offscreenCanvas, figure, updateRainbowColorDeg, fadeOpacity = 1) => {
+export const drawRainbowPen = (ctx: CanvasRenderingContext2D, offscreenCanvas: HTMLCanvasElement, figure: Figure, updateRainbowColorDeg: Callback, fadeOpacity = 1) => {
   const { widthIndex } = figure;
 
-  const offCtx = offscreenCanvas.getContext('2d');
-  offCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+  const offCtx = offscreenCanvas.getContext('2d')!;
+  offCtx!.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
   const widthInfo = widthList[widthIndex]
 
@@ -206,13 +207,13 @@ export const drawRainbowPen = (ctx, offscreenCanvas, figure, updateRainbowColorD
   ctx.restore();
 }
 
-const drawLazyRainbowLine = (ctx, figure, updateRainbowColorDeg, width) => {
+const drawLazyRainbowLine = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, width: number) => {
   const { points, rainbowColorDeg, erased } = figure;
 
   const lazyPoints = getLazyPoints(points, { size: width })
   let colorDeg = rainbowColorDeg
 
-  lazyPoints.forEach((point, index) => {
+  lazyPoints.forEach((point: Point, index: number) => {
     if (index === 0) return;
 
     const pointA = lazyPoints[index-1]
@@ -244,7 +245,7 @@ const drawLazyRainbowLine = (ctx, figure, updateRainbowColorDeg, width) => {
   updateRainbowColorDeg(colorDeg)
 }
 
-export const drawHighlighter = (ctx, figure, colorList) => {
+export const drawHighlighter = (ctx: CanvasRenderingContext2D, figure: Figure, colorList: ColorOption[]) => {
   const { points, colorIndex, widthIndex } = figure;
 
   const colorInfo = colorList[colorIndex]
@@ -265,11 +266,11 @@ export const drawHighlighter = (ctx, figure, colorList) => {
   ctx.fill(path2DData);
 }
 
-export const drawRainbowHighlighter = (ctx, offscreenCanvas, figure, updateRainbowColorDeg) => {
+export const drawRainbowHighlighter = (ctx: CanvasRenderingContext2D, offscreenCanvas: HTMLCanvasElement, figure: Figure, updateRainbowColorDeg: Callback) => {
   const { widthIndex } = figure;
 
-  const offCtx = offscreenCanvas.getContext('2d');
-  offCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+  const offCtx = offscreenCanvas.getContext('2d')!;
+  offCtx!.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
 
   const widthInfo = widthList[widthIndex]
 
@@ -284,12 +285,12 @@ export const drawRainbowHighlighter = (ctx, offscreenCanvas, figure, updateRainb
   ctx.restore();
 }
 
-export const drawArrow = (ctx, figure, updateRainbowColorDeg, colorList) => {
+export const drawArrow = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]) => {
   const { points, widthIndex } = figure;
 
   const isSmallArrow = isSmallArrowFigure(points, widthIndex);
   const figurePoints = calcPointsArrow(points, widthIndex);
-  const arcSegments = buildArrowArcSegments(figurePoints, widthIndex);
+  const arcSegments = buildArrowArcSegments((figurePoints as Point[]), widthIndex);
 
   const [color] = detectColorAndWidth(ctx, figure, updateRainbowColorDeg, colorList)
   const shadowColor = '#222';
@@ -308,15 +309,15 @@ export const drawArrow = (ctx, figure, updateRainbowColorDeg, colorList) => {
   }
 
   ctx.beginPath();
-  ctx.moveTo(...figurePoints[0]);
+  ctx.moveTo(...(figurePoints[0] as [number, number]));
 
-  arcSegments.forEach(({ entryPoint, cornerPoint, exitPoint, arcRadius }) => {
+  arcSegments.forEach(({ entryPoint, cornerPoint, exitPoint, arcRadius }: { entryPoint: Point; cornerPoint: Point; exitPoint: Point; arcRadius: number }) => {
     if (isSmallArrow) {
-      ctx.lineTo(...cornerPoint);
+      ctx.lineTo(...(cornerPoint as [number, number]));
       return;
     }
 
-    ctx.lineTo(...entryPoint);
+    ctx.lineTo(...(entryPoint as [number, number]));
     ctx.arcTo(cornerPoint[0], cornerPoint[1], exitPoint[0], exitPoint[1], arcRadius);
   });
 
@@ -327,29 +328,29 @@ export const drawArrow = (ctx, figure, updateRainbowColorDeg, colorList) => {
   ctx.shadowColor = 'transparent'; // Reset shadows
 }
 
-export const drawArrowActive = (ctx, figure, hoveredDot) => {
+export const drawArrowActive = (ctx: CanvasRenderingContext2D, figure: Figure, hoveredDot: string) => {
   const [pointA, pointB] = figure.points
 
   drawTwoDots(ctx, pointA, pointB, hoveredDot)
 }
 
-export const drawFlatArrow = (ctx, figure, updateRainbowColorDeg, colorList) => {
+export const drawFlatArrow = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]) => {
   const [color, width] = detectColorAndWidth(ctx, figure, updateRainbowColorDeg, colorList)
   const segments = calcSegmentsFlatArrow(figure.points, figure.widthIndex)
   const stroke = figure.strokeIndex
 
   segments.forEach(([pointA, pointB]) => {
-    drawLineSkeleton(ctx, pointA, pointB, color, width, stroke)
+    drawLineSkeleton(ctx, (pointA as Point), pointB, color, width, stroke)
   })
 }
 
-export const drawFlatArrowActive = (ctx, figure, hoveredDot) => {
+export const drawFlatArrowActive = (ctx: CanvasRenderingContext2D, figure: Figure, hoveredDot: string) => {
   const [pointA, pointB] = figure.points
 
   drawTwoDots(ctx, pointA, pointB, hoveredDot)
 }
 
-export const drawLine = (ctx, figure, updateRainbowColorDeg, colorList) => {
+export const drawLine = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]) => {
   const { points: [pointA, pointB] } = figure
   const [color, width] = detectColorAndWidth(ctx, figure, updateRainbowColorDeg, colorList)
   const stroke = figure.strokeIndex
@@ -357,13 +358,13 @@ export const drawLine = (ctx, figure, updateRainbowColorDeg, colorList) => {
   drawLineSkeleton(ctx, pointA, pointB, color, width, stroke)
 }
 
-export const drawLineActive = (ctx, figure, hoveredDot) => {
+export const drawLineActive = (ctx: CanvasRenderingContext2D, figure: Figure, hoveredDot: string) => {
   const [pointA, pointB] = figure.points
 
   drawTwoDots(ctx, pointA, pointB, hoveredDot)
 }
 
-const drawLineSkeleton = (ctx, pointA, pointB, color, width, stroke) => {
+const drawLineSkeleton = (ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point, color: any, width: number, stroke: number) => {
   const [startX, startY] = pointA;
   const [endX, endY] = pointB;
   const lineDashPattern = strokeSettings(stroke, width);
@@ -381,7 +382,7 @@ const drawLineSkeleton = (ctx, pointA, pointB, color, width, stroke) => {
   ctx.restore();
 };
 
-export const drawOval = (ctx, figure, updateRainbowColorDeg, colorList) => {
+export const drawOval = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]) => {
   const { points: [pointA, pointB] } = figure
   const [color, width] = detectColorAndWidth(ctx, figure, updateRainbowColorDeg, colorList)
   const stroke = figure.strokeIndex
@@ -389,13 +390,13 @@ export const drawOval = (ctx, figure, updateRainbowColorDeg, colorList) => {
   drawOvalSkeleton(ctx, pointA, pointB, color, width, stroke)
 }
 
-export const drawOvalActive = (ctx, figure, hoveredDot) => {
+export const drawOvalActive = (ctx: CanvasRenderingContext2D, figure: Figure, hoveredDot: string) => {
   const [pointA, pointB] = figure.points
 
   drawSelectionBoxWithDots(ctx, pointA, pointB, hoveredDot)
 }
 
-const drawOvalSkeleton = (ctx, pointA, pointB, color, width, stroke) => {
+const drawOvalSkeleton = (ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point, color: any, width: number, stroke: number) => {
   const [startX, startY] = pointA;
   const [endX, endY] = pointB;
   const lineDashPattern = strokeSettings(stroke, width);
@@ -418,7 +419,7 @@ const drawOvalSkeleton = (ctx, pointA, pointB, color, width, stroke) => {
   ctx.restore();
 }
 
-export const drawRectangle = (ctx, figure, updateRainbowColorDeg, colorList) => {
+export const drawRectangle = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]) => {
   const { points: [pointA, pointB] } = figure
   const [color, width] = detectColorAndWidth(ctx, figure, updateRainbowColorDeg, colorList)
   const stroke = figure.strokeIndex
@@ -427,13 +428,13 @@ export const drawRectangle = (ctx, figure, updateRainbowColorDeg, colorList) => 
   drawRectangleSkeleton(ctx, pointA, pointB, color, width, stroke, edge)
 }
 
-export const drawRectangleActive = (ctx, figure, hoveredDot) => {
+export const drawRectangleActive = (ctx: CanvasRenderingContext2D, figure: Figure, hoveredDot: string) => {
   const [pointA, pointB] = figure.points
 
   drawSelectionBoxWithDots(ctx, pointA, pointB, hoveredDot)
 }
 
-const drawRectangleSkeleton = (ctx, pointA, pointB, color, width, stroke, edge) => {
+const drawRectangleSkeleton = (ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point, color: any, width: number, stroke: number, edge: number) => {
   const [startX, startY] = pointA;
   const [endX, endY] = pointB;
   const lineDashPattern = strokeSettings(stroke, width);
@@ -484,7 +485,7 @@ const drawRectangleSkeleton = (ctx, pointA, pointB, color, width, stroke, edge) 
   ctx.restore();
 }
 
-export const drawDiamond = (ctx, figure, updateRainbowColorDeg, colorList) => {
+export const drawDiamond = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, colorList: ColorOption[]) => {
   const { points: [pointA, pointB] } = figure
   const [color, width] = detectColorAndWidth(ctx, figure, updateRainbowColorDeg, colorList)
   const stroke = figure.strokeIndex
@@ -493,13 +494,13 @@ export const drawDiamond = (ctx, figure, updateRainbowColorDeg, colorList) => {
   drawDiamondSkeleton(ctx, pointA, pointB, color, width, stroke, edge)
 }
 
-export const drawDiamondActive = (ctx, figure, hoveredDot) => {
+export const drawDiamondActive = (ctx: CanvasRenderingContext2D, figure: Figure, hoveredDot: string) => {
   const [pointA, pointB] = figure.points
 
   drawSelectionBoxWithDots(ctx, pointA, pointB, hoveredDot)
 }
 
-const drawDiamondSkeleton = (ctx, pointA, pointB, color, width, stroke, edge) => {
+const drawDiamondSkeleton = (ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point, color: any, width: number, stroke: number, edge: number) => {
   const [startX, startY] = pointA;
   const [endX, endY] = pointB;
   const lineDashPattern = strokeSettings(stroke, width);
@@ -525,25 +526,25 @@ const drawDiamondSkeleton = (ctx, pointA, pointB, color, width, stroke, edge) =>
   ctx.beginPath();
 
   if (edge === 0) {
-    ctx.moveTo(...topCorner);
+    ctx.moveTo(...(topCorner as [number, number]));
 
-    ctx.lineTo(...rightCorner);
-    ctx.lineTo(...bottomCorner);
-    ctx.lineTo(...leftCorner);
+    ctx.lineTo(...(rightCorner as [number, number]));
+    ctx.lineTo(...(bottomCorner as [number, number]));
+    ctx.lineTo(...(leftCorner as [number, number]));
   } else {
     ctx.moveTo(topCorner[0] + offsetX, topCorner[1] + offsetY);
 
     ctx.lineTo(rightCorner[0] - offsetX, rightCorner[1] - offsetY);
-    ctx.bezierCurveTo(...rightCorner, ...rightCorner, rightCorner[0] - offsetX, rightCorner[1] + offsetY);
+    ctx.bezierCurveTo(...(rightCorner as [number, number]), ...(rightCorner as [number, number]), rightCorner[0] - offsetX, rightCorner[1] + offsetY);
 
     ctx.lineTo(bottomCorner[0] + offsetX, bottomCorner[1] - offsetY);
-    ctx.bezierCurveTo(...bottomCorner, ...bottomCorner, bottomCorner[0] - offsetX, bottomCorner[1] - offsetY);
+    ctx.bezierCurveTo(...(bottomCorner as [number, number]), ...(bottomCorner as [number, number]), bottomCorner[0] - offsetX, bottomCorner[1] - offsetY);
 
     ctx.lineTo(leftCorner[0] + offsetX, leftCorner[1] + offsetY);
-    ctx.bezierCurveTo(...leftCorner, ...leftCorner, leftCorner[0] + offsetX, leftCorner[1] - offsetY);
+    ctx.bezierCurveTo(...(leftCorner as [number, number]), ...(leftCorner as [number, number]), leftCorner[0] + offsetX, leftCorner[1] - offsetY);
 
     ctx.lineTo(topCorner[0] - offsetX, topCorner[1] + offsetY);
-    ctx.bezierCurveTo(...topCorner, ...topCorner, topCorner[0] + offsetX, topCorner[1] + offsetY);
+    ctx.bezierCurveTo(...(topCorner as [number, number]), ...(topCorner as [number, number]), topCorner[0] + offsetX, topCorner[1] + offsetY);
   }
 
   ctx.closePath();
@@ -551,7 +552,7 @@ const drawDiamondSkeleton = (ctx, pointA, pointB, color, width, stroke, edge) =>
   ctx.restore();
 }
 
-export const drawLaser = (ctx, figure) => {
+export const drawLaser = (ctx: CanvasRenderingContext2D, figure: Figure) => {
   const { points, widthIndex } = figure
   const [innerWidth, otherWidth] = widthList[widthIndex].laser_width;
 
@@ -581,7 +582,7 @@ export const drawLaser = (ctx, figure) => {
   ctx.shadowColor = 'transparent'; // Reset shadows
 }
 
-export const drawEraserTail = (ctx, figure) => {
+export const drawEraserTail = (ctx: CanvasRenderingContext2D, figure: Figure) => {
   const { points, widthIndex } = figure
   const width = widthList[widthIndex].pen_fixed_width
 
@@ -599,7 +600,7 @@ export const drawEraserTail = (ctx, figure) => {
   ctx.shadowBlur = 0;
 }
 
-export const drawText = (ctx, figure, updateRainbowColorDeg, isActive, hoveredDot, colorList) => {
+export const drawText = (ctx: CanvasRenderingContext2D, figure: Figure, updateRainbowColorDeg: Callback, isActive: boolean, hoveredDot: string, colorList: ColorOption[]) => {
   const { points: [startAt], text, scale, width, height, widthIndex } = figure;
 
   const [color, fontSize, font_y_offset_compensation] = detectColorAndFontSize(ctx, figure, updateRainbowColorDeg, colorList)
@@ -612,7 +613,7 @@ export const drawText = (ctx, figure, updateRainbowColorDeg, isActive, hoveredDo
       startAt[1] + height * scale,
     ];
 
-    drawSelectionBoxWithDots(ctx, startAt, endAt, hoveredDot)
+    drawSelectionBoxWithDots(ctx, startAt, (endAt as Point), hoveredDot)
     drawTextAutoResizeHandle(ctx, figure);
 
     // FOR DEV: Обведення прямокутника
@@ -622,7 +623,7 @@ export const drawText = (ctx, figure, updateRainbowColorDeg, isActive, hoveredDo
   }
 }
 
-const drawTextAutoResizeHandle = (ctx, figure) => {
+const drawTextAutoResizeHandle = (ctx: CanvasRenderingContext2D, figure: Figure) => {
   if (figure.autoResize) return;
 
   const handle = getTextAutoResizeHandle(figure);
@@ -633,12 +634,12 @@ const drawTextAutoResizeHandle = (ctx, figure) => {
   ctx.lineCap = 'round';
 
   ctx.beginPath();
-  ctx.moveTo(...handle.startAt);
-  ctx.lineTo(...handle.endAt);
+  ctx.moveTo(...(handle.startAt as [number, number]));
+  ctx.lineTo(...(handle.endAt as [number, number]));
   ctx.stroke();
 }
 
-const drawTextSkeleton = (ctx, [startX, startY], text, color, fontSize, font_y_offset_compensation, scale, width, widthIndex) => {
+const drawTextSkeleton = (ctx: CanvasRenderingContext2D, [startX, startY]: Point, text: string, color: any, fontSize: number, font_y_offset_compensation: number, scale: number, width: number, widthIndex: number) => {
   ctx.save();
   ctx.translate(startX, startY);
   ctx.scale(scale, scale);
@@ -658,24 +659,24 @@ const drawTextSkeleton = (ctx, [startX, startY], text, color, fontSize, font_y_o
   ctx.restore();
 }
 
-const drawSelectionBox = (ctx, startX, startY, endX, endY) => {
+const drawSelectionBox = (ctx: CanvasRenderingContext2D, startX: number, startY: number, endX: number, endY: number) => {
   ctx.strokeStyle = dotBorderColor;
   ctx.lineWidth = activeSelectionBoxLineWidth;
   ctx.strokeRect(startX, startY, endX - startX, endY - startY);
 }
 
-const drawTwoDots = (ctx, pointA, pointB, hoveredDot) => {
+const drawTwoDots = (ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point, hoveredDot: string) => {
   drawDot(ctx, pointA, hoveredDot === 'pointA')
   drawDot(ctx, pointB, hoveredDot === 'pointB')
 }
 
-const drawSelectionBoxWithDots = (ctx, pointA, pointB, hoveredDot) => {
+const drawSelectionBoxWithDots = (ctx: CanvasRenderingContext2D, pointA: Point, pointB: Point, hoveredDot: string) => {
   const { pointAwithMargin, pointBwithMargin, pointCwithMargin, pointDwithMargin } = getCornersWithMargin(pointA, pointB)
 
-  drawSelectionBox(ctx, ...pointAwithMargin, ...pointBwithMargin)
+  drawSelectionBox(ctx, ...(pointAwithMargin as [number, number]), ...(pointBwithMargin as [number, number]))
 
-  drawDot(ctx, pointAwithMargin, hoveredDot === 'pointA')
-  drawDot(ctx, pointBwithMargin, hoveredDot === 'pointB')
-  drawDot(ctx, pointCwithMargin, hoveredDot === 'pointC')
-  drawDot(ctx, pointDwithMargin, hoveredDot === 'pointD')
+  drawDot(ctx, (pointAwithMargin as Point), hoveredDot === 'pointA')
+  drawDot(ctx, (pointBwithMargin as Point), hoveredDot === 'pointB')
+  drawDot(ctx, (pointCwithMargin as Point), hoveredDot === 'pointC')
+  drawDot(ctx, (pointDwithMargin as Point), hoveredDot === 'pointD')
 }

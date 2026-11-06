@@ -1,15 +1,18 @@
+export type ToolbarPosition = { x: number; y: number };
+export type ToolbarViewport = { width: number; height: number };
+
 // The saved position is always the top-left of the Draw mode switcher.
 export const toolbarIconSize = { width: 44, height: 56 };
 export const pointerToolbarArrowSize = 17;
 
 // Open toward the half of the viewport with more room.
-export function isToolbarReversed(position, viewport, orientation) {
+export function isToolbarReversed(position: ToolbarPosition, viewport: ToolbarViewport, orientation: string) {
   return orientation === 'vertical'
     ? position.y + toolbarIconSize.height / 2 > viewport.height / 2
     : position.x + toolbarIconSize.width / 2 > viewport.width / 2;
 }
 
-export function getPointerToolbarOffset(orientation, margin) {
+export function getPointerToolbarOffset(orientation: string, margin: number) {
   return {
     x: margin + (orientation === 'horizontal' ? pointerToolbarArrowSize : 0),
     y: margin + (orientation === 'vertical' ? pointerToolbarArrowSize : 0),
@@ -18,7 +21,7 @@ export function getPointerToolbarOffset(orientation, margin) {
 
 // Fit the visible toolbar without overwriting the user's saved icon anchor.
 // If a small viewport forces it to move, collapsing restores that anchor.
-export function getVisibleToolbarPosition(position, viewport, size, orientation, isReversed, margin) {
+export function getVisibleToolbarPosition(position: ToolbarPosition, viewport: ToolbarViewport, size: ToolbarViewport, orientation: string, isReversed: boolean, margin: number) {
   const offsetX = isReversed && orientation === 'horizontal' ? size.width - toolbarIconSize.width : 0;
   const offsetY = isReversed && orientation === 'vertical' ? size.height - toolbarIconSize.height : 0;
   const left = position.x - offsetX;

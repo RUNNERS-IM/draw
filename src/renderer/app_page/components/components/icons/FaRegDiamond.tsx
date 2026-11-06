@@ -1,10 +1,9 @@
-import React from "react";
 
 // Based on Font Awesome Free 5.15.4 regular square (CC BY 4.0).
 // Modified geometry: diamond with matching outline thickness and corner radii.
 // https://github.com/FortAwesome/Font-Awesome/blob/5.15.4/svgs/regular/square.svg
 
-const FaRegDiamond = ({ size, ...props }) => {
+const FaRegDiamond = ({ size, ...props }: { size?: number; [key: string]: any }) => {
   const computedSize = size ?? "1em";
 
   return (

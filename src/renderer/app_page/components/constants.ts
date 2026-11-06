@@ -51,7 +51,7 @@ export const dotHoverColor = dotBorderColor + '99';
 export const activeSelectionBoxLineWidth = 1;
 export const dotTextMargin = 5;
 
-export const isLightColor = (color) => {
+export const isLightColor = (color: string) => {
   const red = parseInt(color.slice(1, 3), 16);
   const green = parseInt(color.slice(3, 5), 16);
   const blue = parseInt(color.slice(5, 7), 16);
@@ -77,7 +77,7 @@ export const toolbarColorIds = [
   'color_6',
 ];
 
-export const createApplicationColorList = (colorPalette) => {
+export const createApplicationColorList = (colorPalette: Record<string, string>) => {
   const rainbowColor = {
     id: 'color_0',
     color: '#000000',

@@ -12,12 +12,16 @@ const TICK_MS = 60 * 60 * 1000;
 const UPDATE_WIDTH = 400;
 const UPDATE_GUARD_MS = 1000;
 
-let busy = false;
-let store = null;
-let beforeInstall = () => {};
-let current = null;
+type StoreLike = { get: (key: string) => any; set: (key: string, value: unknown) => void };
+export type UpdateOffer = { version: string; notes: string[] | null; downloading: boolean; percent: number };
+type UpdateEntry = { window: BrowserWindow; offer: UpdateOffer; answer: (value: string) => void };
 
-export function startUpdates(options) {
+let busy = false;
+let store: StoreLike;
+let beforeInstall = () => {};
+let current: UpdateEntry | null = null;
+
+export function startUpdates(options: { store: StoreLike; beforeInstall: () => void }) {
   store = options.store;
   beforeInstall = options.beforeInstall;
 
@@ -50,7 +54,7 @@ export function checkNow() {
   check(true);
 }
 
-async function check(asked) {
+async function check(asked: boolean) {
   if (busy || (!asked && !store.get('auto_check_updates'))) return;
   busy = true;
 
@@ -87,14 +91,14 @@ async function check(asked) {
   }
 }
 
-async function askAfterDownload(version, notes) {
+async function askAfterDownload(version: string, notes: string[] | null) {
   await autoUpdater.downloadUpdate();
   return askUpdate({ version, notes, downloading: false, percent: 100 }, false).answer;
 }
 
-async function askWhileDownloading(version, notes) {
+async function askWhileDownloading(version: string, notes: string[] | null) {
   const prompt = askUpdate({ version, notes, downloading: true, percent: 0 }, true);
-  const progress = (info) => prompt.set({ percent: info.percent });
+  const progress = (info: { percent: number }) => prompt.set({ percent: info.percent });
   autoUpdater.on('download-progress', progress);
 
   let done = false;
@@ -122,11 +126,11 @@ async function askWhileDownloading(version, notes) {
 }
 
 // 업데이트 질문 창. 닫으면 「나중에」다. focus 가 false 면 포커스를 뺏지 않아, 다른 앱에서 치던 Enter 가 설치로 눌리지 않는다.
-export function askUpdate(offer, focus) {
+export function askUpdate(offer: UpdateOffer, focus: boolean) {
   if (current && !current.window.isDestroyed()) current.window.close();
 
-  let resolve;
-  const answerPromise = new Promise((done) => {
+  let resolve: (value: string) => void = () => {};
+  const answerPromise = new Promise<string>((done) => {
     resolve = done;
   });
 
@@ -150,11 +154,11 @@ export function askUpdate(offer, focus) {
     webPreferences: { preload: preloadPath('update_page'), nodeIntegration: false },
   });
 
-  const entry = { window, offer: { ...offer }, answer: () => {} };
+  const entry: UpdateEntry = { window, offer: { ...offer }, answer: () => {} };
   let answered = false;
   let shownAt = Number.POSITIVE_INFINITY;
 
-  entry.answer = (value) => {
+  entry.answer = (value: string) => {
     if (Date.now() - shownAt < UPDATE_GUARD_MS) return;
     if (answered || (value === 'install' && entry.offer.downloading)) return;
     answered = true;
@@ -186,7 +190,7 @@ export function askUpdate(offer, focus) {
   return {
     window,
     answer: answerPromise,
-    set: (change) => {
+    set: (change: Partial<UpdateOffer>) => {
       if (entry.offer.downloading && change.downloading === false) shownAt = Date.now();
       entry.offer = { ...entry.offer, ...change };
       if (!window.isDestroyed()) window.webContents.send('update_offer_changed', entry.offer);
@@ -197,7 +201,7 @@ export function askUpdate(offer, focus) {
   };
 }
 
-async function tell(message) {
+async function tell(message: string) {
   app.focus({ steal: true });
   await dialog.showMessageBox({ type: 'info', message, buttons: ['OK'] });
 }

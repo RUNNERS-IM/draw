@@ -1,4 +1,4 @@
-import React from 'react';
+import type { Callback } from '../types';
 
 const OPACITY_MIN = 0;
 const OPACITY_MAX = 100;
@@ -7,10 +7,10 @@ const SPACING_MIN = 20;
 const SPACING_MAX = 120;
 const SPACING_STEP = 5;
 
-const createSliderMarks = (min, max, step) => (
+const createSliderMarks = (min: number, max: number, step: number) => (
   Array.from({ length: (max - min) / step - 1 }, (_, index) => min + (index + 1) * step)
 );
-const getSliderProgress = (value, min, max) => {
+const getSliderProgress = (value: any, min: number, max: number) => {
   const numericValue = Number(value);
   const clampedValue = Math.min(max, Math.max(min, Number.isFinite(numericValue) ? numericValue : min));
 
@@ -44,7 +44,7 @@ const WhiteboardSidebar = ({
   onChangeSpacing,
   onChangePatternStyle,
   onClickResize,
-}) => {
+}: { theme: string; opacity: number; spacing: number; patternStyle: string; onChangeTheme: Callback; onChangeOpacity: Callback; onChangeSpacing: Callback; onChangePatternStyle: Callback; onClickResize: Callback }) => {
   const opacityProgress = getSliderProgress(opacity, OPACITY_MIN, OPACITY_MAX);
   const spacingProgress = getSliderProgress(spacing, SPACING_MIN, SPACING_MAX);
 

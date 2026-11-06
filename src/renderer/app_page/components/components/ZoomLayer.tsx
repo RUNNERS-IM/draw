@@ -1,6 +1,7 @@
+import type { Callback } from '../types';
 import './ZoomLayer.scss';
 
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { zoomLevels } from '../constants';
 
 const maxZoomIndex = zoomLevels.length - 1;
@@ -18,7 +19,7 @@ const ZoomLayer = ({
   onStartExitZoom,
   onLockZoom,
   onResumeZoomEnd,
-}) => {
+}: { imageDataUrl: string; currentFocusPoint: { x: number; y: number }; resumeFocusPoint: { x: number; y: number }; currentZoomIndex: number; animateEntry: boolean; isResuming: boolean; isExiting: boolean; onExitZoom: Callback; onStartExitZoom: Callback; onLockZoom: Callback; onResumeZoomEnd: Callback }) => {
   const [zoomIndex, setZoomIndex] = useState(currentZoomIndex);
   const [focusPoint, setFocusPoint] = useState(resumeFocusPoint || currentFocusPoint);
 
@@ -27,16 +28,16 @@ const ZoomLayer = ({
   const zoomIn = useCallback(() => {
     if (zoomIndex === maxZoomIndex) return;
 
-    setZoomIndex(currentIndex => Math.min(currentIndex + 1, maxZoomIndex));
+    setZoomIndex((currentIndex: number) => Math.min(currentIndex + 1, maxZoomIndex));
   }, [zoomIndex]);
 
   const zoomOut = useCallback(() => {
     if (zoomIndex === minZoomIndex) return;
 
-    setZoomIndex(currentIndex => Math.max(currentIndex - 1, minZoomIndex));
+    setZoomIndex((currentIndex: number) => Math.max(currentIndex - 1, minZoomIndex));
   }, [zoomIndex]);
 
-  const handleKeyDown = useCallback((event) => {
+  const handleKeyDown = useCallback((event: any) => {
     if (isExiting) return;
 
     if (event.key === 'Escape') {
@@ -66,13 +67,13 @@ const ZoomLayer = ({
     };
   }, [handleKeyDown]);
 
-  const handlePointerMove = (event) => {
+  const handlePointerMove = (event: any) => {
     if (isExiting) return;
 
     setFocusPoint({ x: event.clientX, y: event.clientY });
   };
 
-  const handleClick = (event) => {
+  const handleClick = () => {
     if (isExiting) return;
     if (isResuming) return;
 
@@ -85,7 +86,7 @@ const ZoomLayer = ({
     });
   };
 
-  const handleWheel = (event) => {
+  const handleWheel = (event: any) => {
     event.preventDefault();
 
     if (isExiting) return;
@@ -103,7 +104,7 @@ const ZoomLayer = ({
     }
   };
 
-  const handleContextMenu = (event) => {
+  const handleContextMenu = (event: any) => {
     event.preventDefault();
 
     if (isExiting) return;
@@ -111,7 +112,7 @@ const ZoomLayer = ({
     onStartExitZoom();
   };
 
-  const handleHintClick = (event) => {
+  const handleHintClick = (event: any) => {
     event.stopPropagation();
 
     onStartExitZoom();

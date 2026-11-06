@@ -1,10 +1,9 @@
-import React from "react";
 
 // Based on Google Material Design Icons rounded_corner (Apache 2.0).
 // https://react-icons.github.io/react-icons/search/#q=MdRoundedCorner
 // Modified geometry: larger dashed square with one sharp top-right edge.
 
-const MdSharpCorner = ({ size, ...props }) => {
+const MdSharpCorner = ({ size, ...props }: { size?: number; [key: string]: any }) => {
   const computedSize = size ?? "1em";
 
   return (

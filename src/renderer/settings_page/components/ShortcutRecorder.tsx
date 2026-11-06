@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { debounce } from 'lodash';
 import {
   MdKeyboardCommandKey,
@@ -7,9 +7,9 @@ import {
 } from "react-icons/md";
 import { ImShift } from "react-icons/im";
 
-const HotkeyPill = ({ accelerator }) => {
-  const humanizedKey = (key) => {
-    const keyMap = {
+const HotkeyPill = ({ accelerator }: { accelerator: any }) => {
+  const humanizedKey = (key: string) => {
+    const keyMap: Record<string, any> = {
       'Meta': <MdKeyboardCommandKey />,
       'Control': <MdOutlineKeyboardControlKey />,
       'Alt': <MdOutlineKeyboardOptionKey />,
@@ -22,7 +22,7 @@ const HotkeyPill = ({ accelerator }) => {
   return (
     <span className="hotkey-pill">
       {
-        accelerator.map(key => (
+        accelerator.map((key: string) => (
           <span key={key} className="key">{humanizedKey(key)}</span>
         ))
       }
@@ -30,14 +30,14 @@ const HotkeyPill = ({ accelerator }) => {
   );
 };
 
-const ShortcutRecorder = ({ accelerator, onCheck, onChange }) => {
+const ShortcutRecorder = ({ accelerator, onCheck, onChange }: { accelerator: any; onCheck: (...args: any[]) => any; onChange: (...args: any[]) => any }) => {
   const isMac = window.electronAPI.isMac;
 
   const [isRecording, setIsRecording] = useState(false);
-  const [currentKeys, setCurrentKeys] = useState([]);
-  const inputRef = useRef(null);
+  const [currentKeys, setCurrentKeys] = useState<any>([]);
+  const inputRef = useRef<any>(null);
 
-  const codeToKey = (code) => {
+  const codeToKey = (code: string) => {
     if (code.startsWith('Key') && code.length === 4) {
       return code.slice(3).toUpperCase(); // 'KeyA' -> 'A'
     }
@@ -46,7 +46,7 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }) => {
       return code.slice(5); // 'Digit1' -> '1'
     }
 
-    const punctuation = {
+    const punctuation: Record<string, string> = {
       Minus: '-',
       Equal: '=',
       BracketLeft: '[',
@@ -62,12 +62,12 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }) => {
     return null;
   };
 
-  const validateShortcut = (keys) => {
+  const validateShortcut = (keys: any) => {
     if (!keys) return true;
 
     const modifiers = ['Meta', 'Control', 'Alt', 'Shift'];
-    const hasModifier = keys.some(part => modifiers.includes(part));
-    const hasNonModifier = keys.some(part => !modifiers.includes(part));
+    const hasModifier = keys.some((part: string) => modifiers.includes(part));
+    const hasNonModifier = keys.some((part: string) => !modifiers.includes(part));
 
     if (!hasModifier) {
       return false;
@@ -116,7 +116,7 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }) => {
     }
   };
 
-  const stopRecording = async (keys) => {
+  const stopRecording = async (keys: any) => {
     if (validateShortcut(keys)) {
       const electronKey = keys.join('+')
 
@@ -132,7 +132,7 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }) => {
     debounce((keys) => stopRecording(keys), 200)
   ).current;
 
-  const handleKeyDown = (event) => {
+  const handleKeyDown = (event: any) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -157,7 +157,7 @@ const ShortcutRecorder = ({ accelerator, onCheck, onChange }) => {
     setCurrentKeys(modifiers);
   };
 
-  const handleKeyUp = (event) => {
+  const handleKeyUp = (event: any) => {
     event.preventDefault();
     event.stopPropagation();
 

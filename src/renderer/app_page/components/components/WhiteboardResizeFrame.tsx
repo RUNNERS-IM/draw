@@ -1,4 +1,4 @@
-import React from 'react';
+import type { Callback } from '../types';
 import './WhiteboardResizeFrame.scss';
 
 const RESIZE_HANDLES = ['nw', 'n', 'ne', 'e', 'se', 's', 'sw', 'w'];
@@ -9,7 +9,7 @@ const WhiteboardResizeFrame = ({
   onStartResize,
   onSnapResize,
   onApply,
-}) => (
+}: { onStartMove: Callback; onStartResize: Callback; onSnapResize: Callback; onApply: Callback }) => (
   <div
     className="whiteboard-resize-frame"
     onPointerDown={onStartMove}

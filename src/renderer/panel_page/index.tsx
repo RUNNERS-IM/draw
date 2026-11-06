@@ -1,17 +1,18 @@
-import React, { useEffect, useRef, useState } from 'react';
+import type { ComponentType } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import { Pencil, MousePointer2, PanelLeft, Trash2, LogIn, RefreshCw, Info, Download, Settings, CircleHelp, Power } from 'lucide-react';
 import { MenuHead, MenuItem, MenuSeparator, MenuSwitch } from '../../runners-account/runners-menu';
 import { t } from '../../shared/i18n';
 import './panel.css';
 
-const icon = (Icon) => <Icon strokeWidth={1.5} />;
+const icon = (Icon: ComponentType<any>) => <Icon strokeWidth={1.5} />;
 const api = window.electronAPI;
 
 // 메뉴 막대 아이콘을 누르면 뜨는 패널. 줄 값은 runners-menu.css(글자 13 · 줄 32 · 폭 300)를 그대로 쓴다.
 const Panel = () => {
-  const [state, setState] = useState(null);
-  const root = useRef(null);
+  const [state, setState] = useState<any>(null);
+  const root = useRef<any>(null);
 
   useEffect(() => {
     api.getPanelState().then(setState);
@@ -28,7 +29,7 @@ const Panel = () => {
 
   if (!state) return null;
 
-  const run = (name) => () => api.panelAction(name);
+  const run = (name: string) => () => api.panelAction(name);
 
   return (
     <main className="panel" ref={root}>
@@ -75,4 +76,4 @@ const Panel = () => {
   );
 };
 
-createRoot(document.getElementById('root')).render(<Panel />);
+createRoot(document.getElementById('root')!).render(<Panel />);

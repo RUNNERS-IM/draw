@@ -5,7 +5,7 @@ import fs from 'fs';
 import path from 'path';
 import { askUpdate } from './updates';
 
-const wait = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+const wait = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
 const figures = () => {
   const now = Date.now();
@@ -21,12 +21,12 @@ const figures = () => {
   ];
 };
 
-export async function runTestShots(app) {
-  const log = [];
-  const note = (line) => log.push(line);
+export async function runTestShots(app: any) {
+  const log: string[] = [];
+  const note = (line: string) => log.push(line);
   fs.mkdirSync(app.dir, { recursive: true });
 
-  const shot = async (window, name) => {
+  const shot = async (window: Electron.BrowserWindow, name: string) => {
     note(`  [${name}] 숨김=${electronApp.isHidden()} 보임=${window.isVisible()} 자리=${JSON.stringify(window.getBounds())} 맨앞=${window.isFocused()}`);
     const image = await window.webContents.capturePage();
     fs.writeFileSync(path.join(app.dir, `${name}.png`), image.toPNG());
@@ -35,17 +35,17 @@ export async function runTestShots(app) {
 
   try {
     // 화면 코드 오류를 result.txt 에 남긴다. 그렇지 않으면 창이 비어 있는 까닭을 알 수 없다.
-    const watch = (window) => {
+    const watch = (window: Electron.BrowserWindow) => {
       window.webContents.on('console-message', (details) => {
         if (details.level === 'error') note(`  [화면 오류] ${details.message} (${details.sourceId}:${details.lineNumber})`);
       });
     };
-    Object.values(app.getWindows()).forEach((window) => window && watch(window));
+    (Object.values(app.getWindows()) as Electron.BrowserWindow[]).forEach((window) => window && watch(window));
     electronApp.on('browser-window-created', (_event, window) => watch(window));
     await wait(2500);
     note(`화면들: ${JSON.stringify(screen.getAllDisplays().map((d) => d.bounds))}`);
 
-    for (const theme of ['light', 'dark']) {
+    for (const theme of ['light', 'dark'] as const) {
       nativeTheme.themeSource = theme;
       const { mainWindow, extendedToolbarWindow, panelWindow } = app.getWindows();
 
@@ -66,7 +66,7 @@ export async function runTestShots(app) {
       note(`[${theme}] 그리기 모드: 그림판 창 보임=${mainWindow.isVisible()}, 그리는 중=${app.isDrawing()}`);
       await shot(mainWindow, `${theme}-3-그리기-빈화면`);
 
-      const send = (action) => mainWindow.webContents.send('test_action', action);
+      const send = (action: unknown) => mainWindow.webContents.send('test_action', action);
       const count = () => mainWindow.webContents.executeJavaScript('window.__drawFigureCount');
 
       send({ type: 'figures', figures: figures() });
@@ -150,7 +150,7 @@ export async function runTestShots(app) {
     }
     note('끝');
   } catch (error) {
-    note(`오류: ${error?.stack || error}`);
+    note(`오류: ${(error as Error)?.stack || error}`);
   }
 
   fs.writeFileSync(path.join(app.dir, 'result.txt'), log.join('\n') + '\n');

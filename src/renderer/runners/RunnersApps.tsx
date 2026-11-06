@@ -1,12 +1,11 @@
 // 「RUNNERS의 다른 앱」 · 「RUNNERS의 서비스」 카드. Split · Prompt · Monitor 와 같은 모양이다.
 // 목록은 ~/git/runners/_docs/작업 가이드/runners-apps.json 을 복사한 것이고, 아이콘은 src/assets/runners-apps/ 에 있다.
-import React from 'react';
 import source from './runners-apps.json';
 import { t, currentLocale } from '../../shared/i18n';
 import { safeUrl } from '../../shared/safeUrl';
 import './RunnersApps.css';
 
-const pickText = (text) => (currentLocale() === 'ko' ? text.ko : text.en) || text.en || text.ko || '';
+const pickText = (text: { ko?: string; en?: string }) => (currentLocale() === 'ko' ? text.ko : text.en) || text.en || text.ko || '';
 
 const groups = source.groups
   .map((group) => ({
@@ -15,7 +14,7 @@ const groups = source.groups
   }))
   .filter((group) => group.items.length > 0);
 
-const RunnersApps = ({ onOpen }) => (
+const RunnersApps = ({ onOpen }: { onOpen: (...args: any[]) => any }) => (
   <div className="runners-apps">
     {groups.map((group) => (
       <section key={group.id} className="runners-apps-group" aria-labelledby={`runners-apps-${group.id}`}>

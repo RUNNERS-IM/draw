@@ -1,8 +1,9 @@
+import type { Figure, Point } from '../types';
 import { getStroke } from "perfect-freehand";
 import { LazyBrush } from "lazy-brush";
 import { widthList, SNAP_ANGLE, dotTextMargin, lineHeightMultiplier } from '../constants'
 
-export function getPerfectPath2D(points, strokeOptions) {
+export function getPerfectPath2D(points: Point[], strokeOptions: Record<string, unknown>) {
   const stroke = getStroke(points, strokeOptions);
 
   const pathData = getSvgPathFromStroke(stroke);
@@ -10,11 +11,11 @@ export function getPerfectPath2D(points, strokeOptions) {
 }
 
 // https://github.com/steveruizok/perfect-freehand/tree/main
-const getSvgPathFromStroke = (stroke) => {
+const getSvgPathFromStroke = (stroke: Point[]) => {
   if (!stroke.length) return ''
 
   const d = stroke.reduce(
-    (acc, [x0, y0], i, arr) => {
+    (acc: any, [x0, y0]: Point, i: number, arr) => {
       const [x1, y1] = arr[(i + 1) % arr.length]
       acc.push(x0, y0, (x0 + x1) / 2, (y0 + y1) / 2)
       return acc
@@ -26,7 +27,7 @@ const getSvgPathFromStroke = (stroke) => {
   return d.join(' ')
 }
 
-export const getLazyPoints = (points, options = {}) => {
+export const getLazyPoints = (points: Point[], options: any = {}) => {
   const radius = Math.min(options.size / 2, 6)
 
   const startPoint = points[0]
@@ -39,9 +40,9 @@ export const getLazyPoints = (points, options = {}) => {
     radius: radius,
     initialPoint: { x: startPoint[0], y: startPoint[1] },
     friction: 0.2,
-  });
+  } as any);
 
-  points.forEach((point, index) => {
+  points.forEach((point: Point, index: number) => {
     if (index === 0) return;
 
     lazy.update({ x: point[0], y: point[1] })
@@ -58,7 +59,7 @@ export const getLazyPoints = (points, options = {}) => {
 
 // https://en.wikipedia.org/wiki/Distance_from_a_point_to_a_line
 // Distance from a point to a line
-export const pointToSegmentDistance = (px, py, pointA, pointB) => {
+export const pointToSegmentDistance = (px: number, py: number, pointA: Point, pointB: Point) => {
   const [x1, y1] = pointA;
   const [x2, y2] = pointB;
 
@@ -104,7 +105,7 @@ export const pointToSegmentDistance = (px, py, pointA, pointB) => {
   }
 }
 
-export const getMouseCoordinates = (event) => {
+export const getMouseCoordinates = (event: any) => {
   return {
     x: event.nativeEvent.pageX,
     y: event.nativeEvent.pageY,
@@ -112,7 +113,7 @@ export const getMouseCoordinates = (event) => {
 }
 
 // Remove points that are too close to each other
-export const filterClosePoints = (points, widthIndex) => {
+export const filterClosePoints = (points: Point[], widthIndex: number) => {
   if (points.length <= 1) { return points }
 
   const minDistance = widthList[widthIndex].close_point_distance;
@@ -137,7 +138,7 @@ export const filterClosePoints = (points, widthIndex) => {
   return result
 }
 
-export const distanceBetweenPoints = (pointA, pointB) => {
+export const distanceBetweenPoints = (pointA: Point, pointB: Point) => {
   const [startX, startY] = pointA
   const [endX, endY] = pointB
 
@@ -145,9 +146,9 @@ export const distanceBetweenPoints = (pointA, pointB) => {
 }
 
 // Reusable 2D canvas context used only for measuring text dimensions.
-let textMeasurementContext;
+let textMeasurementContext: CanvasRenderingContext2D | null = null;
 
-const getTextMeasurementContext = (widthIndex) => {
+const getTextMeasurementContext = (widthIndex: number) => {
   if (!textMeasurementContext) {
     const canvas = document.createElement('canvas');
     textMeasurementContext = canvas.getContext('2d');
@@ -155,24 +156,24 @@ const getTextMeasurementContext = (widthIndex) => {
 
   const fontSize = widthList[widthIndex].font_size;
 
-  textMeasurementContext.font = `${fontSize}px Excalifont`;
+  textMeasurementContext!.font = `${fontSize}px Excalifont`;
 
   return textMeasurementContext;
 };
 
-const calculateTextLineHeight = (widthIndex) => {
+const calculateTextLineHeight = (widthIndex: number) => {
   const fontSize = widthList[widthIndex].font_size;
 
   return fontSize * lineHeightMultiplier;
 };
 
-export const calculateCanvasTextWidth = (text, widthIndex) => {
+export const calculateCanvasTextWidth = (text: string, widthIndex: number) => {
   const dummyCanvasCtx = getTextMeasurementContext(widthIndex);
 
   const lines = text.split('\n');
 
   // Width Detection:
-  const maxLineWidth = Math.max(...lines.map(line => dummyCanvasCtx.measureText(line).width));
+  const maxLineWidth = Math.max(...lines.map((line: string) => dummyCanvasCtx!.measureText(line).width));
 
   // Height Detection:
   const lineHeight = calculateTextLineHeight(widthIndex);
@@ -182,13 +183,13 @@ export const calculateCanvasTextWidth = (text, widthIndex) => {
   return [maxLineWidth, totalHeight]
 }
 
-export const calculateCanvasTextMinWidth = (widthIndex) => {
+export const calculateCanvasTextMinWidth = (widthIndex: number) => {
   const [width, _height] = calculateCanvasTextWidth('W', widthIndex);
 
   return width;
 }
 
-export const calculateCanvasWrappedTextHeight = (text, widthIndex, textAreaWidth) => {
+export const calculateCanvasWrappedTextHeight = (text: string, widthIndex: number, textAreaWidth: number) => {
   const wrappedLines = getWrappedTextLines(text, widthIndex, textAreaWidth);
 
   const lineHeight = calculateTextLineHeight(widthIndex);
@@ -198,7 +199,7 @@ export const calculateCanvasWrappedTextHeight = (text, widthIndex, textAreaWidth
   return totalHeight;
 }
 
-const splitStringToFitWidth = (dummyCanvasCtx, string, textAreaWidth) => {
+const splitStringToFitWidth = (dummyCanvasCtx: CanvasRenderingContext2D, string: string, textAreaWidth: number) => {
   const result = [];
   let currentPart = '';
 
@@ -223,20 +224,20 @@ const splitStringToFitWidth = (dummyCanvasCtx, string, textAreaWidth) => {
   return result;
 }
 
-export const getWrappedTextLines = (text, widthIndex, textAreaWidth) => {
+export const getWrappedTextLines = (text: string, widthIndex: number, textAreaWidth: number) => {
   const dummyCanvasCtx = getTextMeasurementContext(widthIndex);
 
   const lines = text.split('\n');
 
-  const wrappedLines = [];
+  const wrappedLines: string[] = [];
 
-  lines.forEach(line => {
+  lines.forEach((line: string) => {
     const tokens = line.split(/(\s+)/).filter(Boolean);
 
     let currentLine = '';
     let pendingSpaces = '';
 
-    tokens.forEach(token => {
+    tokens.forEach((token: string) => {
       if (/^\s+$/.test(token)) {
         pendingSpaces += token;
         return;
@@ -244,7 +245,7 @@ export const getWrappedTextLines = (text, widthIndex, textAreaWidth) => {
 
       const nextLine = currentLine + pendingSpaces + token;
 
-      const nextLineWidth = dummyCanvasCtx.measureText(nextLine).width;
+      const nextLineWidth = dummyCanvasCtx!.measureText(nextLine).width;
 
       if (nextLineWidth <= textAreaWidth) {
         currentLine = nextLine;
@@ -260,7 +261,7 @@ export const getWrappedTextLines = (text, widthIndex, textAreaWidth) => {
         pendingSpaces = '';
       }
 
-      const wrappedWordParts = splitStringToFitWidth(dummyCanvasCtx, token, textAreaWidth);
+      const wrappedWordParts = splitStringToFitWidth(dummyCanvasCtx!, token, textAreaWidth);
 
       wrappedLines.push(...wrappedWordParts.slice(0, -1));
       currentLine = wrappedWordParts.at(-1) || '';
@@ -273,8 +274,8 @@ export const getWrappedTextLines = (text, widthIndex, textAreaWidth) => {
 }
 
 // https://en.m.wikipedia.org/wiki/Intersection_(geometry)#Two_line_segments
-export const segmentsIntersect = (p1, p2, q1, q2) => {
-  const cross = (a, b, c) =>
+export const segmentsIntersect = (p1: Point, p2: Point, q1: Point, q2: Point) => {
+  const cross = (a: any, b: any, c: any) =>
     (b[0] - a[0]) * (c[1] - a[1]) - (b[1] - a[1]) * (c[0] - a[0]);
 
   const o1 = cross(p1, p2, q1);
@@ -285,7 +286,7 @@ export const segmentsIntersect = (p1, p2, q1, q2) => {
   return (o1 * o2 < 0) && (o3 * o4 < 0);
 }
 
-export function applySoftSnap(startX, startY, x, y) {
+export function applySoftSnap(startX: number, startY: number, x: number, y: number) {
   const dx = x - startX;
   const dy = y - startY;
 
@@ -308,7 +309,7 @@ export function applySoftSnap(startX, startY, x, y) {
   };
 }
 
-export function applyAspectRatioLock(startX, startY, x, y, ratio) {
+export function applyAspectRatioLock(startX: number, startY: number, x: number, y: number, ratio: number) {
   const EPS = 0.01;
   let dx = x - startX;
   let dy = y - startY;
@@ -333,7 +334,7 @@ export function applyAspectRatioLock(startX, startY, x, y, ratio) {
   return { x: adjustedX, y: y }; // Інакше тримаємо Y курсора на горизонтальній грані, підганяємо X за ratio.
 }
 
-export const calcPointsArrow = (points, widthIndex) => {
+export const calcPointsArrow = (points: Point[], widthIndex: number) => {
   const minArrowLength = 20;
   const minTailSize = 1;
   const arrowSetup = [
@@ -375,7 +376,7 @@ export const calcPointsArrow = (points, widthIndex) => {
   // const t1 = [ -2 * d1[1],                            d7[1]]
   // const t2 = [ -2 * d1[1],                            d1[1]]
 
-  function transformPoint([x, y]) {
+  function transformPoint([x, y]: Point) {
     return [
       startX + x * cos - y * sin,
       startY + x * sin + y * cos
@@ -388,7 +389,7 @@ export const calcPointsArrow = (points, widthIndex) => {
   return figurePoints
 }
 
-export const calcSegmentsFlatArrow = (points, widthIndex) => {
+export const calcSegmentsFlatArrow = (points: Point[], widthIndex: number) => {
   const minArrowLength = 20;
   const arrowSetup = [
     { max_scale_length: 70,  max_head_len: 17, max_head_half: 8 },
@@ -418,7 +419,7 @@ export const calcSegmentsFlatArrow = (points, widthIndex) => {
   const headHalf = arrow.max_head_half * scaleFactor
   const headBaseX = length - headLen
 
-  function transformPoint([x, y]) {
+  function transformPoint([x, y]: Point) {
     return [
       startX + x * cos - y * sin,
       startY + x * sin + y * cos
@@ -437,7 +438,7 @@ export const calcSegmentsFlatArrow = (points, widthIndex) => {
   ];
 }
 
-export const isSmallArrowFigure = (points, widthIndex) => {
+export const isSmallArrowFigure = (points: Point[], widthIndex: number) => {
   const [startPoint, endPoint] = points;
 
   const smallArrowLengths = [60, 80, 100, 120, 140];
@@ -447,7 +448,7 @@ export const isSmallArrowFigure = (points, widthIndex) => {
   return arrowLength < smallArrowLength;
 }
 
-export const buildArrowArcSegments = (arrowPoints, widthIndex) => {
+export const buildArrowArcSegments = (arrowPoints: Point[], widthIndex: number) => {
   const arrowRoundSetup = [
     { radius: 1, offset: 2 },
     { radius: 2, offset: 3 },
@@ -456,7 +457,7 @@ export const buildArrowArcSegments = (arrowPoints, widthIndex) => {
     { radius: 5, offset: 6 },
   ];
 
-  const moveTowards = (fromPoint, toPoint, distance) => {
+  const moveTowards = (fromPoint: Point, toPoint: Point, distance: number) => {
     const fullDistance = distanceBetweenPoints(fromPoint, toPoint);
     if (!fullDistance) {
       return [...fromPoint];
@@ -474,7 +475,7 @@ export const buildArrowArcSegments = (arrowPoints, widthIndex) => {
   const arcRadius = arrowRoundSetup[widthIndex].radius;
   const arcOffset = arrowRoundSetup[widthIndex].offset;
 
-  return arrowPoints.map((cornerPoint, index) => {
+  return arrowPoints.map((cornerPoint: Point, index: number) => {
     const prevPoint = arrowPoints[(index - 1 + pointsCount) % pointsCount];
     const nextPoint = arrowPoints[(index + 1) % pointsCount];
 
@@ -494,7 +495,7 @@ export const buildArrowArcSegments = (arrowPoints, widthIndex) => {
   });
 }
 
-export const getCornersWithMargin = (pointA, pointB) => {
+export const getCornersWithMargin = (pointA: Point, pointB: Point) => {
   const directionX = pointA[0] <= pointB[0] ? 1 : -1;
   const directionY = pointA[1] <= pointB[1] ? 1 : -1;
 
@@ -526,7 +527,7 @@ export const getCornersWithMargin = (pointA, pointB) => {
   };
 }
 
-export const getTextAutoResizeHandle = (figure) => {
+export const getTextAutoResizeHandle = (figure: Figure) => {
   const { points: [startAt], width, height, scale } = figure;
   const [startX, startY] = startAt;
 

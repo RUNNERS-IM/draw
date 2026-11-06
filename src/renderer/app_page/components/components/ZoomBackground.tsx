@@ -1,6 +1,6 @@
+import type { Callback } from '../types';
 import './ZoomBackground.scss';
 
-import React from 'react';
 import { zoomLevels } from '../constants';
 
 const ZoomBackground = ({
@@ -8,10 +8,10 @@ const ZoomBackground = ({
   currentFocusPoint,
   currentZoomIndex,
   onStartExitZoom,
-}) => {
+}: { imageDataUrl: string; currentFocusPoint: { x: number; y: number }; currentZoomIndex: number; onStartExitZoom: Callback }) => {
   const zoom = zoomLevels[currentZoomIndex];
 
-  const handleHintClick = (event) => {
+  const handleHintClick = (event: any) => {
     event.stopPropagation();
 
     onStartExitZoom();

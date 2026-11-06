@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from 'react';
+import type { Callback } from '../types';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import './Whiteboard.scss';
 
 import { LuSettings } from 'react-icons/lu';
@@ -11,9 +12,9 @@ const getViewportSize = () => ({
   height: Math.max(1, window.innerHeight),
 });
 
-const clampLayout = (layout, viewportSize) => {
-  const clamp = (value, min, max) => Math.min(max, Math.max(min, value));
-  const round = (value) => Number(value.toFixed(2));
+const clampLayout = (layout: any, viewportSize: any) => {
+  const clamp = (value: any, min: number, max: number) => Math.min(max, Math.max(min, value));
+  const round = (value: any) => Number(value.toFixed(2));
 
   const widthPx = (layout.width / 100) * viewportSize.width;
   const heightPx = (layout.height / 100) * viewportSize.height;
@@ -32,7 +33,7 @@ const clampLayout = (layout, viewportSize) => {
   };
 };
 
-const resizeLayout = (layout, handle, deltaX, deltaY) => {
+const resizeLayout = (layout: any, handle: string, deltaX: number, deltaY: number) => {
   const nextLayout = { ...layout };
 
   if (handle.includes('w')) {
@@ -56,7 +57,7 @@ const resizeLayout = (layout, handle, deltaX, deltaY) => {
   return nextLayout;
 };
 
-const moveLayout = (layout, deltaX, deltaY) => ({
+const moveLayout = (layout: any, deltaX: number, deltaY: number) => ({
   ...layout,
   x: layout.x + deltaX,
   y: layout.y + deltaY,
@@ -85,7 +86,7 @@ const CENTER_SNAP_LAYOUTS = [
   },
 ];
 
-const getSnapResizeLayout = (handle, ratio) => {
+const getSnapResizeLayout = (handle: string, ratio: number) => {
   const isLeft = handle.includes('w');
   const isRight = handle.includes('e');
   const isTop = handle.includes('n');
@@ -99,7 +100,7 @@ const getSnapResizeLayout = (handle, ratio) => {
   };
 };
 
-const getNextSnapIndex = (previousSnap, handle, snapCount) => (
+const getNextSnapIndex = (previousSnap: any, handle: string, snapCount: number) => (
   previousSnap.handle === handle ? (previousSnap.snapIndex + 1) % snapCount : 0
 );
 
@@ -114,27 +115,27 @@ const Whiteboard = ({
   onChangePatternStyle,
   onChangeSpacing,
   onChangeLayout,
-}) => {
+}: { theme: string; layout: any; opacity: number; patternStyle: string; spacing: number; onChangeTheme: Callback; onChangeOpacity: Callback; onChangePatternStyle: Callback; onChangeSpacing: Callback; onChangeLayout: Callback }) => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isResizeMode, setIsResizeMode] = useState(false);
   const [viewportSize] = useState(getViewportSize);
 
   const currentLayout = clampLayout(layout, viewportSize);
 
-  const interactionRef = useRef(null);
-  const latestLayoutRef = useRef(null);
-  const lastSnapResizeRef = useRef({ handle: null, snapIndex: -1 });
+  const interactionRef = useRef<any>(null);
+  const latestLayoutRef = useRef<any>(null);
+  const lastSnapResizeRef = useRef<{ handle: string | null; snapIndex: number }>({ handle: null, snapIndex: -1 });
 
   latestLayoutRef.current = currentLayout;
 
-  const updateLayout = useCallback((nextLayout, saveToStore) => {
+  const updateLayout = useCallback((nextLayout: any, saveToStore: boolean) => {
     const clampedLayout = clampLayout(nextLayout, viewportSize);
 
     latestLayoutRef.current = clampedLayout;
     onChangeLayout(clampedLayout, saveToStore);
   }, [onChangeLayout, viewportSize]);
 
-  const handlePointerMove = useCallback((event) => {
+  const handlePointerMove = useCallback((event: any) => {
     const interaction = interactionRef.current;
     if (!interaction) return;
 
@@ -157,7 +158,7 @@ const Whiteboard = ({
     window.removeEventListener('pointerup', handlePointerUp);
   }, [handlePointerMove]);
 
-  const startInteraction = useCallback((event, type, handle = null) => {
+  const startInteraction = useCallback((event: any, type: string, handle: string | null = null) => {
     if (!isResizeMode) return;
 
     event.preventDefault();
@@ -176,7 +177,7 @@ const Whiteboard = ({
     window.addEventListener('pointerup', handlePointerUp);
   }, [currentLayout, handlePointerMove, handlePointerUp, isResizeMode]);
 
-  const handleApplyResizeMode = useCallback((event) => {
+  const handleApplyResizeMode = useCallback((event?: any) => {
     event?.preventDefault();
     event?.stopPropagation();
 
@@ -188,7 +189,7 @@ const Whiteboard = ({
     window.removeEventListener('pointerup', handlePointerUp);
   }, [handlePointerMove, handlePointerUp, updateLayout]);
 
-  const handleSnapResize = useCallback((event, handle) => {
+  const handleSnapResize = useCallback((event: any, handle: string) => {
     event.preventDefault();
     event.stopPropagation();
 
@@ -208,7 +209,7 @@ const Whiteboard = ({
   useEffect(() => {
     if (!isResizeMode && !isSidebarOpen) return;
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: any) => {
       if (isResizeMode && ['Enter', 'Escape'].includes(event.key)) {
         event.preventDefault();
         event.stopPropagation();
@@ -285,7 +286,7 @@ const Whiteboard = ({
         isResizeMode &&
           <WhiteboardResizeFrame
             onStartMove={(event) => startInteraction(event, 'move')}
-            onStartResize={(event, handle) => startInteraction(event, 'resize', handle)}
+            onStartResize={(event, handle: string) => startInteraction(event, 'resize', handle)}
             onSnapResize={handleSnapResize}
             onApply={handleApplyResizeMode}
           />

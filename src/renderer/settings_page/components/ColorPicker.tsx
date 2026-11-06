@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { IoCheckmark } from 'react-icons/io5';
 import { defaultColorPickerColors } from '../../app_page/components/constants';
 import './ColorPicker.scss';
@@ -26,7 +26,7 @@ const COLOR_PICKER_COLORS = [
   ['#FFF4E6', '#FFD8A8', '#FFA94D', '#FD7E14', '#E8590C', '#D9480F'],
 ];
 
-const ColorSwatch = ({ color, isActive, onClick }) => (
+const ColorSwatch = ({ color, isActive, onClick }: { color: string; isActive: boolean; onClick: (...args: any[]) => any }) => (
   <div
     className={`color-picker-swatch ${isActive ? 'active' : ''}`}
     onClick={onClick}
@@ -38,8 +38,8 @@ const ColorSwatch = ({ color, isActive, onClick }) => (
   </div>
 );
 
-const ColorPicker = ({ initialColor, onCancel, onSave }) => {
-  const pickerRef = useRef(null);
+const ColorPicker = ({ initialColor, onCancel, onSave }: { initialColor: string; onCancel: (...args: any[]) => any; onSave: (...args: any[]) => any }) => {
+  const pickerRef = useRef<any>(null);
   const [draftColor, setDraftColor] = useState(initialColor);
 
   const inputValue = draftColor.slice(1);
@@ -48,13 +48,13 @@ const ColorPicker = ({ initialColor, onCancel, onSave }) => {
   const activeShadeIndex = activeShades?.indexOf(draftColor);
 
   useEffect(() => {
-    const handlePointerDown = (event) => {
+    const handlePointerDown = (event: any) => {
       if (!pickerRef.current?.contains(event.target)) {
         onCancel();
       }
     };
 
-    const handleKeyDown = (event) => {
+    const handleKeyDown = (event: any) => {
       if (event.key === 'Escape') {
         event.preventDefault();
         onCancel();
@@ -70,7 +70,7 @@ const ColorPicker = ({ initialColor, onCancel, onSave }) => {
     };
   }, [onCancel]);
 
-  const changeInput = (event) => {
+  const changeInput = (event: any) => {
     const nextInput = event.target.value.toUpperCase();
 
     setDraftColor(`#${nextInput}`);

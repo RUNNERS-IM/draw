@@ -1,14 +1,16 @@
-import React, { useEffect, useState, useCallback, useRef } from "react";
+import type { ComponentType } from 'react';
+import type { Callback, ColorOption } from '../types';
+import { useEffect, useState, useCallback, useRef } from "react";
 import "./ToolBar.scss";
-import { drawingToolList, shapeList, widthList, shortcutHintHoldDelayMs, toolbarViewportMargin, updateStoreDelay } from "../constants";
+import { widthList, shortcutHintHoldDelayMs, toolbarViewportMargin, updateStoreDelay } from "../constants";
 
 import { t } from '../../../../shared/i18n';
 import { toolbarIconSize, isToolbarReversed, getVisibleToolbarPosition } from '../../../../shared/toolbarPosition';
 
 const STICKY_DISTANCE = 15;
 
-const humanizedKey = (key) => {
-  const keyMap = {
+const humanizedKey = (key: string) => {
+  const keyMap: Record<string, string> = {
     Meta: "⌘",
     Control: "⌃",
     Alt: "⌥",
@@ -18,7 +20,7 @@ const humanizedKey = (key) => {
   return keyMap[key] || key;
 };
 
-const humanizedShortcut = (shortcut) => {
+const humanizedShortcut = (shortcut: string) => {
   if (!shortcut) return null
   if (shortcut === '[NULL]') return null
 
@@ -35,8 +37,6 @@ const ToolBar = ({
   setIsCollapsed,
   shortcutHintsDisabled,
   clearDeskShortcut,
-  lastActiveBrush,
-  lastActiveFigure,
   activeTool,
   activeColorIndex,
   activeWidthIndex,
@@ -50,8 +50,8 @@ const ToolBar = ({
   handlePositionCommit,
   Icons,
   colorList,
-}) => {
-  const toolConfig = {
+}: { orientation: string; position: any; setPosition: Callback; toolbarSlide: string; setToolbarSlide: Callback; isCollapsed: boolean; setIsCollapsed: Callback; shortcutHintsDisabled: any; clearDeskShortcut: any; activeTool: string; activeColorIndex: number; activeWidthIndex: number; handleCloseToolBar: Callback; handleChangeColor: Callback; handleChangeWidth: Callback; handleChangeTool: Callback; handleClearDesk: Callback; handleUndo: Callback; handleEnablePointerMode: Callback; handlePositionCommit: Callback; Icons: Record<string, ComponentType<any>>; colorList: ColorOption[] }) => {
+  const toolConfig: Record<string, any> = {
     brush:       { title: t("tool.brush"),       alias: "B", mainPanel: "1", subPanel: "1" },
     pen:         { title: t("tool.pen"),         alias: "P", mainPanel: "1", subPanel: "2" },
     fadepen:     { title: t("tool.fadepen"),     alias: "P", mainPanel: "1", subPanel: "3" },
@@ -71,7 +71,7 @@ const ToolBar = ({
     clearDesk:   { title: t("tool.clear"),                   mainPanel: humanizedShortcut(clearDeskShortcut) },
   };
 
-  const toolbarTools = [
+  const toolbarTools: [string, React.ReactNode][] = [
     ["pen", <Icons.Pen />],
     ["highlighter", <Icons.Highlighter />],
     ["arrow", <Icons.Arrow />],
@@ -81,7 +81,7 @@ const ToolBar = ({
     ["eraser", <Icons.Eraser />],
   ];
 
-  const allIcons = {
+  const allIcons: Record<string, any> = {
     brush: <Icons.Brush />,
     pen: <Icons.Pen />,
     fadepen: <Icons.MagicPen />,
@@ -111,9 +111,9 @@ const ToolBar = ({
     position, viewport, toolbarSize, orientation, isReversed, toolbarViewportMargin
   );
 
-  const toolbarRef = useRef();
-  const shortcutHintTimerRef = useRef(null);
-  const positionCommitTimeoutRef = useRef(null);
+  const toolbarRef = useRef<any>(undefined);
+  const shortcutHintTimerRef = useRef<any>(null);
+  const positionCommitTimeoutRef = useRef<any>(null);
 
   const clearShortcutHintTimer = useCallback(() => {
     if (!shortcutHintTimerRef.current) return;
@@ -127,7 +127,7 @@ const ToolBar = ({
     setShowShortcutHints(false);
   }, [clearShortcutHintTimer]);
 
-  const handleShortcutHintKeyDown = useCallback((event) => {
+  const handleShortcutHintKeyDown = useCallback((event: any) => {
     const eventRepeat = event.repeat;
 
     if (event.key !== "Meta" && event.key !== "Control") {
@@ -152,15 +152,15 @@ const ToolBar = ({
     }, shortcutHintHoldDelayMs);
   }, [clearShortcutHintTimer, hideShortcutHints, isCollapsed, shortcutHintsDisabled]);
 
-  const handleShortcutHintKeyUp = useCallback((event) => {
+  const handleShortcutHintKeyUp = useCallback((event: any) => {
     if (event.metaKey) return;
     if (event.ctrlKey) return;
 
     hideShortcutHints();
   }, [hideShortcutHints]);
 
-  const clampPosition = useCallback((x, y, withSticky = false) => {
-    const toInt = (value) => Math.trunc(value);
+  const clampPosition = useCallback((x: number, y: number, withSticky = false) => {
+    const toInt = (value: any) => Math.trunc(value);
 
     if (!toolbarRef.current) {
       return { x: toInt(x), y: toInt(y) };
@@ -206,7 +206,7 @@ const ToolBar = ({
     return { x: toInt(nextX), y: toInt(nextY) };
   }, []);
 
-  const onPointerDown = (e) => {
+  const onPointerDown = (e: any) => {
     setDragging(true);
     setOffset({
       x: e.clientX - visiblePosition.x,
@@ -214,7 +214,7 @@ const ToolBar = ({
     });
   };
 
-  const onPointerMove = useCallback((e) => {
+  const onPointerMove = useCallback((e: any) => {
     if (!dragging) return;
 
     const newX = e.clientX - offset.x;
@@ -233,7 +233,7 @@ const ToolBar = ({
   }, [dragging, position, handlePositionCommit]);
 
   useEffect(() => {
-    setPosition((prev) => clampPosition(prev.x, prev.y));
+    setPosition((prev: any) => clampPosition(prev.x, prev.y));
   }, [position.x, position.y, clampPosition, setPosition]);
 
   useEffect(() => {
@@ -256,7 +256,7 @@ const ToolBar = ({
       return;
     }
 
-    let frameId = null;
+    let frameId: number | null = null;
 
     const applyClamp = () => {
       // Refit the visible toolbar without changing the saved icon position.
@@ -328,54 +328,40 @@ const ToolBar = ({
     hideShortcutHints();
   }, [hideShortcutHints, isCollapsed, shortcutHintsDisabled]);
 
-  const pickTool = (tool) => {
+  const pickTool = (tool: string) => {
     handleChangeTool(tool);
     setToolbarSlide("main-slide")
   };
 
-  const onChangeColor = (index) => {
+  const onChangeColor = (index: number) => {
     handleChangeColor(index);
     setToolbarSlide("main-slide")
   };
 
-  const onChangeWidth = (index) => {
+  const onChangeWidth = (index: number) => {
     handleChangeWidth(index);
     setToolbarSlide("main-slide")
   };
 
-  const renderShortcutTitle = (title, ...shortcuts) => {
+  const renderShortcutTitle = (title: string, ...shortcuts: string[]) => {
     const titleShortcuts = shortcuts.filter(Boolean);
 
     return titleShortcuts.length ? `${title} — ${titleShortcuts.join(" or ")}` : title;
   };
 
-  const renderToolTitle = (tool, shortcutType) => {
+  const renderToolTitle = (tool: string, shortcutType?: string) => {
     const config = toolConfig[tool];
 
-    return renderShortcutTitle(config.title, config.alias, config[shortcutType]);
+    return renderShortcutTitle(config.title, config.alias, config[shortcutType as string]);
   };
 
-  const pickFigureOrSwitchView = () => {
-    if (shapeList.includes(activeTool)) {
-      setToolbarSlide("tool-slide");
-    } else {
-      pickTool(lastActiveFigure);
-    }
-  };
 
-  const pickBrushOrSwitchView = () => {
-    if (drawingToolList.includes(activeTool)) {
-      setToolbarSlide("brush-slide");
-    } else {
-      pickTool(lastActiveBrush);
-    }
-  };
 
   const handleToggleCollapsed = () => {
-    setIsCollapsed((prev) => !prev);
+    setIsCollapsed((prev: any) => !prev);
   };
 
-  const renderToolShortcutHint = (tool, shortcutType) => {
+  const renderToolShortcutHint = (tool: string, shortcutType: string) => {
     const config = toolConfig[tool];
     const shortcut = config[shortcutType];
 
@@ -534,7 +520,7 @@ const ToolBar = ({
           <div className="side-view-body color-group">
             <ul className="toolbar__items">
               {
-                colorList.map((color, index) => {
+                colorList.map((color: ColorOption, index: number) => {
                   const shortcut = String(index + 1);
 
                   return (

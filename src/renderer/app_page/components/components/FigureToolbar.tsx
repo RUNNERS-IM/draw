@@ -1,4 +1,6 @@
-import React, { useCallback, useLayoutEffect, useRef, useState } from 'react';
+import type { ComponentType } from 'react';
+import type { Callback, ColorOption, Figure } from '../types';
+import { useCallback, useLayoutEffect, useRef, useState } from 'react';
 import './FigureToolbar.scss';
 import { MdRoundedCorner } from 'react-icons/md';
 import MdSharpCorner from './icons/MdSharpCorner';
@@ -9,14 +11,14 @@ import { t } from '../../../../shared/i18n';
 const strokeStyleFigureTypes = ['flat_arrow', 'rectangle', 'diamond', 'oval', 'line'];
 const edgeStyleFigureTypes = ['rectangle', 'diamond'];
 
-const clamp = (value, min, max) => {
+const clamp = (value: any, min: number, max: number) => {
   return Math.min(
     Math.max(value, min),
     Math.max(min, max),
   );
 };
 
-const getFigureBounds = (figure) => {
+const getFigureBounds = (figure: Figure) => {
   if (figure.type === 'text') {
     const [x, y] = figure.points[0];
 
@@ -50,7 +52,7 @@ const FigureToolbar = ({
   onChangeEdges,
   onDelete,
   Icons,
-}) => {
+}: { figure: Figure; colorList: ColorOption[]; onChangeColor: Callback; onChangeWidth: Callback; onChangeStroke: Callback; onChangeEdges: Callback; onDelete: Callback; Icons: Record<string, ComponentType<any>> }) => {
   const figureType        = figure.type;
   const figureColorIndex  = figure.colorIndex;
   const figureWidthIndex  = figure.widthIndex;
@@ -60,10 +62,10 @@ const FigureToolbar = ({
   const figureHasEdgeStyle   = edgeStyleFigureTypes.includes(figureType);
   const figureHasStrokeStyle = strokeStyleFigureTypes.includes(figureType);
 
-  const [openMenu, setOpenMenu] = useState(null);
+  const [openMenu, setOpenMenu] = useState<any>(null);
   const [position, setPosition] = useState({ left: 0, top: 0, placement: 'bottom' });
 
-  const toolbarRef = useRef(null);
+  const toolbarRef = useRef<any>(null);
 
   const updatePosition = useCallback(() => {
     const toolbarElement = toolbarRef.current;
@@ -137,14 +139,14 @@ const FigureToolbar = ({
     updatePosition();
   }, [updatePosition]);
 
-  const toggleMenu = (menuName) => {
-    setOpenMenu((currentMenu) => currentMenu === menuName ? null : menuName);
+  const toggleMenu = (menuName: string) => {
+    setOpenMenu((currentMenu: any) => currentMenu === menuName ? null : menuName);
   };
 
   const renderColorSubmenu = () => {
     return (
       <div className="figure-sub-toolbar">
-        {colorList.map((color, index) => (
+        {colorList.map((color: ColorOption, index: number) => (
           <div key={color.id} className="figure-sub-item">
             <button
               tabIndex={-1}

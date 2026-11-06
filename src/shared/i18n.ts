@@ -1,6 +1,6 @@
 // 첫 판 화면 글: 한국어 · 영어. 나머지 언어는 다음 판에서 더한다.
 // 메인 프로세스는 setLocale 로, 창은 preload 가 넘긴 window.electronAPI.locale 로 언어를 정한다.
-const messages = {
+const messages: Record<string, Record<string, string>> = {
   ko: {
     'tool.brush': '붓', 'tool.pen': '펜', 'tool.fadepen': '사라지는 펜', 'tool.arrow': '화살표', 'tool.flat_arrow': '납작 화살표',
     'tool.rectangle': '네모', 'tool.diamond': '마름모', 'tool.oval': '동그라미', 'tool.line': '선', 'tool.text': '글자',
@@ -111,11 +111,11 @@ const messages = {
 
 let current = typeof window !== 'undefined' ? pick(window.electronAPI?.locale || navigator.language) : 'en';
 
-function pick(language) {
+function pick(language: string) {
   return String(language || '').toLowerCase().startsWith('ko') ? 'ko' : 'en';
 }
 
-export function setLocale(language) {
+export function setLocale(language: string) {
   current = pick(language);
 }
 
@@ -123,10 +123,10 @@ export function currentLocale() {
   return current;
 }
 
-export function t(key, vars) {
+export function t(key: string, vars?: Record<string, string | number>) {
   const text = messages[current][key] ?? messages.en[key] ?? key;
   if (!vars) return text;
-  return text.replace(/\{(\w+)\}/g, (whole, name) => (name in vars ? String(vars[name]) : whole));
+  return text.replace(/\{(\w+)\}/g, (whole: string, name: string) => (name in vars ? String(vars[name]) : whole));
 }
 
 export { messages };

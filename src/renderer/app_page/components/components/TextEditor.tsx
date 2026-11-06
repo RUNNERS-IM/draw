@@ -1,6 +1,7 @@
+import type { Callback, ColorOption } from '../types';
 import './TextEditor.scss';
 
-import React, { useRef, useEffect } from 'react';
+import { useRef, useEffect } from 'react';
 import { widthList, lineHeightMultiplier } from "../constants";
 import { hslTextGradientStops, getCursorColor } from "./drawer/figures";
 
@@ -8,14 +9,14 @@ const TextEditor = ({
   textEditorContainer,
   handleTextEditorBlur,
   colorList,
-}) => {
-  const textAreaRef = useRef(null);
+}: { textEditorContainer: any; handleTextEditorBlur: Callback; colorList: ColorOption[] }) => {
+  const textAreaRef = useRef<any>(null);
 
   useEffect(() => {
     const textArea = textAreaRef.current;
     if (!textArea) return;
 
-    const handleKeyDown = (e) => {
+    const handleKeyDown = (e: any) => {
       if (e.key === 'Escape') {
         textArea.blur();
       }
@@ -74,13 +75,13 @@ const TextEditor = ({
     textArea.style.webkitTextFillColor = "transparent";
   }
 
-  const selectTextArea = (textArea) => {
+  const selectTextArea = (textArea: any) => {
     const sel = window.getSelection();
     const range = document.createRange();
 
     range.selectNodeContents(textArea);
-    sel.removeAllRanges();
-    sel.addRange(range);
+    sel!.removeAllRanges();
+    sel!.addRange(range);
   }
 
   const top = textEditorContainer.startAt[1];
@@ -93,7 +94,7 @@ const TextEditor = ({
   let textEditorClassName = 'fixed-width';
 
   if (textEditorContainer.autoResize) {
-    width = 'auto';
+    width = 'auto' as any;
     textEditorClassName = '';
   }
 

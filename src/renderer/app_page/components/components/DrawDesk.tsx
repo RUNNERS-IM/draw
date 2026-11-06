@@ -1,6 +1,7 @@
+import type { Callback, ColorOption, Figure, FigureInfo } from '../types';
 import './DrawDesk.scss';
 
-import React, { useEffect, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { palmMinContactArea, palmMinContactLength } from '../constants'
 import { getMouseCoordinates } from '../utils/general';
 import {
@@ -41,12 +42,12 @@ const DrawDesk = ({
   activeTool,
   handleChangeTool,
   colorList,
-}) => {
+}: { allFigures: Figure[]; allFadeFigures: Figure[]; allLaserFigures: Figure[]; allEraserFigures: Figure[]; fadeOpacity: number; activeFigureInfo: FigureInfo; cursorType: string; handleMouseDown: Callback; handleMouseMove: Callback; handleMouseUp: Callback; handleDoubleClick: Callback; updateRainbowColorDeg: Callback; activeTool: string; handleChangeTool: Callback; colorList: ColorOption[] }) => {
 
-  const canvasRef = useRef(null);
-  const offscreenCanvasRef = useRef(null);
+  const canvasRef = useRef<any>(null);
+  const offscreenCanvasRef = useRef<any>(null);
 
-  const prevToolRef = useRef(null);
+  const prevToolRef = useRef<any>(null);
   const simulateKeyDown = useRef(false);
 
   const dpr = window.devicePixelRatio || 1;
@@ -82,11 +83,11 @@ const DrawDesk = ({
     draw(allFigures, allFadeFigures, allLaserFigures, allEraserFigures, activeFigureInfo, fadeOpacity, offscreenCanvasRef.current);
   }, [allFigures, allFadeFigures, allLaserFigures, allEraserFigures, activeFigureInfo, fadeOpacity, colorList]);
 
-  const draw = (allFigures, allFadeFigures, allLaserFigures, allEraserFigures, activeFigureInfo, fadeOpacity, offscreenCanvas) => {
+  const draw = (allFigures: Figure[], allFadeFigures: Figure[], allLaserFigures: Figure[], allEraserFigures: Figure[], activeFigureInfo: FigureInfo, fadeOpacity: number, offscreenCanvas: HTMLCanvasElement) => {
     const ctx = canvasRef.current.getContext('2d');
     ctx.clearRect(0, 0, canvasRef.current.width, canvasRef.current.height);
 
-    allFigures.forEach((figure) => {
+    allFigures.forEach((figure: Figure) => {
       if (['brush', 'pen'].includes(figure.type)) {
         if (colorList[figure.colorIndex].isRainbow) {
           drawRainbowPen(ctx, offscreenCanvas, figure, updateRainbowColorDeg)
@@ -164,7 +165,7 @@ const DrawDesk = ({
       }
     })
 
-    allFadeFigures.forEach((figure) => {
+    allFadeFigures.forEach((figure: Figure) => {
       if (figure.type === 'fadepen') {
         if (colorList[figure.colorIndex].isRainbow) {
           drawRainbowPen(ctx, offscreenCanvas, figure, updateRainbowColorDeg, fadeOpacity)
@@ -174,16 +175,16 @@ const DrawDesk = ({
       }
     })
 
-    allLaserFigures.forEach((figure) => {
+    allLaserFigures.forEach((figure: Figure) => {
       drawLaser(ctx, figure)
     })
 
-    allEraserFigures.forEach((figure) => {
+    allEraserFigures.forEach((figure: Figure) => {
       drawEraserTail(ctx, figure)
     })
   };
 
-  const isTemporaryEraser = (event) => {
+  const isTemporaryEraser = (event: any) => {
     const contactLength = Math.max(event.width, event.height);
     const contactArea = event.width * event.height;
     const isPalm = contactLength >= palmMinContactLength && contactArea >= palmMinContactArea;
@@ -193,7 +194,7 @@ const DrawDesk = ({
            (event.pointerType === 'touch' && isPalm);
   }
 
-  const onPointerDown = (event) => {
+  const onPointerDown = (event: any) => {
     event.preventDefault(); // NOTE: Required for Text figure
 
     if(event.pointerType === 'mouse' && event.button === 2) return;
@@ -213,7 +214,7 @@ const DrawDesk = ({
     handleMouseDown(coordinates);
   }
 
-  const onPointerMove = (event) => {
+  const onPointerMove = (event: any) => {
     if (simulateKeyDown.current && activeTool === 'eraser') {
       simulateKeyDown.current = false;
 
@@ -230,7 +231,7 @@ const DrawDesk = ({
     handleMouseMove(coordinates);
   }
 
-  const onPointerUp = (event) => {
+  const onPointerUp = (event: any) => {
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -246,7 +247,7 @@ const DrawDesk = ({
     }
   }
 
-  const onDoubleClick = (event) => {
+  const onDoubleClick = (event: any) => {
     const coordinates = getMouseCoordinates(event);
 
     handleDoubleClick(coordinates);

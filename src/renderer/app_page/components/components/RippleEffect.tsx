@@ -1,11 +1,10 @@
-import React from 'react';
 import './RippleEffect.scss';
 
-const RippleEffect = ({ rippleEffects }) => {
+const RippleEffect = ({ rippleEffects }: { rippleEffects: any }) => {
   return (
     <div id='ripple-wrapper'>
       {
-        rippleEffects.map((ripple) => {
+        rippleEffects.map((ripple: any) => {
           const [x, y] = ripple.points;
 
           return (
