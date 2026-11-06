@@ -4,6 +4,10 @@ const CopyWebpackPlugin = require("copy-webpack-plugin");
 
 const rules = [
   {
+    resourceQuery: /raw/,
+    type: 'asset/source',
+  },
+  {
     test: /\.[jt]sx?$/,
     exclude: /node_modules/,
     use: {

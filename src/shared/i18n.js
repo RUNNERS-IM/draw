@@ -19,6 +19,7 @@ const messages = {
 
     'about.title': 'Draw 정보', 'about.line': '{version} · 무료 오픈소스', 'about.website': '웹사이트', 'about.get': '받기',
     'about.credit': 'DrawPen(Dmytro Vasin, MIT 라이선스)을 바탕으로 만들었습니다',
+    'about.notices': '오픈소스 고지', 'about.close': '닫기',
 
     'update.title': '새 버전이 나왔습니다', 'update.ask': 'Draw {version} 을 지금 설치할까요?', 'update.notes': '새로워진 점',
     'update.downloading': '내려받는 중… {percent}%', 'update.later': '나중에', 'update.install': '지금 설치',
@@ -71,6 +72,7 @@ const messages = {
 
     'about.title': 'About Draw', 'about.line': '{version} · Free and open source', 'about.website': 'Website', 'about.get': 'Get',
     'about.credit': 'Built on DrawPen by Dmytro Vasin (MIT License)',
+    'about.notices': 'Open Source Notices', 'about.close': 'Close',
 
     'update.title': 'A new version is available', 'update.ask': 'Install Draw {version} now?', 'update.notes': "What's new",
     'update.downloading': 'Downloading… {percent}%', 'update.later': 'Later', 'update.install': 'Install Now',

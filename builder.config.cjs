@@ -27,7 +27,10 @@ module.exports = {
     "!node_modules/{react,react-dom,scheduler,lucide-react,react-icons,lazy-brush,perfect-freehand,ntcjs,lodash.throttle}/**",
   ],
   // Why: 원본 DrawPen 의 MIT 라이선스는 사본에 함께 넣어야 한다(앱 안 Contents/Resources/LICENSE).
-  extraResources: [{ from: "LICENSE", to: "LICENSE" }],
+  extraResources: [
+    { from: "LICENSE", to: "LICENSE" },
+    { from: "THIRD_PARTY_NOTICES.md", to: "THIRD_PARTY_NOTICES.md" },
+  ],
   npmRebuild: false,
   mac: {
     category: "public.app-category.productivity",

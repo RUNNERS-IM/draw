@@ -22,8 +22,10 @@
     "build": "node tools/build/build.cjs",
     "build:dev": "NODE_ENV=development node tools/build/build.cjs",
     "start": "npm run build:dev && NODE_ENV=development electron .",
-    "test": "node --test \"tests/*.test.mjs\" && node src/runners-account/check.mjs",
-    "dist": "npm run build && electron-builder --config builder.config.cjs"
+    "test": "node --test \"tests/*.test.mjs\" && npm run check:account",
+    "check:account": "node src/runners-account/check.mjs",
+    "notices": "node scripts/third-party-notices.mjs",
+    "dist": "npm run check:account && npm run build && electron-builder --config builder.config.cjs"
   },
   "devDependencies": {
     "@babel/core": "^8.0.1",

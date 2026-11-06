@@ -3,12 +3,16 @@
 import React from 'react';
 import source from './runners-apps.json';
 import { t, currentLocale } from '../../shared/i18n.js';
+import { safeUrl } from '../../shared/safeUrl.js';
 import './RunnersApps.css';
 
 const pickText = (text) => (currentLocale() === 'ko' ? text.ko : text.en) || text.en || text.ko || '';
 
 const groups = source.groups
-  .map((group) => ({ ...group, items: group.items.filter((item) => item.id !== 'draw') }))
+  .map((group) => ({
+    ...group,
+    items: group.items.filter((item) => item.id !== 'draw').map((item) => ({ ...item, url: safeUrl(item.url) })),
+  }))
   .filter((group) => group.items.length > 0);
 
 const RunnersApps = ({ onOpen }) => (
@@ -24,7 +28,8 @@ const RunnersApps = ({ onOpen }) => (
                 <div className="runners-apps-name">{item.name}</div>
                 <div className="runners-apps-desc">{pickText(item.desc)}</div>
               </div>
-              <button type="button" className="runners-apps-get" onClick={() => onOpen(item.url)}>{t('about.get')}</button>
+              {/* 받을 주소가 없는 줄은 눌러도 아무 일이 없는 단추를 두지 않고 단추를 뺀다. */}
+              {item.url && <button type="button" className="runners-apps-get" onClick={() => onOpen(item.url)}>{t('about.get')}</button>}
             </li>
           ))}
         </ul>

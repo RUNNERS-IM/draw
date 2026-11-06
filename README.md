@@ -31,4 +31,4 @@ npm run dist      # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
 
 ## 원본과 라이선스
 
-Draw 는 Dmytro Vasin 의 [DrawPen](https://github.com/DmytroVasin/DrawPen)(MIT 라이선스)을 바탕으로 만들었습니다. 원본의 저작권 표시와 라이선스 전문은 [LICENSE](LICENSE) 에 그대로 있고, 원본의 변경 기록은 [CHANGELOG.md](CHANGELOG.md) 에 있습니다.
+Draw 는 Dmytro Vasin 의 [DrawPen](https://github.com/DmytroVasin/DrawPen)(MIT 라이선스)을 바탕으로 만들었습니다. 원본의 저작권 표시와 라이선스 전문은 [LICENSE](LICENSE) 에 그대로 있고, 원본의 변경 기록은 [CHANGELOG.md](CHANGELOG.md) 에 있습니다. 함께 싣는 오픈소스 패키지의 고지는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 에 있고, 앱의 정보 창에서도 볼 수 있습니다.

@@ -49,6 +49,9 @@ const PANEL_GAP = 4
 const PANEL_BLUR_GUARD_MS = 300
 const PANEL_REOPEN_GUARD_MS = 300
 const HELP_URL = 'https://github.com/RUNNERS-IM/draw/issues'
+// 「로그인할 때 열기」를 처음 한 번 켰다는 표시 파일(앱 데이터 폴더).
+const LAUNCH_ON_LOGIN_APPLIED = 'open-at-login-default'
+
 const ABOUT_WIDTH = 520
 const ABOUT_HEIGHT = 560
 
@@ -849,6 +852,8 @@ app.whenReady().then(() => {
   hideDock()
 
   startAsHiddenCheck()
+
+  applyLaunchOnLoginDefault()
 
   logDisplays()
 
@@ -2153,6 +2158,21 @@ function safeIsOpenAtLogin() {
   } catch (error) {
     return false
   }
+}
+
+// 직접 받는 판은 맥마다 처음 한 번 「로그인할 때 열기」를 스스로 켠다. 표시 파일을 남겨, 그 뒤에 사람이 끄면 다시 켜지 않는다.
+// 시험판은 지운 뒤에도 로그인 항목이 남으면 안 되므로 켜지 않는다.
+function applyLaunchOnLoginDefault() {
+  if (isLinux || !app.isPackaged || DRAW_TEST_BUILD) return;
+
+  const marker = path.join(app.getPath('userData'), LAUNCH_ON_LOGIN_APPLIED);
+  if (fs.existsSync(marker)) return;
+
+  safeSetLoginItemSettings({ openAtLogin: true });
+  store.set('launch_on_login', true)
+  try {
+    fs.writeFileSync(marker, '');
+  } catch (error) {}
 }
 
 function safeSetLoginItemSettings(settings) {

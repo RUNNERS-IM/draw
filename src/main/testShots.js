@@ -115,6 +115,9 @@ export async function runTestShots(app) {
       const { aboutWindow } = app.getWindows();
       await shot(aboutWindow, `${theme}-7-정보창`);
       note(`[${theme}] 정보 창 크기=${JSON.stringify(aboutWindow.getContentSize())}`);
+      await aboutWindow.webContents.executeJavaScript("document.querySelectorAll('.about-notices-link')[1].click()");
+      await wait(600);
+      await shot(aboutWindow, `${theme}-7-정보창-오픈소스고지`);
       await wait(Number(process.env.DRAW_TEST_HOLD_MS || 0));
       aboutWindow.close();
       await wait(400);
