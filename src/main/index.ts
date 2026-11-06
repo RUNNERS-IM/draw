@@ -22,6 +22,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { getPointerToolbarOffset, isToolbarReversed } from '../shared/toolbarPosition'
 import { t, setLocale, currentLocale } from '../shared/i18n'
+import { loginItemsAllowed } from './loginItems'
 import { startUpdates, checkNow } from './updates'
 import { runTestShots } from './testShots'
 
@@ -2311,10 +2312,18 @@ function setApplicationName() {
   }
 }
 
+function canUseLoginItems() {
+  return loginItemsAllowed({
+    isLinux,
+    isPackaged: app.isPackaged,
+    isTestBuild: DRAW_TEST_BUILD
+  })
+}
+
 function safeWasOpenedAtLogin() {
-  if (isLinux) {
+  if (!canUseLoginItems()) {
     return false
-  } // Linux не підтримує login items
+  }
 
   try {
     return !!app.getLoginItemSettings().wasOpenedAtLogin
@@ -2324,7 +2333,7 @@ function safeWasOpenedAtLogin() {
 }
 
 function safeIsOpenAtLogin() {
-  if (isLinux) {
+  if (!canUseLoginItems()) {
     return false
   }
 
@@ -2338,7 +2347,7 @@ function safeIsOpenAtLogin() {
 // 직접 받는 판은 맥마다 처음 한 번 「로그인할 때 열기」를 스스로 켠다. 표시 파일을 남겨, 그 뒤에 사람이 끄면 다시 켜지 않는다.
 // 시험판은 지운 뒤에도 로그인 항목이 남으면 안 되므로 켜지 않는다.
 function applyLaunchOnLoginDefault() {
-  if (isLinux || !app.isPackaged || DRAW_TEST_BUILD) {
+  if (!canUseLoginItems()) {
     return
   }
 
@@ -2355,7 +2364,7 @@ function applyLaunchOnLoginDefault() {
 }
 
 function safeSetLoginItemSettings(settings: Electron.Settings) {
-  if (isLinux) {
+  if (!canUseLoginItems()) {
     return
   }
 
