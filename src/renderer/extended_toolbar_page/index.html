@@ -7,10 +7,21 @@
       :root {
         --toolbar-window-margin: 10px; /* Matches with EXTENDED_TOOLBAR_WINDOW_MARGIN */
 
-        --toolbar-background-color: #FFFFFF;
-        --toolbar-border-color: #020202;
+        --toolbar-background-color: #F6F6F6;
+        --toolbar-border-color: rgba(0, 0, 0, 0.14);
+        --toolbar-icon-color: rgba(0, 0, 0, 0.85);
+        --toolbar-hover-color: rgba(0, 0, 0, 0.06);
         --toolbar-thickness: 44px;
         --toolbar-arrow-size: 17px; /* Matches pointerToolbarArrowSize */
+      }
+
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --toolbar-background-color: #2A2A2A;
+          --toolbar-border-color: rgba(255, 255, 255, 0.16);
+          --toolbar-icon-color: rgba(255, 255, 255, 0.88);
+          --toolbar-hover-color: rgba(255, 255, 255, 0.1);
+        }
       }
 
       html,
@@ -51,8 +62,9 @@
       }
 
       #toolbar {
-        width: 80px;
-        height: 72px;
+        width: 44px;
+        height: 56px;
+        color: var(--toolbar-icon-color);
       }
 
       .toolbar__close {
@@ -61,11 +73,18 @@
         left: -5px;
         z-index: 1;
         background-color: var(--toolbar-background-color);
-        border: 1px solid var(--toolbar-border-color);
+        border: 0.5px solid var(--toolbar-border-color);
         border-radius: 15px;
+        color: var(--toolbar-icon-color);
+        opacity: 0;
+      }
+
+      #toolbar:hover .toolbar__close {
+        opacity: 1;
       }
 
       .toolbar__close button {
+        color: inherit;
         display: flex;
         padding: 2px;
         justify-content: center;
@@ -79,33 +98,47 @@
 
       .toolbar__mode-switcher {
         display: flex;
+        flex-direction: column;
+        align-items: center;
         box-sizing: border-box;
-        width: 80px;
-        height: 72px;
+        width: 44px;
+        height: 56px;
         background-color: var(--toolbar-background-color);
-        border-radius: 10px;
-        border: 1px solid var(--toolbar-border-color);
+        border-radius: 14px 14px 0 0;
+        box-shadow: 0 0 0 0.5px var(--toolbar-border-color);
       }
 
       .toolbar__main-button {
         display: flex;
-        padding: 10px 0;
       }
 
       .toolbar__main-button button {
         display: flex;
-        align-self: center;
+        justify-content: center;
+        align-items: center;
+        width: 34px;
+        height: 34px;
+        color: inherit;
+        border-radius: 8px;
         cursor: pointer;
       }
 
+      .toolbar__main-button button:hover {
+        background-color: var(--toolbar-hover-color);
+      }
+
       .toolbar__main-button svg {
-        width: 50px;
-        height: 50px;
+        width: 20px;
+        height: 20px;
+      }
+
+      .toolbar__draglines:last-child {
+        display: none;
       }
 
       .toolbar__draglines {
         display: flex;
-        padding: 0 4px;
+        padding: 7px 0 3px;
         align-items: center;
       }
 
@@ -113,7 +146,7 @@
         display: grid;
         row-gap: 2px;
         column-gap: 2px;
-        grid-template-columns: repeat(2, min-content);
+        grid-template-columns: repeat(3, min-content);
       }
 
       .draglines div {
@@ -130,7 +163,7 @@
         align-items: center;
         justify-content: center;
         box-sizing: border-box;
-        border: 1px solid var(--toolbar-border-color);
+        border: 0.5px solid var(--toolbar-border-color);
         background-color: var(--toolbar-background-color);
         cursor: pointer;
       }
@@ -166,6 +199,10 @@
         rotate: 180deg;
       }
 
+      .toolbar--vertical.toolbar--reversed .toolbar__mode-switcher {
+        border-radius: 0 0 14px 14px;
+      }
+
       .toolbar--vertical {
         margin-top: var(--toolbar-arrow-size);
       }
@@ -176,8 +213,10 @@
         transform: translateX(-50%);
         width: var(--toolbar-thickness);
         height: var(--toolbar-arrow-size);
-        border-top: 0;
-        border-radius: 0 0 10px 10px;
+        border: 0;
+        box-shadow: 0 0 0 0.5px var(--toolbar-border-color);
+        color: var(--toolbar-icon-color);
+        border-radius: 0 0 14px 14px;
       }
 
       .toolbar--vertical .toolbar__slider svg {
@@ -187,9 +226,7 @@
       .toolbar--vertical.toolbar--reversed .toolbar__slider {
         top: auto;
         bottom: 100%;
-        border-top: 1px solid var(--toolbar-border-color);
-        border-bottom: 0;
-        border-radius: 10px 10px 0 0;
+        border-radius: 14px 14px 0 0;
       }
 
       .toolbar--vertical.toolbar--reversed .toolbar__slider svg {
@@ -213,8 +250,8 @@
         </div>
 
         <div class="toolbar__main-button">
-          <button tabindex="-1" title="Draw Mode">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <button tabindex="-1" >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
               <path d="M12 3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
               <path d="M18.375 2.625a1 1 0 0 1 3 3l-9.013 9.014a2 2 0 0 1-.853.505l-2.873.84a.5.5 0 0 1-.62-.62l.84-2.873a2 2 0 0 1 .506-.852z"></path>
             </svg>
@@ -234,9 +271,7 @@
       </div>
 
       <div class="toolbar__slider">
-        <svg stroke="currentColor" fill="currentColor" stroke-width="0" viewBox="0 0 256 512" height="1em" width="1em" xmlns="http://www.w3.org/2000/svg">
-          <path d="M224.3 273l-136 136c-9.4 9.4-24.6 9.4-33.9 0l-22.6-22.6c-9.4-9.4-9.4-24.6 0-33.9l96.4-96.4-96.4-96.4c-9.4-9.4-9.4-24.6 0-33.9L54.3 103c9.4-9.4 24.6-9.4 33.9 0l136 136c9.5 9.4 9.5 24.6.1 34z"></path>
-        </svg>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m9 18 6-6-6-6"></path></svg>
       </div>
 
       <div class="toolbar__close">

@@ -1,5 +1,5 @@
-// The saved position is always the top-left of the DrawPen mode switcher.
-export const toolbarIconSize = { width: 80, height: 72 };
+// The saved position is always the top-left of the Draw mode switcher.
+export const toolbarIconSize = { width: 44, height: 56 };
 export const pointerToolbarArrowSize = 17;
 
 // Open toward the half of the viewport with more room.

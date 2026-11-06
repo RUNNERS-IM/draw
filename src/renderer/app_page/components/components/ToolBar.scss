@@ -1,7 +1,8 @@
 :root {
   --toolbar-thickness: 44px;
-  --toolbar-width--full: calc(10px + 9*36px + 2*9px + 10px);
-  --toolbar-width--mini: calc(10px + 36px + 10px);
+  --toolbar-width--full: calc(6px + 10*34px + 2*9px + 6px);
+  --toolbar-width--mini: calc(6px + 34px + 6px);
+  --toolbar-icon-height: 56px; // Matches toolbarIconSize.height
   --toolbar-switch-duration: 0.3s;
 }
 
@@ -520,8 +521,178 @@
 
 #toolbar.toolbar--vertical.toolbar--reversed {
   flex-direction: column-reverse;
-  transform: translateY(calc(-100% + 72px));
+  transform: translateY(calc(-100% + var(--toolbar-icon-height)));
 
   .toolbar__slider { border-radius: 10px 10px 0 0; }
-  .toolbar__close { top: calc(100% - 77px); }
+  .toolbar__close { top: calc(100% - var(--toolbar-icon-height) - 5px); }
+}
+
+// Draw: 왼쪽 세로 막대 하나로 보이게 한다. 칸마다 있던 테두리를 걷고 막대 전체에 반경 14 · 그림자를 준다.
+#toolbar.toolbar--vertical {
+  width: var(--toolbar-thickness);
+  color: var(--toolbar-icon-color);
+  background-color: var(--toolbar-background-color);
+  border-radius: 14px;
+  box-shadow: 0 0 0 0.5px var(--toolbar-border-color), 0 6px 24px rgba(0, 0, 0, 0.28);
+  font-family: var(--font-primary);
+
+  .toolbar__close {
+    opacity: 0;
+    color: var(--toolbar-icon-color);
+    background-color: var(--toolbar-background-color);
+    border: 0.5px solid var(--toolbar-border-color);
+    transition: opacity 120ms ease-out;
+
+    button {
+      color: inherit;
+    }
+  }
+
+  &:hover .toolbar__close {
+    opacity: 1;
+  }
+
+  .toolbar__mode-switcher {
+    box-sizing: border-box;
+    flex-direction: column;
+    align-items: center;
+    width: var(--toolbar-thickness);
+    height: var(--toolbar-icon-height);
+    background: none;
+    border: 0;
+    border-radius: 0;
+
+    .toolbar__draglines {
+      padding: 7px 0 3px;
+
+      &:last-child {
+        display: none;
+      }
+
+      .draglines {
+        grid-template-columns: repeat(3, min-content);
+      }
+    }
+
+    .toolbar__main-button {
+      padding: 0;
+
+      button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 34px;
+        height: 34px;
+        color: inherit;
+        border-radius: 8px;
+
+        &:hover {
+          background-color: var(--toolbar-hover-color);
+        }
+
+        svg {
+          width: 20px;
+          height: 20px;
+        }
+      }
+    }
+  }
+
+  .toolbar__container {
+    width: 100%;
+    background: none;
+    border: 0;
+
+    button {
+      color: inherit;
+    }
+
+    .toolbar__items {
+      li {
+        width: 34px;
+        height: 34px;
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        border: 0;
+        border-radius: 8px;
+
+        &:hover {
+          background-color: var(--toolbar-hover-color);
+        }
+
+        button {
+          width: 100%;
+          height: 100%;
+
+          svg {
+            width: 20px;
+            height: 20px;
+          }
+        }
+
+        &.active {
+          border: 0;
+          border-radius: 8px;
+          color: #FFFFFF;
+          background-color: var(--toolbar-accent-color);
+        }
+
+        &.cross-line {
+          width: 24px;
+          height: 1px;
+          margin: 4px 0;
+          background-color: var(--toolbar-border-color);
+        }
+
+        .toolbar__shortcut-hint {
+          left: auto;
+          right: -4px;
+          bottom: auto;
+          top: 50%;
+          transform: translate(100%, -50%) scale(0.95);
+          color: var(--toolbar-icon-color);
+          background-color: var(--toolbar-background-color);
+          border: 0.5px solid var(--toolbar-border-color);
+          white-space: nowrap;
+        }
+      }
+
+      .toolbar__color-picker {
+        width: 20px;
+        height: 20px;
+        border: 0.5px solid var(--toolbar-border-color);
+        border-radius: 50%;
+      }
+
+      li.active .toolbar__color-picker {
+        box-shadow: 0 0 0 1.5px #FFFFFF;
+      }
+
+      .toolbar__color-hint-wrapper .toolbar__color-hint {
+        border: 0.5px solid var(--toolbar-border-color);
+      }
+    }
+  }
+
+  &.toolbar--shortcut-hints-visible .toolbar__items li .toolbar__shortcut-hint {
+    transform: translate(100%, -50%) scale(1);
+  }
+
+  .toolbar__slider {
+    height: 17px;
+    border: 0;
+    background: none;
+    color: inherit;
+
+    svg {
+      width: 14px;
+      height: 14px;
+    }
+  }
+}
+
+// 힌트가 막대 밖 오른쪽으로 나가도록 잘림을 푼다. 다른 슬라이드로 넘어가는 칸은 힌트가 없을 때 잘린다.
+#toolbar.toolbar--vertical.toolbar--shortcut-hints-visible .toolbar__container {
+  overflow: visible;
 }

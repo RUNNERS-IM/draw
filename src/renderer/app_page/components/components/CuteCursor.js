@@ -50,29 +50,25 @@ const CuteCursor = ({
 
     let iconProps = {
       size: iconSize,
-      fill: iconColor,
-      stroke: '#FFF',
-      strokeWidth: "20"
+      fill: 'none',
+      stroke: iconColor,
+      strokeWidth: 1.5,
     };
-
-    if (colorList[activeColorIndex].isLightColor) {
-      iconProps.stroke = '#777';
-    }
 
     if (colorList[activeColorIndex].isRainbow) {
       iconProps = {
         size: iconSize,
-        fill: "url(#svg-gradient)",
-        stroke: '#777',
-        strokeWidth: "10"
+        fill: 'none',
+        stroke: "url(#svg-gradient)",
+        strokeWidth: 1.5
       };
     }
 
     const monochromeIconProps = {
       size: iconSize,
-      fill: '#333',
-      stroke: "#DDD",
-      strokeWidth: "10",
+      fill: 'none',
+      stroke: '#777',
+      strokeWidth: 1.5,
     }
 
     switch (toolName) {

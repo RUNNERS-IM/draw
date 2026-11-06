@@ -36,6 +36,9 @@ export const palmMinContactArea = 2000;
 export const drawingToolList = ['brush', 'pen', 'fadepen'];
 export const penVariantList = ['pen', 'fadepen'];
 
+// 첫 판 도구 막대에 있는 도구. 다른 도구(붓 · 레이저 등)는 코드만 두고 꺼 둔다.
+export const enabledToolList = ['pen', 'highlighter', 'arrow', 'rectangle', 'oval', 'text', 'eraser'];
+
 export const shapeList = ['arrow', 'flat_arrow', 'rectangle', 'diamond', 'oval', 'line'];
 export const arrowVariantList = ['arrow', 'flat_arrow'];
 

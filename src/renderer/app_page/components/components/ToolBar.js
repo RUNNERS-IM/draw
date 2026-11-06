@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import "./ToolBar.scss";
 import { drawingToolList, shapeList, widthList, shortcutHintHoldDelayMs, toolbarViewportMargin, updateStoreDelay } from "../constants.js";
 
+import { t } from '../../../../shared/i18n.js';
 import { toolbarIconSize, isToolbarReversed, getVisibleToolbarPosition } from '../../../../shared/toolbarPosition.js';
 
 const STICKY_DISTANCE = 15;
@@ -44,29 +45,41 @@ const ToolBar = ({
   handleChangeWidth,
   handleChangeTool,
   handleClearDesk,
+  handleUndo,
   handleEnablePointerMode,
   handlePositionCommit,
   Icons,
   colorList,
 }) => {
   const toolConfig = {
-    brush:       { title: "Brush",       alias: "B", mainPanel: "1", subPanel: "1" },
-    pen:         { title: "Pen",         alias: "P", mainPanel: "1", subPanel: "2" },
-    fadepen:     { title: "Fade Pen",    alias: "P", mainPanel: "1", subPanel: "3" },
-    arrow:       { title: "Arrow",       alias: "A", mainPanel: "2", subPanel: "1" },
-    flat_arrow:  { title: "Flat Arrow",  alias: "A", mainPanel: "2", subPanel: "2" },
-    rectangle:   { title: "Rectangle",   alias: "R", mainPanel: "2", subPanel: "3" },
-    diamond:     { title: "Diamond",     alias: "D", mainPanel: "2", subPanel: "4" },
-    oval:        { title: "Oval",        alias: "O", mainPanel: "2", subPanel: "5" },
-    line:        { title: "Line",                    mainPanel: "2", subPanel: "6" },
-    text:        { title: "Text",        alias: "T", mainPanel: "3" },
-    highlighter: { title: "Highlighter", alias: "H", mainPanel: "4" },
-    laser:       { title: "Laser",       alias: "L", mainPanel: "5" },
-    eraser:      { title: "Eraser",      alias: "E", mainPanel: "6" },
-    color:       { title: "Color",                   mainPanel: "7", disabledFor: ["laser", "eraser"] },
-    brushSize:   { title: "Brush Size",              mainPanel: "8" },
-    clearDesk:   { title: "Clear Desk",              mainPanel: humanizedShortcut(clearDeskShortcut) },
+    brush:       { title: t("tool.brush"),       alias: "B", mainPanel: "1", subPanel: "1" },
+    pen:         { title: t("tool.pen"),         alias: "P", mainPanel: "1", subPanel: "2" },
+    fadepen:     { title: t("tool.fadepen"),     alias: "P", mainPanel: "1", subPanel: "3" },
+    highlighter: { title: t("tool.highlighter"), alias: "H", mainPanel: "2" },
+    arrow:       { title: t("tool.arrow"),       alias: "A", mainPanel: "3", subPanel: "1" },
+    flat_arrow:  { title: t("tool.flat_arrow"),  alias: "A", mainPanel: "3", subPanel: "2" },
+    rectangle:   { title: t("tool.rectangle"),   alias: "R", mainPanel: "4", subPanel: "3" },
+    diamond:     { title: t("tool.diamond"),     alias: "D", mainPanel: "4", subPanel: "4" },
+    oval:        { title: t("tool.oval"),        alias: "O", mainPanel: "5", subPanel: "5" },
+    line:        { title: t("tool.line"),                    mainPanel: "4", subPanel: "6" },
+    text:        { title: t("tool.text"),        alias: "T", mainPanel: "6" },
+    laser:       { title: t("tool.laser"),       alias: "L", mainPanel: "7" },
+    eraser:      { title: t("tool.eraser"),      alias: "E", mainPanel: "7" },
+    color:       { title: t("tool.color"),                   mainPanel: "8", disabledFor: ["laser", "eraser"] },
+    brushSize:   { title: t("tool.brushSize"),               mainPanel: "8" },
+    undo:        { title: t("tool.undo"),                    mainPanel: "⌘Z" },
+    clearDesk:   { title: t("tool.clear"),                   mainPanel: humanizedShortcut(clearDeskShortcut) },
   };
+
+  const toolbarTools = [
+    ["pen", <Icons.Pen />],
+    ["highlighter", <Icons.Highlighter />],
+    ["arrow", <Icons.Arrow />],
+    ["rectangle", <Icons.Rectangle />],
+    ["oval", <Icons.Oval />],
+    ["text", <Icons.Text />],
+    ["eraser", <Icons.Eraser />],
+  ];
 
   const allIcons = {
     brush: <Icons.Brush />,
@@ -401,7 +414,7 @@ const ToolBar = ({
         </div>
 
         <div className="toolbar__main-button">
-          <button tabIndex={-1} title="Pointer Mode" onClick={handleEnablePointerMode}>
+          <button tabIndex={-1} title={t("toolbar.pointerMode")} onClick={handleEnablePointerMode}>
             <Icons.DrawModeEnabled />
           </button>
         </div>
@@ -423,58 +436,26 @@ const ToolBar = ({
           <div className="toolbar__panel toolbar__panel--full">
             <div className="toolbar__body">
               <ul className="toolbar__items">
-                <li className={drawingToolList.includes(activeTool) ? "active more_figures" : undefined} onClick={() => pickBrushOrSwitchView()}>
-                  <button tabIndex={-1} title={renderToolTitle(lastActiveBrush, "mainPanel")}>
-                    {allIcons[lastActiveBrush]}
-                  </button>
-                  <div className="toolbar__shortcut-hint">
-                    {renderToolShortcutHint(lastActiveBrush, "mainPanel")}
-                  </div>
-                </li>
-                <li className={shapeList.includes(activeTool) ? "active more_figures" : undefined} onClick={() => pickFigureOrSwitchView()}>
-                  <button tabIndex={-1} title={renderToolTitle(lastActiveFigure, "mainPanel")}>
-                    {allIcons[lastActiveFigure]}
-                  </button>
-                  <div className="toolbar__shortcut-hint">
-                    {renderToolShortcutHint(lastActiveFigure, "mainPanel")}
-                  </div>
-                </li>
-                <li className={activeTool === "text" ? "active" : undefined} onClick={() => handleChangeTool("text")}>
-                  <button tabIndex={-1} title={renderToolTitle("text", "mainPanel")}>
-                    <Icons.Text />
-                  </button>
-                  <div className="toolbar__shortcut-hint">{renderToolShortcutHint("text", "mainPanel")}</div>
-                </li>
-                <li className={activeTool === "highlighter" ? "active" : undefined} onClick={() => handleChangeTool("highlighter")}>
-                  <button tabIndex={-1} title={renderToolTitle("highlighter", "mainPanel")}>
-                    <Icons.Highlighter />
-                  </button>
-                  <div className="toolbar__shortcut-hint">{renderToolShortcutHint("highlighter", "mainPanel")}</div>
-                </li>
-                <li className={activeTool === "laser" ? "active" : undefined} onClick={() => handleChangeTool("laser")}>
-                  <button tabIndex={-1} title={renderToolTitle("laser", "mainPanel")}>
-                    <Icons.Laser />
-                  </button>
-                  <div className="toolbar__shortcut-hint">{renderToolShortcutHint("laser", "mainPanel")}</div>
-                </li>
-                <li className={activeTool === "eraser" ? "active" : undefined} onClick={() => handleChangeTool("eraser")}>
-                  <button tabIndex={-1} title={renderToolTitle("eraser", "mainPanel")}>
-                    <Icons.Eraser />
-                  </button>
-                  <div className="toolbar__shortcut-hint">{renderToolShortcutHint("eraser", "mainPanel")}</div>
-                </li>
+                {toolbarTools.map(([tool, icon]) => (
+                  <li key={tool} className={activeTool === tool ? "active" : undefined} onClick={() => pickTool(tool)}>
+                    <button tabIndex={-1} title={renderToolTitle(tool, "mainPanel")}>
+                      {icon}
+                    </button>
+                    <div className="toolbar__shortcut-hint">{renderToolShortcutHint(tool, "mainPanel")}</div>
+                  </li>
+                ))}
                 <li className="cross-line"></li>
                 <li onClick={() => !isColorControlDisabled && setToolbarSlide("color-slide")}>
                   <button tabIndex={-1} className={`toolbar__color-picker ${activeColor.isRainbow ? 'color-rainbow' : ''} color_tool_${activeTool}`} style={{ backgroundColor: activeColor.color }} title={isColorControlDisabled ? renderToolTitle("color") : renderToolTitle("color", "mainPanel")} />
                   {!isColorControlDisabled && <div className="toolbar__shortcut-hint">{renderToolShortcutHint("color", "mainPanel")}</div>}
                 </li>
-                <li onClick={() => setToolbarSlide("width-slide")}>
-                  <button tabIndex={-1} className={`toolbar__width-picker ${widthList[activeWidthIndex].name}`} title={renderToolTitle("brushSize", "mainPanel")}>
-                    <div />
-                  </button>
-                  <div className="toolbar__shortcut-hint">{renderToolShortcutHint("brushSize", "mainPanel")}</div>
-                </li>
                 <li className="cross-line"></li>
+                <li onClick={handleUndo}>
+                  <button tabIndex={-1} title={renderToolTitle("undo", "mainPanel")}>
+                    <Icons.Undo />
+                  </button>
+                  <div className="toolbar__shortcut-hint">{renderToolShortcutHint("undo", "mainPanel")}</div>
+                </li>
                 <li onClick={handleClearDesk}>
                   <button tabIndex={-1} title={renderToolTitle("clearDesk", "mainPanel")}>
                     <Icons.Trash />
@@ -620,7 +601,7 @@ const ToolBar = ({
       </div>
 
       <div className="toolbar__close">
-        <button tabIndex={-1} onClick={handleCloseToolBar}>
+        <button tabIndex={-1} title={t("toolbar.hide")} onClick={handleCloseToolBar}>
           <Icons.Close size={16} />
         </button>
       </div>

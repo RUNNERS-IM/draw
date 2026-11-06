@@ -1,6 +1,8 @@
-console.log('[DRAWPEN]: Extended toolbar page loading...');
+console.log('[DRAW]: Extended toolbar page loading...');
 
 const toolbar = document.getElementById('toolbar');
+
+toolbar.querySelector('.toolbar__main-button button').title = window.electronAPI.locale?.toLowerCase().startsWith('ko') ? '그리기 모드로 바꾸기' : 'Switch to Draw Mode';
 const closeAppButton = toolbar.querySelector('.toolbar__close');
 const switchToDrawButtons = toolbar.querySelectorAll('.toolbar__main-button button, .toolbar__slider');
 

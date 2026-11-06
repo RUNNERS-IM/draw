@@ -14,7 +14,7 @@ const Toast = ({ info, handleToastClicked, handleToastHidden }) => {
       key={`${info.title}-${info.body}`}
       onAnimationEnd={handleAnimationEnd}
     >
-      <img src="../assets/icon.png" alt='drawpen' className="toast-icon" />
+      <img src="../assets/icon.png" alt='Draw' className="toast-icon" />
 
       <div className="toast-main">
         <div className="toast-main-title">{info.title}</div>

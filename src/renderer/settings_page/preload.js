@@ -1,14 +1,17 @@
-console.log('[DRAWPEN]: Settings page preloading...');
+console.log('[DRAW]: Settings page preloading...');
 
 const { contextBridge, ipcRenderer } = require('electron');
 const { platform } = process;
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  locale: ipcRenderer.sendSync('get_locale'),
+
   // Renderer -> Main
   getConfiguration: () => ipcRenderer.invoke('get_configuration'),
   setShortcut: (key, value) => ipcRenderer.invoke('set_shortcut', key, value),
   canRegisterShortcut: (accelerator) => ipcRenderer.invoke('can_register_shortcut', accelerator),
   setLaunchOnLogin: (value) => ipcRenderer.invoke('set_launch_on_login', value),
+  setAutoCheckUpdates: (value) => ipcRenderer.invoke('set_auto_check_updates', value),
   setStartsHidden: (value) => ipcRenderer.invoke('set_starts_hidden', value),
   setClearDrawingsOnHide: (value) => ipcRenderer.invoke('set_clear_drawings_on_hide', value),
   resetToOriginals: () => ipcRenderer.invoke('reset_to_originals'),

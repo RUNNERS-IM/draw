@@ -1,8 +1,10 @@
-console.log('[DRAWPEN]: Main page preloading...');
+console.log('[DRAW]: Main page preloading...');
 
 const { contextBridge, ipcRenderer } = require('electron');
 
 contextBridge.exposeInMainWorld('electronAPI', {
+  locale: ipcRenderer.sendSync('get_locale'),
+
   // Renderer -> Main
   invokeCloseApp:              () => ipcRenderer.invoke('close_app'),
   invokePointerMode:           () => ipcRenderer.invoke('toggle_draw_or_pointer_window'),
@@ -18,6 +20,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
   invokeCommitToolbarPosition: (position) => ipcRenderer.invoke('commit_toolbar_position', position),
 
   // Main -> Renderer
+  onTestAction:            (callback) => { ipcRenderer.on('test_action', (_event, action) => callback(action)); },
   onResetScreen:           (callback) => { ipcRenderer.on('reset_screen', () => callback()); },
   onToggleToolbar:         (callback) => { ipcRenderer.on('toggle_toolbar', () => callback()); },
   onToggleWhiteboard:      (callback) => { ipcRenderer.on('toggle_whiteboard', () => callback()); },

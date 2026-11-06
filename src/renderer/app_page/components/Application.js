@@ -36,20 +36,14 @@ import {
   moveToCoordinates,
   calculateAspectRatio,
 } from './utils/figureDetection.js';
-import { FaPaintBrush, FaPencilAlt, FaHighlighter, FaRegSquare, FaRegCircle, FaArrowRight, FaLongArrowAltRight, FaEraser, FaRegTrashAlt, FaAngleLeft, FaAngleRight } from "react-icons/fa";
-import { AiOutlineLine } from "react-icons/ai";
-import { GiLaserburn } from "react-icons/gi";
-import { MdOutlineClose } from "react-icons/md";
-import { FaFont } from "react-icons/fa6";
-import { LuSquareMousePointer } from "react-icons/lu";
-import FaMagicPencilAlt from "./components/icons/FaMagicPencilAlt.js";
-import FaRegDiamond from "./components/icons/FaRegDiamond.js";
+import { Brush, Pen, WandSparkles, MoveUpRight, ArrowRight, Square, Diamond, Circle, Minus, Type, Highlighter, Zap, Eraser, Trash2, Undo2, X, MousePointer2, ChevronLeft, ChevronRight } from "lucide-react";
 
 import {
   fadeOutDestroyAfterMs,
   eraserTime,
   penVariantList,
   drawingToolList,
+  enabledToolList,
   shapeList,
   arrowVariantList,
   createApplicationColorList,
@@ -61,25 +55,28 @@ import {
   initialZoomIndex,
 } from './constants.js';
 
+const lucide = (Icon) => (props) => <Icon strokeWidth={1.5} {...props} />;
+
 const Icons = {
-  DrawModeEnabled: LuSquareMousePointer,
-  Close: MdOutlineClose,
-  Brush: FaPaintBrush,
-  Pen: FaPencilAlt,
-  MagicPen: FaMagicPencilAlt,
-  Arrow: FaArrowRight,
-  FlatArrow: FaLongArrowAltRight,
-  Rectangle: FaRegSquare,
-  Diamond: FaRegDiamond,
-  Oval: FaRegCircle,
-  Line: AiOutlineLine,
-  Text: FaFont,
-  Highlighter: FaHighlighter,
-  Laser: GiLaserburn,
-  Eraser: FaEraser,
-  Trash: FaRegTrashAlt,
-  AngleLeft: FaAngleLeft,
-  AngleRight: FaAngleRight,
+  DrawModeEnabled: lucide(MousePointer2),
+  Close: lucide(X),
+  Brush: lucide(Brush),
+  Pen: lucide(Pen),
+  MagicPen: lucide(WandSparkles),
+  Arrow: lucide(MoveUpRight),
+  FlatArrow: lucide(ArrowRight),
+  Rectangle: lucide(Square),
+  Diamond: lucide(Diamond),
+  Oval: lucide(Circle),
+  Line: lucide(Minus),
+  Text: lucide(Type),
+  Highlighter: lucide(Highlighter),
+  Laser: lucide(Zap),
+  Eraser: lucide(Eraser),
+  Trash: lucide(Trash2),
+  Undo: lucide(Undo2),
+  AngleLeft: lucide(ChevronLeft),
+  AngleRight: lucide(ChevronRight),
 };
 
 const Application = (settings) => {
@@ -130,6 +127,26 @@ const Application = (settings) => {
       { id: Date.now() + 4, type: 'text',      colorIndex: 2, widthIndex: 2, points: [[152, 118]],             rainbowColorDeg: (Math.random() * 360), text: 'Hello World', width: 400, height: 150, scale: 1 },
     ]
   }
+
+  const testActionRef = useRef(null);
+
+  useEffect(() => {
+    if (!window.electronAPI.onTestAction) return;
+
+    window.electronAPI.onTestAction((action) => {
+      const { handleChangeTool, handleUndo, handleRedo, handleReset, setToolbarSlide, setAllFigures, setUndoStackFigures } = testActionRef.current;
+
+      if (action.type === 'tool') handleChangeTool(action.tool);
+      if (action.type === 'slide') setToolbarSlide(action.slide);
+      if (action.type === 'undo') handleUndo();
+      if (action.type === 'redo') handleRedo();
+      if (action.type === 'clear') handleReset();
+      if (action.type === 'figures') {
+        setAllFigures(action.figures);
+        setUndoStackFigures(action.figures.map((figure) => ({ type: 'add', figures: [figure] })));
+      }
+    });
+  }, []);
 
   const [colorList, setColorList] = useState(() => createApplicationColorList(settings.tool_bar_color_palette));
   const [rainbowColorDeg, updateRainbowColorDeg] = useState(initialColorDeg);
@@ -362,45 +379,12 @@ const Application = (settings) => {
             break;
           }
 
-          // REDO:
           if (shiftKey) {
-            if (redoStackFigures.length > 0) {
-              const lastAction = redoStackFigures.at(-1);
-              let newActiveFigures
-
-              if (lastAction.type === 'add') {
-                newActiveFigures = [...allFigures, ...lastAction.figures];
-              }
-
-              if (lastAction.type === 'remove') {
-                newActiveFigures = allFigures.filter(figure => !lastAction.figures.some(f => f.id === figure.id))
-              }
-
-              setAllFigures(newActiveFigures);
-              setUndoStackFigures(prevUndoStack => [...prevUndoStack, lastAction]);
-              setRedoStackFigures(prevRedoStack => prevRedoStack.slice(0, -1));
-            }
-
+            handleRedo();
             break;
           }
 
-          // UNDO:
-          if (undoStackFigures.length > 0) {
-            const lastAction = undoStackFigures.at(-1);
-            let newActiveFigures
-
-            if (lastAction.type === 'add') {
-              newActiveFigures = allFigures.filter(figure => !lastAction.figures.some(f => f.id === figure.id))
-            }
-
-            if (lastAction.type === 'remove') {
-              newActiveFigures = [...allFigures, ...lastAction.figures];
-            }
-
-            setAllFigures(newActiveFigures);
-            setUndoStackFigures(prevUndoStack => prevUndoStack.slice(0, -1));
-            setRedoStackFigures(prevRedoStack => [...prevRedoStack, lastAction]);
-          }
+          handleUndo();
         }
         break;
       }
@@ -531,54 +515,40 @@ const Application = (settings) => {
     if (toolbarSlide === 'main-slide') {
       switch (eventCode) {
         case 'digit1': {
-          let nextBrush = toolbarLastActiveBrush;
-
-          if (activeTool === toolbarLastActiveBrush) {
-            nextBrush = getNextVariant(drawingToolList, activeTool, direction);
-          }
-
-          handleChangeTool(nextBrush);
+          handleChangeTool('pen');
           break;
         }
         case 'digit2': {
-          let nextShape = toolbarLastActiveFigure;
-
-          if (activeTool === toolbarLastActiveFigure) {
-            nextShape = getNextVariant(shapeList, activeTool, direction);
-          }
-
-          handleChangeTool(nextShape);
-          break;
-        }
-        case 'digit3': {
-          handleChangeTool('text');
-          break;
-        }
-        case 'digit4': {
           handleChangeTool('highlighter');
           break;
         }
+        case 'digit3': {
+          handleChangeTool('arrow');
+          break;
+        }
+        case 'digit4': {
+          handleChangeTool('rectangle');
+          break;
+        }
         case 'digit5': {
-          handleChangeTool('laser');
+          handleChangeTool('oval');
           break;
         }
         case 'digit6': {
-          handleChangeTool('eraser');
+          handleChangeTool('text');
           break;
         }
         case 'digit7': {
+          handleChangeTool('eraser');
+          break;
+        }
+        case 'digit8': {
           if (['eraser', 'laser'].includes(activeTool)) {
             break;
           }
           const nextColorIndex = (activeColorIndex + direction + colorList.length) % colorList.length;
 
           handleChangeColor(nextColorIndex);
-          break;
-        }
-        case 'digit8': {
-          const nextWidthIndex = (activeWidthIndex + direction + widthList.length) % widthList.length;
-
-          handleChangeWidth(nextWidthIndex);
           break;
         }
       }
@@ -952,8 +922,51 @@ const Application = (settings) => {
     setRedoStackFigures([]);
   };
 
+  const handleUndo = () => {
+    if (activeFigureInfo) {
+      setActiveFigureInfo(null);
+      return;
+    }
+
+    if (undoStackFigures.length === 0) return;
+
+    const lastAction = undoStackFigures.at(-1);
+    let newActiveFigures
+
+    if (lastAction.type === 'add') {
+      newActiveFigures = allFigures.filter(figure => !lastAction.figures.some(f => f.id === figure.id))
+    }
+
+    if (lastAction.type === 'remove') {
+      newActiveFigures = [...allFigures, ...lastAction.figures];
+    }
+
+    setAllFigures(newActiveFigures);
+    setUndoStackFigures(prevUndoStack => prevUndoStack.slice(0, -1));
+    setRedoStackFigures(prevRedoStack => [...prevRedoStack, lastAction]);
+  };
+
+  const handleRedo = () => {
+    if (redoStackFigures.length === 0) return;
+
+    const lastAction = redoStackFigures.at(-1);
+    let newActiveFigures
+
+    if (lastAction.type === 'add') {
+      newActiveFigures = [...allFigures, ...lastAction.figures];
+    }
+
+    if (lastAction.type === 'remove') {
+      newActiveFigures = allFigures.filter(figure => !lastAction.figures.some(f => f.id === figure.id))
+    }
+
+    setAllFigures(newActiveFigures);
+    setUndoStackFigures(prevUndoStack => [...prevUndoStack, lastAction]);
+    setRedoStackFigures(prevRedoStack => prevRedoStack.slice(0, -1));
+  };
+
   const handleChangeTool = (toolName) => {
-    if (activeTool === toolName) {
+    if (activeTool === toolName || !enabledToolList.includes(toolName)) {
       return
     }
 
@@ -2025,6 +2038,7 @@ const Application = (settings) => {
             handleChangeWidth={handleChangeWidth}
             handleChangeTool={handleChangeTool}
             handleClearDesk={handleReset}
+            handleUndo={handleUndo}
             handleEnablePointerMode={handleEnablePointerMode}
             handlePositionCommit={invokeCommitToolbarPosition}
             Icons={Icons}
@@ -2033,6 +2047,9 @@ const Application = (settings) => {
       }
     </>
   );
+
+  testActionRef.current = { handleChangeTool, handleUndo, handleRedo, handleReset, setToolbarSlide, setAllFigures, setUndoStackFigures };
+  if (typeof window !== 'undefined') window.__drawFigureCount = allFigures.length;
 
   if (zoomInfo.status === 'capturing') {
     return <div id="root_wrapper" />;

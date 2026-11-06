@@ -4,6 +4,7 @@ import { MdRoundedCorner } from 'react-icons/md';
 import MdSharpCorner from './icons/MdSharpCorner.js';
 import { TbLineDashed, TbLineDotted, TbMinus } from 'react-icons/tb';
 import { toolbarViewportMargin, widthList } from '../constants.js';
+import { t } from '../../../../shared/i18n.js';
 
 const strokeStyleFigureTypes = ['flat_arrow', 'rectangle', 'diamond', 'oval', 'line'];
 const edgeStyleFigureTypes = ['rectangle', 'diamond'];
@@ -181,13 +182,13 @@ const FigureToolbar = ({
     return (
       <div className="figure-sub-toolbar">
         <div className="figure-sub-item">
-          <button tabIndex={-1} title="Sharp" onClick={() => onChangeEdges(0)}>
+          <button tabIndex={-1} title={t('figure.sharp')} onClick={() => onChangeEdges(0)}>
             <MdSharpCorner />
           </button>
         </div>
 
         <div className="figure-sub-item">
-          <button tabIndex={-1} title="Round" onClick={() => onChangeEdges(1)}>
+          <button tabIndex={-1} title={t('figure.round')} onClick={() => onChangeEdges(1)}>
             <MdRoundedCorner />
           </button>
         </div>
@@ -199,19 +200,19 @@ const FigureToolbar = ({
     return (
       <div className="figure-sub-toolbar">
         <div className="figure-sub-item">
-          <button tabIndex={-1} title="Solid" onClick={() => onChangeStroke(0)}>
+          <button tabIndex={-1} title={t('figure.solid')} onClick={() => onChangeStroke(0)}>
             <TbMinus />
           </button>
         </div>
 
         <div className="figure-sub-item">
-          <button tabIndex={-1} title="Dashed" onClick={() => onChangeStroke(1)}>
+          <button tabIndex={-1} title={t('figure.dashed')} onClick={() => onChangeStroke(1)}>
             <TbLineDashed />
           </button>
         </div>
 
         <div className="figure-sub-item">
-          <button tabIndex={-1} title="Dotted" onClick={() => onChangeStroke(2)}>
+          <button tabIndex={-1} title={t('figure.dotted')} onClick={() => onChangeStroke(2)}>
             <TbLineDotted />
           </button>
         </div>
@@ -234,7 +235,7 @@ const FigureToolbar = ({
           tabIndex={-1}
           className={`toolbar__color-picker ${colorList[figureColorIndex].isRainbow ? 'color-rainbow' : ''}`}
           style={{ '--picker-color': colorList[figureColorIndex].color }}
-          title="Color"
+          title={t('figure.color')}
           onClick={() => toggleMenu('color')}
         />
 
@@ -245,7 +246,7 @@ const FigureToolbar = ({
         <button
           tabIndex={-1}
           className={`toolbar__width-picker ${widthList[figureWidthIndex].name}`}
-          title={figureType === 'text' ? 'Text size' : 'Line width'}
+          title={figureType === 'text' ? t('figure.textSize') : t('figure.lineWidth')}
           onClick={() => toggleMenu('width')}
         >
           <div />
@@ -259,7 +260,7 @@ const FigureToolbar = ({
           <div className={`figure-sub-item ${openMenu === 'edges' ? 'active' : ''}`}>
             <button
               tabIndex={-1}
-              title="Edges"
+              title={t('figure.edges')}
               onClick={() => toggleMenu('edges')}
             >
               {figureEdgeIndex === 0 && <MdSharpCorner />}
@@ -276,7 +277,7 @@ const FigureToolbar = ({
           <div className={`figure-sub-item ${openMenu === 'stroke' ? 'active' : ''}`}>
             <button
               tabIndex={-1}
-              title="Stroke"
+              title={t('figure.stroke')}
               onClick={() => toggleMenu('stroke')}
             >
               {figureStrokeIndex === 0 && <TbMinus />}
@@ -295,7 +296,7 @@ const FigureToolbar = ({
         <button
           tabIndex={-1}
           className="toolbar__delete-button"
-          title="Delete"
+          title={t('figure.delete')}
           onClick={onDelete}
         >
           <Icons.Trash />

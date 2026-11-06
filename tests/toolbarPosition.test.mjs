@@ -38,7 +38,7 @@ test('a constrained viewport temporarily fits the panel without losing its saved
   const small = { width: 500, height: 500 };
   const anchor = Object.freeze({ x: 240, y: 100 });
   const isReversed = isToolbarReversed(anchor, small, 'horizontal');
-  assert.deepEqual(getVisibleToolbarPosition(anchor, small, { width: 460, height: 72 }, 'horizontal', isReversed, margin), { x: 390, y: 100 });
+  assert.deepEqual(getVisibleToolbarPosition(anchor, small, { width: 460, height: 72 }, 'horizontal', isReversed, margin), { x: 426, y: 100 });
   assert.deepEqual(getVisibleToolbarPosition(anchor, small, { width: 154, height: 72 }, 'horizontal', isReversed, margin), anchor);
 });
 

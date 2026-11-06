@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import './Settings.scss';
 import ShortcutRecorder from './ShortcutRecorder';
 import ColorPicker from './ColorPicker';
+import { t } from '../../../shared/i18n.js';
 import {
   createApplicationColorList,
   timeStep,
@@ -27,6 +28,9 @@ import { HiSwitchHorizontal } from "react-icons/hi";
 import { FaRegKeyboard } from "react-icons/fa6";
 import { FaPlus, FaMinus } from "react-icons/fa";
 
+// 첫 판(그리기만)에 없는 설정. 코드는 두고 화면에서만 뺀다.
+const HIDDEN_FEATURES = false;
+
 const ShortcutRow = ({ title, description, hint, shortcut, onCheck, onChange, onReset, onRemove }) => {
   const canReset  = !!shortcut.init && shortcut.init !== shortcut.accelerator;
   const canRemove = (shortcut.accelerator || shortcut.init) && shortcut.accelerator !== '[NULL]';
@@ -43,8 +47,8 @@ const ShortcutRow = ({ title, description, hint, shortcut, onCheck, onChange, on
       </div>
 
       <div className="settings-item-control">
-        { canReset && <IoRefreshCircleOutline className="icon" title="Reset to default" onClick={onReset} /> }
-        { canRemove && <IoCloseCircleOutline className="icon" title="Remove shortcut" onClick={onRemove} /> }
+        { canReset && <IoRefreshCircleOutline className="icon" title={t('settings.resetDefault')} onClick={onReset} /> }
+        { canRemove && <IoCloseCircleOutline className="icon" title={t('settings.removeShortcut')} onClick={onRemove} /> }
 
         <ShortcutRecorder accelerator={shortcut.accelerator} onCheck={onCheck} onChange={onChange} />
       </div>
@@ -61,6 +65,7 @@ const Settings = (config) => {
   const [fadeOutDurationTimeMs, setFadeOutDurationTimeMs] = useState(config.fade_out_duration_time_ms);
   const [laserTimeMs, setLaserTimeMs] = useState(config.laser_time);
   const [launchOnLogin, setLaunchOnLogin] = useState(config.launch_on_login);
+  const [autoCheckUpdates, setAutoCheckUpdates] = useState(config.auto_check_updates);
   const [startsHidden, setStartsHidden] = useState(config.starts_hidden);
   const [clearDrawingsOnHide, setClearDrawingsOnHide] = useState(config.clear_drawings_on_hide);
   const [disableToolbarInPointerMode, setDisableToolbarInPointerMode] = useState(config.disable_toolbar_in_pointer_mode);
@@ -192,6 +197,13 @@ const Settings = (config) => {
     window.electronAPI.setLaunchOnLogin(nextState);
   };
 
+  const toggleAutoCheckUpdates = () => {
+    const nextState = !autoCheckUpdates;
+    setAutoCheckUpdates(nextState);
+
+    window.electronAPI.setAutoCheckUpdates(nextState);
+  };
+
   const toggleStartsHidden = () => {
     const nextState = !startsHidden;
     setStartsHidden(nextState);
@@ -318,7 +330,7 @@ const Settings = (config) => {
             onClick={() => selectTab('shortcuts')}
           >
             <FaRegKeyboard className="icon" />
-            Keyboard Shortcuts
+            {t('settings.tabShortcuts')}
           </div>
 
           <div
@@ -326,7 +338,7 @@ const Settings = (config) => {
             onClick={() => selectTab('appearance')}
           >
             <IoColorPaletteOutline className="icon" />
-            Appearance
+            {t('settings.tabAppearance')}
           </div>
 
           <div
@@ -334,11 +346,11 @@ const Settings = (config) => {
             onClick={() => selectTab('application')}
           >
             <IoApps className="icon" />
-            Application
+            {t('settings.tabApplication')}
           </div>
 
           <div className="settings-sidebar-version">
-            DrawPen {appVersion}
+            Draw {appVersion}
           </div>
         </div>
       </div>
@@ -347,16 +359,16 @@ const Settings = (config) => {
         {activeTab === 'shortcuts' && (
           <div className="settings-container">
             <div className="settings-header">
-              <div className="settings-title">Shortcuts</div>
+              <div className="settings-title">{t('settings.tabShortcuts')}</div>
             </div>
 
             <div className="settings-content">
               <div className="settings-section">
 
                 <ShortcutRow
-                  title="Show/Hide App"
-                  description="Toggles the main application window"
-                  hint="Global shortcut"
+                  title={t('settings.showHideApp')}
+                  description={t('settings.showHideAppDesc')}
+                  hint={t('settings.globalHint')}
                   shortcut={showHideApp}
                   onCheck={canRegisterShortcut}
                   onChange={(acc) => applyShortcut('key_binding_show_hide_app', acc)}
@@ -365,8 +377,8 @@ const Settings = (config) => {
                 />
 
                 <ShortcutRow
-                  title="Show/Hide Toolbar"
-                  description="Toggles the floating toolbar"
+                  title={t('settings.showHideToolbar')}
+                  description={t('settings.showHideToolbarDesc')}
                   shortcut={showHideToolbar}
                   onCheck={canRegisterShortcut}
                   onChange={(acc) => applyShortcut('key_binding_show_hide_toolbar', acc)}
@@ -374,19 +386,21 @@ const Settings = (config) => {
                   onRemove={() => removeShortcut('key_binding_show_hide_toolbar')}
                 />
 
-                <ShortcutRow
-                  title="Show/Hide Whiteboard"
-                  description="Toggles the whiteboard overlay"
+                {HIDDEN_FEATURES && (
+<ShortcutRow
+                  title={t('settings.showHideWhiteboard')}
+                  description={t('settings.showHideWhiteboardDesc')}
                   shortcut={showHideWhiteboard}
                   onCheck={canRegisterShortcut}
                   onChange={(acc) => applyShortcut('key_binding_show_hide_whiteboard', acc)}
                   onReset={() => resetShortcut('key_binding_show_hide_whiteboard')}
                   onRemove={() => removeShortcut('key_binding_show_hide_whiteboard')}
                 />
+)}
 
                 <ShortcutRow
-                  title="Clear Desk"
-                  description="Clears all drawings from the whiteboard"
+                  title={t('settings.clearDesk')}
+                  description={t('settings.clearDeskDesc')}
                   shortcut={clearDesk}
                   onCheck={canRegisterShortcut}
                   onChange={(acc) => applyShortcut('key_binding_clear_desk', acc)}
@@ -396,8 +410,8 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Color Swap</div>
-                    <div className="settings-item-description">Press X to switch colors</div>
+                    <div className="settings-item-title">{t('settings.colorSwap')}</div>
+                    <div className="settings-item-description">{t('settings.colorSwapDesc')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -430,7 +444,7 @@ const Settings = (config) => {
         {activeTab === 'appearance' && (
           <div className="settings-container">
             <div className="settings-header">
-              <div className="settings-title">Appearance</div>
+              <div className="settings-title">{t('settings.tabAppearance')}</div>
             </div>
 
             <div className="settings-content">
@@ -438,7 +452,7 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Toolbar Colors</div>
+                    <div className="settings-item-title">{t('settings.toolbarColors')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -477,7 +491,7 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Hide Drawing Border</div>
+                    <div className="settings-item-title">{t('settings.hideBorder')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -490,7 +504,7 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Cute Cursor</div>
+                    <div className="settings-item-title">{t('settings.cuteCursor')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -500,10 +514,10 @@ const Settings = (config) => {
                         value={cuteCursorMode}
                         onChange={selectCuteCursorMode}
                       >
-                        <option value="permanent">Permanent</option>
-                        <option value="fade">Auto-Fade</option>
-                        <option value="dot">Dot</option>
-                        <option value="hidden">Hidden</option>
+                        <option value="permanent">{t('settings.cursorPermanent')}</option>
+                        <option value="fade">{t('settings.cursorFade')}</option>
+                        <option value="dot">{t('settings.cursorDot')}</option>
+                        <option value="hidden">{t('settings.cursorHidden')}</option>
                       </select>
 
                       <div className="selectbar-arrow">
@@ -515,8 +529,8 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Hide Extended Toolbar</div>
-                    <div className="settings-item-description">Affects only Pointer Mode</div>
+                    <div className="settings-item-title">{t('settings.hideExtended')}</div>
+                    <div className="settings-item-description">{t('settings.hideExtendedDesc')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -529,8 +543,8 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Smooth Strokes</div>
-                    <div className="settings-item-description">Filters out tiny movements after drawing</div>
+                    <div className="settings-item-title">{t('settings.smooth')}</div>
+                    <div className="settings-item-description">{t('settings.smoothDesc')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -543,7 +557,7 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Clear drawings on hide</div>
+                    <div className="settings-item-title">{t('settings.clearOnHide')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -554,10 +568,11 @@ const Settings = (config) => {
                   </div>
                 </div>
 
-                <div className="settings-item">
+                {HIDDEN_FEATURES && (
+<div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Fade Pen start delay</div>
-                    <div className="settings-item-description">Press SPACE to pause the timer</div>
+                    <div className="settings-item-title">{t('settings.fadeDelay')}</div>
+                    <div className="settings-item-description">{t('settings.fadeDelayDesc')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -572,16 +587,18 @@ const Settings = (config) => {
                     </div>
                   </div>
                 </div>
+)}
 
-                <div className="settings-item--nested">
+                {HIDDEN_FEATURES && (
+<div className="settings-item--nested">
                   <div className="settings-item">
                     <div className="settings-item--forward">
                       <IoChevronForward className="icon" />
                     </div>
 
                     <div className="settings-item-info">
-                      <div className="settings-item-title">Fade-out duration</div>
-                      <div className="settings-item-description">Duration of the fade animation</div>
+                      <div className="settings-item-title">{t('settings.fadeDuration')}</div>
+                      <div className="settings-item-description">{t('settings.fadeDurationDesc')}</div>
                     </div>
 
                     <div className="settings-item-control">
@@ -597,11 +614,13 @@ const Settings = (config) => {
                     </div>
                   </div>
                 </div>
+)}
 
-                <div className="settings-item">
+                {HIDDEN_FEATURES && (
+<div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Laser Duration</div>
-                    <div className="settings-item-description">Adjust how long the laser remains on screen</div>
+                    <div className="settings-item-title">{t('settings.laserDuration')}</div>
+                    <div className="settings-item-description">{t('settings.laserDurationDesc')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -616,6 +635,7 @@ const Settings = (config) => {
                     </div>
                   </div>
                 </div>
+)}
 
               </div>
             </div>
@@ -625,15 +645,16 @@ const Settings = (config) => {
         {activeTab === 'application' && (
           <div className="settings-container">
             <div className="settings-header">
-              <div className="settings-title">Application</div>
+              <div className="settings-title">{t('settings.tabApplication')}</div>
             </div>
 
             <div className="settings-content">
               <div className="settings-section">
 
-                <div className="settings-item">
+                {HIDDEN_FEATURES && (
+<div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">App Icon Color</div>
+                    <div className="settings-item-title">{t('settings.appIconColor')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -643,9 +664,9 @@ const Settings = (config) => {
                         value={appIconColor}
                         onChange={selectAppIconColor}
                       >
-                        <option value="default">Default</option>
-                        <option value="white">White</option>
-                        <option value="black">Black</option>
+                        <option value="default">{t('settings.iconDefault')}</option>
+                        <option value="white">{t('settings.iconWhite')}</option>
+                        <option value="black">{t('settings.iconBlack')}</option>
                       </select>
 
                       <div className="selectbar-arrow">
@@ -654,10 +675,12 @@ const Settings = (config) => {
                     </div>
                   </div>
                 </div>
+)}
 
-                <div className="settings-item">
+                {HIDDEN_FEATURES && (
+<div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Toolbar Orientation</div>
+                    <div className="settings-item-title">{t('settings.orientation')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -667,8 +690,8 @@ const Settings = (config) => {
                         value={toolbarOrientation}
                         onChange={selectToolbarOrientation}
                       >
-                        <option value="horizontal">Horizontal</option>
-                        <option value="vertical">Vertical</option>
+                        <option value="horizontal">{t('settings.horizontal')}</option>
+                        <option value="vertical">{t('settings.vertical')}</option>
                       </select>
 
                       <div className="selectbar-arrow">
@@ -677,10 +700,11 @@ const Settings = (config) => {
                     </div>
                   </div>
                 </div>
+)}
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Lock drawing monitor</div>
+                    <div className="settings-item-title">{t('settings.lockMonitor')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -690,7 +714,7 @@ const Settings = (config) => {
                         value={drawingMonitor.display_id || 'auto'}
                         onChange={selectDrawingMonitor}
                       >
-                        <option value="auto">Auto</option>
+                        <option value="auto">{t('settings.monitorAuto')}</option>
                         {
                           displays.map(display => (
                             <option key={display.id} value={display.id}>{display.label}</option>
@@ -702,7 +726,7 @@ const Settings = (config) => {
                           !displays.find(display => display.id === drawingMonitor.display_id) &&
                             (
                               <option disabled value={drawingMonitor.display_id}>
-                                {drawingMonitor.label} (disconnected)
+                                {drawingMonitor.label} ({t('settings.disconnected')})
                               </option>
                             )
                         }
@@ -717,7 +741,7 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Starts hidden on launch</div>
+                    <div className="settings-item-title">{t('settings.startsHidden')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -730,7 +754,7 @@ const Settings = (config) => {
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Launch on system startup</div>
+                    <div className="settings-item-title">{t('settings.launchOnLogin')}</div>
                   </div>
 
                   <div className="settings-item-control">
@@ -741,30 +765,45 @@ const Settings = (config) => {
                   </div>
                 </div>
 
-                <div className="settings-item">
+                {HIDDEN_FEATURES && (
+<div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Save screenshots to</div>
+                    <div className="settings-item-title">{t('settings.saveShots')}</div>
                     <div className="settings-item-description" title={screenshotDirectory.path}>{screenshotDirectory.path}</div>
                   </div>
 
                   <div className="settings-item-control">
                     {
-                      !screenshotDirectory.isDefault && <IoRefreshCircleOutline className="icon" title="Reset to default" onClick={resetScreenshotDirectory} />
+                      !screenshotDirectory.isDefault && <IoRefreshCircleOutline className="icon" title={t('settings.resetDefault')} onClick={resetScreenshotDirectory} />
                     }
                     <div className="buttons-group">
-                      <button className="button" onClick={openScreenshotDirectory}>Open</button>
-                      <button className="button" onClick={chooseScreenshotDirectory}>Choose…</button>
+                      <button className="button" onClick={openScreenshotDirectory}>{t('settings.open')}</button>
+                      <button className="button" onClick={chooseScreenshotDirectory}>{t('settings.choose')}</button>
                     </div>
+                  </div>
+                </div>
+)}
+
+                <div className="settings-item">
+                  <div className="settings-item-info">
+                    <div className="settings-item-title">{t('settings.autoUpdate')}</div>
+                  </div>
+
+                  <div className="settings-item-control">
+                    <div
+                      className={`toggle ${autoCheckUpdates ? 'active' : ''}`}
+                      onClick={toggleAutoCheckUpdates}
+                    ></div>
                   </div>
                 </div>
 
                 <div className="settings-item">
                   <div className="settings-item-info">
-                    <div className="settings-item-title">Reset to defaults</div>
+                    <div className="settings-item-title">{t('settings.resetAll')}</div>
                   </div>
 
                   <div className="settings-item-control">
-                    <button className="button" onClick={resetToOriginals}>Reset All</button>
+                    <button className="button" onClick={resetToOriginals}>{t('settings.resetAllButton')}</button>
                   </div>
                 </div>
 

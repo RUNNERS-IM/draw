@@ -19,7 +19,28 @@
   --space-sm: 4px;
   --space-lg: 10px;
 
-  --font-primary: 'Inter', Arial, Helvetica, sans-serif;
+  --font-primary: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --gray-25:  #3A3A3C;
+    --gray-50:  #2A2A2A;
+    --gray-75:  rgba(255, 255, 255, 0.08);
+    --gray-100: #323234;
+    --gray-200: #3A3A3C;
+    --gray-250: #48484A;
+    --gray-300: #1E1E1E;
+    --gray-400: #545456;
+    --gray-500: #A0A0A5;
+    --gray-600: #B0B0B5;
+    --gray-700: #F5F5F7;
+
+    --blue-500: #0A84FF;
+
+    --shadow-ambient: rgba(0, 0, 0, 0.3);
+    --shadow-ambient-strong: rgba(0, 0, 0, 0.5);
+  }
 }
 
 html, body {
@@ -61,7 +82,7 @@ html, body {
         box-sizing: border-box;
         background-color: var(--gray-50);
         border: 2px solid var(--gray-75);
-        border-radius: 20px;
+        border-radius: 14px;
         box-shadow: 2px 2px 8px var(--shadow-ambient-strong);
         padding: var(--space-lg);
 
@@ -131,7 +152,7 @@ html, body {
         .settings-content {
           .settings-section {
             background-color: var(--gray-100);
-            border-radius: 20px;
+            border-radius: 14px;
             padding: 2px 15px;
             border: 2px solid var(--gray-75);
 
