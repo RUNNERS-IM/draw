@@ -4,5 +4,5 @@ allowBuilds:
   esbuild: true
   electron-winstaller: false
   "@parcel/watcher": false
-minimumReleaseAgeExclude:
-  - lucide-react@1.70.0
+patchedDependencies:
+  ntcjs: patches/ntcjs.patch

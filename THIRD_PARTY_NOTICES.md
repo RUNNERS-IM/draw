@@ -956,7 +956,7 @@ maintained libraries used by this software which have their own
 licenses; we recommend you read them, as their terms may differ from the
 terms above.
 
-# lucide-react 1.70.0
+# lucide-react 1.69.0
 
 License: ISC
 
@@ -1096,7 +1096,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-# react 19.2.9
+# react 19.2.8
 
 License: MIT
 
@@ -1122,7 +1122,7 @@ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 
-# react-dom 19.2.9
+# react-dom 19.2.8
 
 License: MIT
 

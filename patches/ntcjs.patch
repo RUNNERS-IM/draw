@@ -1,0 +1,15 @@
+diff --git a/src/ntc.js b/src/ntc.js
+index 0546d0714985840aacb9fdb1267ab19835da6092..e588b3716317e506764083c51eecfdb929a1ddc8 100644
+--- a/src/ntc.js
++++ b/src/ntc.js
+@@ -65,8 +65,8 @@ var ntc = {
+             s = hsl[1],
+             l = hsl[2];
+         var ndf1 = 0;
+-        ndf2 = 0;
+-        ndf = 0;
++        var ndf2 = 0;
++        var ndf = 0;
+         var cl = -1,
+             df = -1;
+ 

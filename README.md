@@ -18,13 +18,13 @@ Draw on your screen while you present. Draw is a macOS menu bar app with a verti
 
 ## 개발
 
-노드 22 가 필요합니다.
+Node 24 와 pnpm 이 필요합니다.
 
 ```sh
 pnpm install
 pnpm test         # 단위 테스트와 공용 키트 확인
-pnpm start        # 개발 판 실행
-pnpm dist     # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
+pnpm dev          # 개발 판 실행
+pnpm dist         # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
 ```
 
 기본 가지는 `master` 입니다. `release` 가지에 올리면 GitHub Actions 가 버전을 올리고, 서명 · 공증한 판을 GitHub Releases 에 냅니다(`.github/workflows/release.yml`). 버전 번호는 `scripts/bump-release.sh` 가 고르므로 손으로 고치지 않습니다. 출시 전에 `RELEASE_NOTES.md` 를 이번 판 내용으로 고칩니다.
