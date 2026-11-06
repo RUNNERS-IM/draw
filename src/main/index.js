@@ -1,18 +1,11 @@
 import { app, Tray, Menu, BrowserWindow, screen, globalShortcut, shell, ipcMain, nativeTheme, systemPreferences, desktopCapturer, autoUpdater, dialog, clipboard, ClipboardItem } from 'electron';
-import { updateElectronApp } from 'update-electron-app';
 import Store from 'electron-store';
 import { randomUUID } from 'crypto';
 import { isDeepStrictEqual } from 'util';
-import { PostHog } from 'posthog-node'
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
-import electronSquirrelStartup from 'electron-squirrel-startup';
 import { getPointerToolbarOffset, isToolbarReversed } from '../shared/toolbarPosition.js';
-
-if (electronSquirrelStartup) {
-  app.quit();
-}
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isDebugLoggingEnabled = process.env.DRAWPEN_DEBUG === '1'
@@ -683,8 +676,6 @@ app.on('second-instance', () => {
 app.commandLine.appendSwitch('disable-pinch');
 
 app.whenReady().then(() => {
-  launchTracker()
-
   hideDock()
 
   startAsHiddenCheck()
@@ -700,7 +691,6 @@ app.whenReady().then(() => {
 
   registerGlobalShortcuts()
 
-  updateApp()
   setApplicationName()
 
   screen.on('display-added', handleDisplayChange)
@@ -746,12 +736,6 @@ function hideDock() {
   if (isMac) {
     app.dock.hide();
   }
-}
-
-function updateApp() {
-  if (isLinux) return
-
-  updateElectronApp()
 }
 
 ipcMain.handle('get_app_version', () => {
@@ -1914,7 +1898,7 @@ function safeRegisterGlobalShortcut(accelerator, callback) {
 
 function setApplicationName() {
   if (isWin) {
-    app.setAppUserModelId('com.squirrel.DrawPen.DrawPen');
+    app.setAppUserModelId('im.runners.draw');
   }
 }
 
@@ -1944,41 +1928,6 @@ function safeSetLoginItemSettings(settings) {
   try {
     app.setLoginItemSettings(settings)
   } catch (error) {}
-}
-
-function launchTracker() {
-  if (isDevelopment) { return }
-
-  try {
-    const key = process.env.PUBLIC_POSTHOG_KEY;
-
-    if (!key || key === 'undefined' || key === '') {
-      return;
-    }
-
-    const posthog = new PostHog(key, {
-      host: 'https://us.i.posthog.com',
-      flushAt: 1
-    })
-
-    const { screenshot_directory, ...analyticsConfig } = store.store
-
-    posthog.capture({
-      distinctId: store.get('user_id') || 'anonymous',
-      event: 'app_launch',
-      properties: {
-        platform: 'app',
-
-        app_version: app.getVersion(),
-
-        os_platform: os.platform(),
-        os_release:  os.release(),
-        arch:        os.arch(),
-
-        config: analyticsConfig,
-      }
-    })
-  } catch (_) {}
 }
 
 function rawLog(message, ...args) {

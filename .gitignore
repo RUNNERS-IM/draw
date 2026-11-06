@@ -1,7 +1,5 @@
 .DS_Store
 node_modules
-/build
-/package
 .env
 .env.*
 !.env.example
@@ -10,3 +8,4 @@ node_modules
 # Electron-Forge
 out/
 .private/
+dist.noindex/
