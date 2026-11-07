@@ -24,12 +24,9 @@ const AccountTab = () => {
   }, [])
 
   return (
-    <div className="settings-container">
-      <div className="settings-header">
-        <div className="settings-title">{t('settings.tabAccount')}</div>
-      </div>
-
-      <div className="settings-content">
+    <>
+      <section className="settings-group">
+        <h2 className="settings-group-title">{t('settings.tabAccount')}</h2>
         <div className="settings-section">
           <div className="settings-item">
             <div className="settings-item-info">
@@ -50,7 +47,7 @@ const AccountTab = () => {
             </div>
           </div>
         </div>
-      </div>
+      </section>
 
       {signingIn && !email && (
         <SignInSheet
@@ -63,7 +60,7 @@ const AccountTab = () => {
           onClose={() => setSigningIn(false)}
         />
       )}
-    </div>
+    </>
   )
 }
 

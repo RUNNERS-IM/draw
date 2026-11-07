@@ -5,7 +5,6 @@ import { pathToFileURL } from 'node:url'
 export type PageName =
   | 'app_page'
   | 'extended_toolbar_page'
-  | 'about_page'
   | 'settings_page'
   | 'panel_page'
   | 'update_page'

@@ -20,6 +20,7 @@
   --space-lg: 10px;
 
   --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --alert-bg: #f0f0f0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -40,477 +41,530 @@
 
     --shadow-ambient: rgba(0, 0, 0, 0.3);
     --shadow-ambient-strong: rgba(0, 0, 0, 0.5);
+    --alert-bg: #2c2c2e;
   }
 }
 
 html,
-body {
+body,
+#root {
   height: 100%;
   width: 100%;
   margin: 0;
   padding: 0;
+}
+
+body {
   font-family: var(--font-primary);
   font-size: 10px;
-  background-color: var(--gray-300);
-  color: var(--gray-700);
+  background-color: var(--rw-window-bg);
+  color: var(--rw-text);
+  overflow: hidden;
+  user-select: none;
+  cursor: default;
+  // 한국어 줄은 낱말 사이에서 끊는다.
+  word-break: keep-all;
 
   :focus {
     outline: none;
   }
+}
 
-  #root {
-    height: 100%;
-    width: 100%;
+// 창 모양은 Split 설정 창(app/src/renderer/settings/settings.css)과 같다: 맥 제목 줄 28 · 위 도구 막대 탭 · 가운데 544 카드.
+.settings-window {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+// 맥은 창 단추 옆에 제목이 없어서 화면이 가운데에 지금 탭 이름을 그린다. 끌어서 창을 옮길 수 있다.
+.settings-titlebar {
+  flex: none;
+  height: 28px;
+  line-height: 28px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--rw-text-secondary);
+  -webkit-app-region: drag;
+}
+
+.settings-toolbar {
+  flex: none;
+  display: flex;
+  justify-content: center;
+  gap: 2px;
+  padding: 6px 12px 7px;
+  border-bottom: var(--rw-border) solid var(--rw-separator);
+  -webkit-app-region: drag;
+}
+
+.settings-toolbar-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  min-width: 64px;
+  padding: 5px 8px 4px;
+  border: none;
+  border-radius: var(--rw-small-radius);
+  background: transparent;
+  color: var(--rw-text-secondary);
+  font: inherit;
+  font-size: 11px;
+  cursor: default;
+  -webkit-app-region: no-drag;
+
+  span {
+    color: var(--rw-text);
+  }
+
+  &:active,
+  &.selected {
+    background: var(--rw-control-bg);
+  }
+
+  &.selected {
+    color: var(--rw-accent);
+  }
+}
+
+.settings-scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: var(--rw-box-gap);
+  padding: var(--rw-pad) max(var(--rw-pad), calc((100% - 544px) / 2));
+
+  // 정보 탭은 kit RunnersAbout 이 제 여백(28)을 가진다.
+  &.settings-scroll--about {
+    padding: 0 max(0px, calc((100% - 600px) / 2));
+  }
+}
+
+.settings-group {
+  flex: none;
+}
+
+.settings-group-title {
+  margin: 0 0 var(--rw-section-gap);
+  padding: 0 2px;
+  font-size: var(--rw-font-small);
+  font-weight: 600;
+  line-height: 14px;
+  color: var(--rw-text-secondary);
+}
+
+// 메뉴 막대 아이콘을 끄기 전에 묻는 창(Split 설정 창의 .alert 와 같은 값).
+.alert-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.12);
+}
+
+.alert {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 260px;
+  padding: 20px 16px 16px;
+  border-radius: 12px;
+  background: var(--alert-bg);
+  box-shadow:
+    0 0 0 0.5px var(--rw-separator),
+    0 12px 36px rgba(0, 0, 0, 0.28);
+  text-align: center;
+  font-size: 13px;
+}
+
+.alert-icon {
+  width: 56px;
+  height: 56px;
+}
+
+.alert-message {
+  margin-top: 12px;
+  font-weight: 600;
+}
+
+.alert-informative {
+  margin-top: 6px;
+  font-size: 11px;
+  color: var(--rw-text-secondary);
+}
+
+.alert-buttons {
+  display: flex;
+  gap: 8px;
+  width: 100%;
+  margin-top: 16px;
+
+  .rw-button {
+    flex: 1;
+  }
+}
+
+// 흰 카드 한 장과 그 안의 줄. 줄 모양(글자 · 스위치 · 단추)은 Draw 의 예전 설정 창 그대로다.
+.settings-section {
+  background: var(--rw-box-bg);
+  border: var(--rw-border) solid var(--rw-separator);
+  border-radius: var(--rw-radius);
+  padding: 0 var(--rw-row-pad-x);
+
+  .settings-item {
     display: flex;
+    align-items: center;
+    height: 30px;
+    padding: 12px 0;
+    border-bottom: var(--rw-border) solid var(--rw-separator);
 
-    .settings-page {
-      height: 100%;
-      width: 100%;
-      display: flex;
+    &:last-child {
+      border-bottom: none;
     }
 
-    .settings-sidebar-wrapper {
-      height: 100%;
-      padding: var(--space-lg);
-      box-sizing: border-box;
+    .settings-item-hint {
+      display: flex;
+      margin: 4px 10px 0 0;
 
-      .settings-sidebar {
-        display: flex;
-        flex-direction: column;
-        width: 210px;
-        height: 100%;
-        user-select: none;
-        box-sizing: border-box;
-        background-color: var(--gray-50);
-        border: 2px solid var(--gray-75);
-        border-radius: 14px;
-        box-shadow: 2px 2px 8px var(--shadow-ambient-strong);
-        padding: var(--space-lg);
-
-        .settings-sidebar-item {
-          display: flex;
-          align-items: center;
-          height: 40px;
-          padding: 0 var(--space-lg);
-          font-size: 13px;
-          font-weight: 500;
-
-          &.active {
-            background-color: var(--gray-100);
-            border-right: 4px solid var(--blue-500);
-            border-radius: 10px;
-          }
-
-          .icon {
-            width: 16px;
-            height: 16px;
-            background-color: var(--gray-300);
-            border: 1px solid var(--gray-500);
-            border-radius: 5px;
-            margin-inline-end: 8px;
-            padding: 2px 4px;
-          }
-        }
-
-        .settings-sidebar-version {
-          margin-top: auto;
-          font-size: 12px;
-          color: var(--gray-500);
-          border: 1px solid var(--gray-400);
-          border-radius: 30px;
-          text-align: center;
-          font-weight: 600;
-          padding: var(--space-lg);
-
-          &:hover {
-            color: var(--gray-600);
-          }
-        }
+      svg {
+        width: 16px;
+        height: 16px;
       }
     }
 
-    .settings-container-wrapper {
+    .settings-item-info {
       flex: 1;
       min-width: 0;
-      padding: var(--space-lg) 20px var(--space-lg) var(--space-lg);
+      padding-right: var(--space-lg);
 
-      .settings-container {
-        display: flex;
-        flex-direction: column;
-        height: 100%;
-        box-sizing: border-box;
+      .settings-item-title {
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--gray-700);
+      }
 
-        .settings-header {
-          margin-top: var(--space-lg);
-          margin-bottom: var(--space-lg);
+      .settings-item-description {
+        margin: 3px 0 0 0;
+        color: var(--gray-600);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+    }
 
-          .settings-title {
-            font-size: 13px;
-            font-weight: 500;
+    .settings-item-control {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+
+      .toggle {
+        position: relative;
+        width: 44px;
+        height: 24px;
+        background-color: var(--gray-400);
+        border-radius: 12px;
+        cursor: pointer;
+        transition: background-color 0.2s ease;
+
+        &::after {
+          content: '';
+          position: absolute;
+          top: 2px;
+          left: 2px;
+          width: 20px;
+          height: 20px;
+          background-color: var(--gray-25);
+          border-radius: 50%;
+          transition: transform 0.3s ease;
+        }
+
+        &.active {
+          background-color: var(--blue-500);
+
+          &::after {
+            transform: translateX(20px);
           }
         }
 
-        .settings-content {
-          .settings-section {
+        &:active::after {
+          transform: scale(0.95);
+        }
+      }
+
+      .button {
+        padding: 6px 16px;
+        border: 1px solid var(--gray-400);
+        border-radius: 4px;
+        background-color: var(--gray-25);
+        color: var(--gray-500);
+        font-family: var(--font-primary);
+        font-size: 12px;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+
+        &:hover {
+          background-color: var(--gray-100);
+        }
+
+        &:active {
+          background-color: var(--gray-250);
+          transform: translateY(1px);
+        }
+      }
+
+      .selectbar-container {
+        position: relative;
+
+        .selectbar {
+          padding: 6px 16px;
+          border: 1px solid var(--gray-400);
+          border-radius: 4px;
+          background-color: var(--gray-25);
+          color: var(--gray-500);
+          font-family: var(--font-primary);
+          font-size: 12px;
+          cursor: pointer;
+
+          max-width: 130px;
+          text-overflow: ellipsis;
+          white-space: nowrap;
+          overflow: hidden;
+
+          appearance: none;
+          padding-right: 24px;
+
+          &:hover {
             background-color: var(--gray-100);
-            border-radius: 14px;
-            padding: 2px 15px;
-            border: 2px solid var(--gray-75);
+          }
+        }
 
-            .settings-item {
-              display: flex;
-              align-items: center;
-              height: 30px;
-              padding: 12px 0;
-              border-bottom: 1px solid var(--gray-300);
+        .selectbar-arrow {
+          display: flex;
+          position: absolute;
+          top: calc(50% - 6px);
+          right: 6px;
+          pointer-events: none;
 
-              &:last-child {
-                border-bottom: none;
-              }
-
-              .settings-item-hint {
-                display: flex;
-                margin: 4px 10px 0 0;
-
-                svg {
-                  width: 16px;
-                  height: 16px;
-                }
-              }
-
-              .settings-item-info {
-                flex: 1;
-                min-width: 0;
-                padding-right: var(--space-lg);
-
-                .settings-item-title {
-                  font-size: 13px;
-                  font-weight: 500;
-                  color: var(--gray-700);
-                }
-
-                .settings-item-description {
-                  margin: 3px 0 0 0;
-                  color: var(--gray-600);
-                  overflow: hidden;
-                  text-overflow: ellipsis;
-                  white-space: nowrap;
-                }
-              }
-
-              .settings-item-control {
-                display: flex;
-                align-items: center;
-                gap: var(--space-sm);
-
-                .toggle {
-                  position: relative;
-                  width: 44px;
-                  height: 24px;
-                  background-color: var(--gray-400);
-                  border-radius: 12px;
-                  cursor: pointer;
-                  transition: background-color 0.2s ease;
-
-                  &::after {
-                    content: '';
-                    position: absolute;
-                    top: 2px;
-                    left: 2px;
-                    width: 20px;
-                    height: 20px;
-                    background-color: var(--gray-25);
-                    border-radius: 50%;
-                    transition: transform 0.3s ease;
-                  }
-
-                  &.active {
-                    background-color: var(--blue-500);
-
-                    &::after {
-                      transform: translateX(20px);
-                    }
-                  }
-
-                  &:active::after {
-                    transform: scale(0.95);
-                  }
-                }
-
-                .button {
-                  padding: 6px 16px;
-                  border: 1px solid var(--gray-400);
-                  border-radius: 4px;
-                  background-color: var(--gray-25);
-                  color: var(--gray-500);
-                  font-family: var(--font-primary);
-                  font-size: 12px;
-                  cursor: pointer;
-                  transition: transform 0.3s ease;
-
-                  &:hover {
-                    background-color: var(--gray-100);
-                  }
-
-                  &:active {
-                    background-color: var(--gray-250);
-                    transform: translateY(1px);
-                  }
-                }
-
-                .selectbar-container {
-                  position: relative;
-
-                  .selectbar {
-                    padding: 6px 16px;
-                    border: 1px solid var(--gray-400);
-                    border-radius: 4px;
-                    background-color: var(--gray-25);
-                    color: var(--gray-500);
-                    font-family: var(--font-primary);
-                    font-size: 12px;
-                    cursor: pointer;
-
-                    max-width: 130px;
-                    text-overflow: ellipsis;
-                    white-space: nowrap;
-                    overflow: hidden;
-
-                    appearance: none;
-                    padding-right: 24px;
-
-                    &:hover {
-                      background-color: var(--gray-100);
-                    }
-                  }
-
-                  .selectbar-arrow {
-                    display: flex;
-                    position: absolute;
-                    top: calc(50% - 6px);
-                    right: 6px;
-                    pointer-events: none;
-
-                    .icon {
-                      width: 12px;
-                      height: 12px;
-                      color: var(--gray-500);
-                    }
-                  }
-                }
-
-                .stepper-container {
-                  user-select: none;
-
-                  display: flex;
-                  height: 27px;
-                  background-color: var(--gray-25);
-                  border: 1px solid var(--gray-400);
-                  border-radius: 4px;
-                  overflow: hidden;
-
-                  .stepper-button {
-                    cursor: pointer;
-
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 30px;
-                    background-color: var(--gray-50);
-
-                    &:active {
-                      background-color: var(--gray-100);
-                    }
-
-                    .stepper-button--icon {
-                      width: 10px;
-                      height: 10px;
-                      color: var(--gray-500);
-                    }
-                  }
-
-                  .stepper-value {
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    width: 45px;
-                    color: var(--gray-500);
-                    font-weight: 600;
-
-                    border-left: 1px solid var(--gray-400);
-                    border-right: 1px solid var(--gray-400);
-                  }
-                }
-
-                .icon {
-                  width: 16px;
-                  height: 16px;
-                  cursor: pointer;
-                  color: var(--gray-500);
-
-                  &:hover {
-                    color: var(--gray-700);
-                  }
-
-                  &.icon--disabled {
-                    cursor: default;
-
-                    &:hover {
-                      color: var(--gray-500);
-                    }
-                  }
-                }
-
-                .shortcut-recorder {
-                  display: flex;
-                  align-items: center;
-
-                  .record-block {
-                    cursor: pointer;
-                    padding: var(--space-sm);
-                    border-radius: 5px;
-                    color: var(--gray-500);
-                    transition: background-color 0.3s ease;
-
-                    &:hover {
-                      background-color: var(--gray-250);
-                    }
-
-                    &.recording {
-                      color: var(--gray-500);
-
-                      .hotkey-pill {
-                        .key {
-                          color: var(--blue-500);
-                          border-color: var(--blue-500);
-                          animation: slideUp 0.3s ease;
-                        }
-                      }
-                    }
-
-                    .placeholder {
-                      padding: 5px;
-                      font-size: 12px;
-                    }
-
-                    .hotkey-pill {
-                      display: inline-flex;
-                      align-items: center;
-                      gap: var(--space-sm);
-
-                      .key {
-                        width: 22px;
-                        height: 22px;
-                        display: flex;
-                        align-items: center;
-                        font-size: 12px;
-                        justify-content: center;
-                        border: 1px solid var(--gray-400);
-                        background-color: var(--gray-25);
-                        border-radius: 4px;
-                      }
-                    }
-                  }
-
-                  .shortcut-input {
-                    position: absolute;
-                    opacity: 0;
-                    width: 1px;
-                    height: 1px;
-                    border: 0;
-                    padding: 0;
-                  }
-                }
-
-                .color-swatches {
-                  display: flex;
-                  gap: var(--space-sm);
-                  align-items: center;
-
-                  .color-swatch {
-                    cursor: pointer;
-                    width: 24px;
-                    height: 24px;
-                    box-sizing: border-box;
-                    padding: 0;
-                    border: 1px solid var(--gray-400);
-                    border-radius: 4px;
-
-                    &.color-rainbow {
-                      background-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
-                    }
-                  }
-                }
-
-                .buttons-group {
-                  display: flex;
-                  gap: var(--space-sm);
-                }
-              }
-            }
-
-            .toolbar-colors-control {
-              display: flex;
-
-              .toolbar-color-slot-anchor {
-                position: relative;
-
-                display: flex;
-                justify-content: center;
-                align-items: center;
-                width: 26px;
-                height: 26px;
-                margin: 2px;
-                padding: 2px;
-                border: 1px solid transparent;
-
-                &.active {
-                  border-color: var(--gray-400);
-                  border-radius: 5px;
-                }
-
-                .toolbar-color-slot {
-                  width: 24px;
-                  height: 24px;
-                  box-sizing: border-box;
-                  padding: 0;
-                  border: 1px solid var(--gray-400);
-                  border-radius: 4px;
-                  cursor: pointer;
-                }
-              }
-            }
-
-            .settings-item--nested {
-              border-top: 1px solid var(--gray-25);
-              border-bottom: 1px solid var(--gray-25);
-
-              .settings-item--forward {
-                display: flex;
-                justify-content: center;
-                width: 25px;
-                margin-inline-end: 5px;
-                pointer-events: none;
-
-                .icon {
-                  width: 12px;
-                  height: 12px;
-                  color: var(--gray-500);
-                }
-              }
-
-              &:last-child {
-                border-bottom: none;
-              }
-            }
-
-            .settings-item--nested + .settings-item {
-              border-top: 1px solid var(--gray-300);
-            }
+          .icon {
+            width: 12px;
+            height: 12px;
+            color: var(--gray-500);
           }
         }
       }
+
+      .stepper-container {
+        user-select: none;
+
+        display: flex;
+        height: 27px;
+        background-color: var(--gray-25);
+        border: 1px solid var(--gray-400);
+        border-radius: 4px;
+        overflow: hidden;
+
+        .stepper-button {
+          cursor: pointer;
+
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 30px;
+          background-color: var(--gray-50);
+
+          &:active {
+            background-color: var(--gray-100);
+          }
+
+          .stepper-button--icon {
+            width: 10px;
+            height: 10px;
+            color: var(--gray-500);
+          }
+        }
+
+        .stepper-value {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          width: 45px;
+          color: var(--gray-500);
+          font-weight: 600;
+
+          border-left: 1px solid var(--gray-400);
+          border-right: 1px solid var(--gray-400);
+        }
+      }
+
+      .icon {
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+        color: var(--gray-500);
+
+        &:hover {
+          color: var(--gray-700);
+        }
+
+        &.icon--disabled {
+          cursor: default;
+
+          &:hover {
+            color: var(--gray-500);
+          }
+        }
+      }
+
+      .shortcut-recorder {
+        display: flex;
+        align-items: center;
+
+        .record-block {
+          cursor: pointer;
+          padding: var(--space-sm);
+          border-radius: 5px;
+          color: var(--gray-500);
+          transition: background-color 0.3s ease;
+
+          &:hover {
+            background-color: var(--gray-250);
+          }
+
+          &.recording {
+            color: var(--gray-500);
+
+            .hotkey-pill {
+              .key {
+                color: var(--blue-500);
+                border-color: var(--blue-500);
+                animation: slideUp 0.3s ease;
+              }
+            }
+          }
+
+          .placeholder {
+            padding: 5px;
+            font-size: 12px;
+          }
+
+          .hotkey-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+
+            .key {
+              width: 22px;
+              height: 22px;
+              display: flex;
+              align-items: center;
+              font-size: 12px;
+              justify-content: center;
+              border: 1px solid var(--gray-400);
+              background-color: var(--gray-25);
+              border-radius: 4px;
+            }
+          }
+        }
+
+        .shortcut-input {
+          position: absolute;
+          opacity: 0;
+          width: 1px;
+          height: 1px;
+          border: 0;
+          padding: 0;
+        }
+      }
+
+      .color-swatches {
+        display: flex;
+        gap: var(--space-sm);
+        align-items: center;
+
+        .color-swatch {
+          cursor: pointer;
+          width: 24px;
+          height: 24px;
+          box-sizing: border-box;
+          padding: 0;
+          border: 1px solid var(--gray-400);
+          border-radius: 4px;
+
+          &.color-rainbow {
+            background-image: conic-gradient(red, yellow, lime, aqua, blue, magenta, red);
+          }
+        }
+      }
+
+      .buttons-group {
+        display: flex;
+        gap: var(--space-sm);
+      }
     }
+  }
+
+  .toolbar-colors-control {
+    display: flex;
+
+    .toolbar-color-slot-anchor {
+      position: relative;
+
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      width: 26px;
+      height: 26px;
+      margin: 2px;
+      padding: 2px;
+      border: 1px solid transparent;
+
+      &.active {
+        border-color: var(--gray-400);
+        border-radius: 5px;
+      }
+
+      .toolbar-color-slot {
+        width: 24px;
+        height: 24px;
+        box-sizing: border-box;
+        padding: 0;
+        border: 1px solid var(--gray-400);
+        border-radius: 4px;
+        cursor: pointer;
+      }
+    }
+  }
+
+  .settings-item--nested {
+    border-top: 1px solid var(--gray-25);
+    border-bottom: 1px solid var(--gray-25);
+
+    .settings-item--forward {
+      display: flex;
+      justify-content: center;
+      width: 25px;
+      margin-inline-end: 5px;
+      pointer-events: none;
+
+      .icon {
+        width: 12px;
+        height: 12px;
+        color: var(--gray-500);
+      }
+    }
+
+    &:last-child {
+      border-bottom: none;
+    }
+  }
+
+  .settings-item--nested + .settings-item {
+    border-top: 1px solid var(--gray-300);
   }
 }
 

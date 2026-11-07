@@ -2,14 +2,7 @@ import { resolve } from 'node:path'
 import { defineConfig } from 'electron-vite'
 import react from '@vitejs/plugin-react'
 
-const pages = [
-  'app_page',
-  'extended_toolbar_page',
-  'about_page',
-  'settings_page',
-  'panel_page',
-  'update_page'
-]
+const pages = ['app_page', 'extended_toolbar_page', 'settings_page', 'panel_page', 'update_page']
 
 export default defineConfig({
   main: {

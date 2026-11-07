@@ -21,6 +21,10 @@ const api = {
     ipcRenderer.invoke('can_register_shortcut', accelerator),
   setLaunchOnLogin: (value: unknown) => ipcRenderer.invoke('set_launch_on_login', value),
   setAutoCheckUpdates: (value: unknown) => ipcRenderer.invoke('set_auto_check_updates', value),
+  checkUpdate: () => ipcRenderer.invoke('check_update'),
+  // 메인이 실제로 바꾼 값(아이콘이 지금 보이는가)을 돌려준다.
+  setShowTrayIcon: (value: boolean): Promise<boolean> =>
+    ipcRenderer.invoke('set_show_tray_icon', value),
   setStartsHidden: (value: unknown) => ipcRenderer.invoke('set_starts_hidden', value),
   setClearDrawingsOnHide: (value: unknown) =>
     ipcRenderer.invoke('set_clear_drawings_on_hide', value),
@@ -57,6 +61,18 @@ const api = {
     ipcRenderer.on('account_changed', listener)
     return () => {
       ipcRenderer.removeListener('account_changed', listener)
+    }
+  },
+
+  // 정보 탭(kit RunnersAbout)이 쓰는 값.
+  getVersion: (): Promise<string> => ipcRenderer.invoke('get_app_version'),
+  openExternal: (url: string) => ipcRenderer.invoke('open_external', url),
+  // 이미 열린 설정 창에 다른 탭을 열라고 할 때(예: 앱 메뉴의 「Draw 정보」).
+  onOpenTab: (callback: (tab: string) => void) => {
+    const listener = (_event: unknown, tab: string) => callback(tab)
+    ipcRenderer.on('open_settings_tab', listener)
+    return () => {
+      ipcRenderer.removeListener('open_settings_tab', listener)
     }
   },
 

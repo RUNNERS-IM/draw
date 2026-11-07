@@ -1,20 +1,8 @@
 import type { ComponentType } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import {
-  Pencil,
-  MousePointer2,
-  PanelLeft,
-  Trash2,
-  LogIn,
-  RefreshCw,
-  Info,
-  Download,
-  Settings,
-  CircleHelp,
-  Power
-} from 'lucide-react'
-import { MenuHead, MenuItem, MenuSeparator, MenuSwitch } from '../../runners-account/runners-menu'
+import { Pencil, MousePointer2, PanelLeft, Trash2, Settings, CircleHelp, Power } from 'lucide-react'
+import { MenuHead, MenuItem, MenuSeparator } from '../../runners-account/runners-menu'
 import { useTranslation } from 'react-i18next'
 import './panel.css'
 import { applyTextDirection } from '../i18n'
@@ -25,6 +13,7 @@ const icon = (Icon: ComponentType<any>) => <Icon strokeWidth={1.5} />
 const api = window.electronAPI
 
 // 메뉴 막대 아이콘을 누르면 뜨는 패널. 줄 값은 runners-menu.css(글자 13 · 줄 32 · 폭 300)를 그대로 쓴다.
+// 맨 위는 그리기 시작 · 끝내기, 켬/끔 스위치는 설정 › 일반에만 둔다(2026-11-08 창 통일 2A).
 const Panel = () => {
   const { t } = useTranslation()
   const [state, setState] = useState<any>(null)
@@ -56,30 +45,6 @@ const Panel = () => {
   return (
     <main className="panel" ref={root}>
       <MenuHead name="Draw" sub={state.version} />
-      <MenuSwitch
-        icon={icon(LogIn)}
-        label={t('panel.login')}
-        checked={state.launchOnLogin}
-        onChange={(value) => {
-          setState({ ...state, launchOnLogin: value })
-          api.setLaunchOnLogin(value)
-        }}
-      />
-      <MenuSwitch
-        icon={icon(RefreshCw)}
-        label={t('panel.autoUpdate')}
-        checked={state.autoCheckUpdates}
-        onChange={(value) => {
-          setState({ ...state, autoCheckUpdates: value })
-          api.setAutoCheckUpdates(value)
-        }}
-      />
-      <MenuSeparator />
-      <div className="panel-status">
-        <span className={`panel-dot${state.drawing ? ' on' : ''}`} />
-        {state.drawing ? t('panel.statusDrawing') : t('panel.statusPointer')}
-      </div>
-      <MenuSeparator />
       <MenuItem
         icon={state.drawing ? icon(MousePointer2) : icon(Pencil)}
         label={state.drawing ? t('panel.stopDrawing') : t('panel.startDrawing')}
@@ -99,12 +64,6 @@ const Panel = () => {
         onSelect={run('clear')}
       />
       <MenuSeparator />
-      <MenuItem icon={icon(Info)} label={t('panel.about')} onSelect={run('about')} />
-      <MenuItem
-        icon={icon(Download)}
-        label={t('panel.checkUpdate')}
-        onSelect={run('check_update')}
-      />
       <MenuItem
         icon={icon(Settings)}
         label={t('panel.settings')}

@@ -1,6 +1,6 @@
 // 시험판 전용(DRAW_TEST_BUILD): 키보드 · 마우스를 흉내 내지 않고, 앱의 처리 함수를 불러 상태를 띄워 창마다 그림을 저장한다.
 // 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=<언어 코드>] Draw 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
-import { BrowserWindow, app as electronApp, nativeTheme, screen } from 'electron'
+import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
 import { askUpdate } from './updates'
@@ -97,7 +97,7 @@ export async function runTestShots(app: any) {
     const problem = () =>
       page("document.querySelector('.ra-error')?.textContent ?? '(없음)'") as Promise<string>
 
-    await page("document.querySelectorAll('.settings-sidebar-item')[3].click()")
+    await page("document.querySelectorAll('.settings-toolbar-item')[2].click()")
     await wait(500)
     await shot(settingsWindow, `${theme}-8-설정-계정`)
     await page("document.querySelector('.settings-item-control .button').click()")
@@ -144,6 +144,85 @@ export async function runTestShots(app: any) {
     )
   }
 
+  // 설정 창 하나(2026-11-08 창 통일): 그리기 · 일반 · 계정 · 정보 탭, 메뉴 막대 아이콘 끄기 · 켜기, ⌘, 메뉴.
+  const settingsScenes = async (theme: string) => {
+    app.showSettingsWindow()
+    await wait(1500)
+    const { settingsWindow } = app.getWindows()
+    const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+    const tab = async (index: number) => {
+      await page(`document.querySelectorAll('.settings-toolbar-item')[${index}].click()`)
+      await wait(500)
+    }
+    note(
+      `[${theme}] 설정 창: 크기=${JSON.stringify(settingsWindow.getContentSize())}, 탭=${await page("[...document.querySelectorAll('.settings-toolbar-item')].map((b) => b.textContent).join(' · ')")}, 제목 줄=${await page("document.querySelector('.settings-titlebar')?.textContent ?? '(없음)'")}`
+    )
+    await shot(settingsWindow, `${theme}-8-설정-그리기-위`)
+    await page("document.querySelector('.settings-scroll').scrollTop = 99999")
+    await wait(300)
+    await shot(settingsWindow, `${theme}-8-설정-그리기-아래`)
+
+    await tab(1)
+    await shot(settingsWindow, `${theme}-8-설정-일반`)
+
+    // 메뉴 막대 아이콘 끄기: 스위치를 누르면 묻는 창이 뜨고, 확인을 누르면 메인이 아이콘을 없앤다.
+    const toggle =
+      "document.querySelectorAll('.settings-section')[0].querySelectorAll('.settings-item')[2].querySelector('.toggle')"
+    await page(`${toggle}.click()`)
+    await wait(400)
+    note(
+      `[${theme}] 아이콘 끄기 누름: 묻는 창=${await page("document.querySelector('.alert-message')?.textContent ?? '(없음)'")}, 아이콘 보임=${app.isTrayShown()}`
+    )
+    await shot(settingsWindow, `${theme}-8-설정-일반-아이콘끄기확인`)
+    await page("document.querySelector('.alert-buttons .rw-button.default').click()")
+    await wait(600)
+    note(
+      `[${theme}] 아이콘 끄기 확인: 아이콘 보임=${app.isTrayShown()}, 스위치 켜짐=${await page(`${toggle}.classList.contains('active')`)}`
+    )
+
+    // 아이콘을 숨긴 채 Draw 를 다시 열면(두 번째 실행 · 맥 activate) 설정 › 일반이 열린다.
+    await tab(0)
+    app.openedAgain()
+    await wait(800)
+    note(
+      `[${theme}] 아이콘 숨김 중 다시 열기: 설정 창 보임=${settingsWindow.isVisible()}, 탭=${await page("document.querySelector('.settings-toolbar-item.selected')?.textContent")}, 그리는 중=${app.isDrawing()}`
+    )
+    await page(`${toggle}.click()`)
+    await wait(600)
+    note(
+      `[${theme}] 아이콘 다시 켜기: 아이콘 보임=${app.isTrayShown()}, 묻는 창=${await page("Boolean(document.querySelector('.alert'))")}`
+    )
+
+    await accountScenes(settingsWindow, theme)
+
+    await tab(3)
+    await wait(600)
+    await shot(settingsWindow, `${theme}-8-설정-정보`)
+    await page("document.querySelector('.about-notices-link').click()")
+    await wait(600)
+    await shot(settingsWindow, `${theme}-8-설정-정보-오픈소스고지`)
+    await page("document.querySelector('.notices-close').click()")
+    await wait(300)
+    settingsWindow.close()
+    await wait(400)
+
+    // ⌘, : 맥은 앱 메뉴 단축키로 연다. 메뉴 줄의 단축키와 처리 함수를 불러 설정 창이 뜨는지 본다.
+    const settingsItem = Menu.getApplicationMenu()
+      ?.items.flatMap((item) => item.submenu?.items ?? [])
+      .find((item) => item.accelerator === app.settingsAccelerator)
+    note(
+      `[${theme}] ⌘, 메뉴 줄: 글=${settingsItem?.label ?? '(없음)'}, 단축키=${settingsItem?.accelerator ?? '(없음)'}`
+    )
+    settingsItem?.click()
+    await wait(1500)
+    const reopened = app.getWindows().settingsWindow
+    note(
+      `[${theme}] ⌘, 처리 함수: 설정 창 열림=${Boolean(reopened?.isVisible())}, 탭=${reopened ? await reopened.webContents.executeJavaScript("document.querySelector('.settings-toolbar-item.selected')?.textContent") : '(없음)'}`
+    )
+    reopened?.close()
+    await wait(400)
+  }
+
   const shot = async (window: Electron.BrowserWindow, name: string) => {
     note(
       `  [${name}] 숨김=${electronApp.isHidden()} 보임=${window.isVisible()} 자리=${JSON.stringify(window.getBounds())} 맨앞=${window.isFocused()}`
@@ -185,10 +264,21 @@ export async function runTestShots(app: any) {
       await wait(800)
       await shot(panelWindow, `${theme}-2-패널-클릭모드`)
       await wait(Number(process.env.DRAW_TEST_HOLD_MS || 0))
-      app.hidePanel()
+      const panelRows = () =>
+        panelWindow.webContents.executeJavaScript(
+          "[...document.querySelectorAll('.rm-head, .rm-item, .rm-separator')].map((node) => node.classList.contains('rm-separator') ? '—' : node.textContent).join(' | ')"
+        )
+      note(`[${theme}] 패널 줄(클릭 모드): ${await panelRows()}`)
+
+      // 패널 맨 위 「그리기 시작」 줄을 누르면 패널이 닫히고 그리기 모드가 된다.
+      await panelWindow.webContents.executeJavaScript("document.querySelector('.rm-item').click()")
+      await wait(1200)
+      note(
+        `[${theme}] 패널 「그리기 시작」 누름: 패널 보임=${panelWindow.isVisible()}, 그리는 중=${app.isDrawing()}`
+      )
 
       app.enableDrawMode()
-      await wait(1200)
+      await wait(400)
       note(
         `[${theme}] 그리기 모드: 그림판 창 보임=${mainWindow.isVisible()}, 그리는 중=${app.isDrawing()}`
       )
@@ -271,39 +361,10 @@ export async function runTestShots(app: any) {
       app.showPanel()
       await wait(800)
       await shot(panelWindow, `${theme}-6-패널-그리는중`)
+      note(`[${theme}] 패널 줄(그리는 중): ${await panelRows()}`)
       app.hidePanel()
 
-      app.showAboutWindow()
-      await wait(1800)
-      const { aboutWindow } = app.getWindows()
-      await shot(aboutWindow, `${theme}-7-정보창`)
-      note(`[${theme}] 정보 창 크기=${JSON.stringify(aboutWindow.getContentSize())}`)
-      await aboutWindow.webContents.executeJavaScript(
-        "document.querySelector('.about-notices-link').click()"
-      )
-      await wait(600)
-      await shot(aboutWindow, `${theme}-7-정보창-오픈소스고지`)
-      await wait(Number(process.env.DRAW_TEST_HOLD_MS || 0))
-      aboutWindow.close()
-      await wait(400)
-
-      app.showSettingsWindow()
-      await wait(1500)
-      const { settingsWindow } = app.getWindows()
-      await shot(settingsWindow, `${theme}-8-설정-단축키`)
-      for (const [index, name] of [
-        [1, '모양'],
-        [2, '앱']
-      ]) {
-        await settingsWindow.webContents.executeJavaScript(
-          `document.querySelectorAll('.settings-sidebar-item')[${index}].click()`
-        )
-        await wait(400)
-        await shot(settingsWindow, `${theme}-8-설정-${name}`)
-      }
-      await accountScenes(settingsWindow, theme)
-      settingsWindow.close()
-      await wait(400)
+      await settingsScenes(theme)
 
       const notes = ['왼쪽 도구 막대를 고쳤습니다.', '패널 글을 다듬었습니다.']
       const updateWindow = () =>

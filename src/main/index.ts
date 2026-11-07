@@ -85,8 +85,12 @@ const HELP_URL = 'https://github.com/RUNNERS-IM/draw/issues'
 // 「로그인할 때 열기」를 처음 한 번 켰다는 표시 파일(앱 데이터 폴더).
 const LAUNCH_ON_LOGIN_APPLIED = 'open-at-login-default'
 
-const ABOUT_WIDTH = 520
-const ABOUT_HEIGHT = 560
+// 설정 창 크기는 Split 설정 창과 같다(2026-11-08 창 통일 결정).
+const SETTINGS_WIDTH = 656
+const SETTINGS_HEIGHT = 700
+const SETTINGS_MIN_HEIGHT = 420
+const SETTINGS_TABS = ['draw', 'general', 'account', 'about'] as const
+type SettingsTab = (typeof SETTINGS_TABS)[number]
 
 let lastShortcutTime = 0
 const throttleDelay = 250
@@ -251,6 +255,10 @@ const schema = {
     type: 'boolean',
     default: false
   },
+  show_tray_icon: {
+    type: 'boolean',
+    default: true
+  },
   clear_drawings_on_hide: {
     type: 'boolean',
     default: false
@@ -294,11 +302,12 @@ if (isLoggingEnabled) {
   })
 }
 
-let tray: Tray
+let tray: Tray | null = null
 let mainWindow: BrowserWindow
 let extendedToolbarWindow: BrowserWindow
-let aboutWindow: BrowserWindow | null = null
 let settingsWindow: BrowserWindow | null = null
+// 설정 창이 처음 열릴 때 보여 줄 탭. 화면이 get_configuration 으로 한 번 받아 간다.
+let settingsTab: SettingsTab = 'draw'
 let panelWindow: BrowserWindow
 let panelOpenedAt = 0
 let panelClosedAt = 0
@@ -413,13 +422,13 @@ function updateContextMenu() {
     {
       label: withAccelHint(t('panel.settings'), KEY_SETTINGS),
       accelerator: accelForTray(KEY_SETTINGS),
-      click: showSettingsWindow
+      click: () => showSettingsWindow()
+    },
+    {
+      label: t('panel.help'),
+      click: () => shell.openExternal(HELP_URL)
     },
     { type: 'separator' },
-    {
-      label: t('panel.about'),
-      click: showAboutWindow
-    },
     {
       label: withAccelHint(t('panel.quit'), KEY_Q),
       accelerator: accelForTray(KEY_Q),
@@ -430,14 +439,27 @@ function updateContextMenu() {
   tray.setContextMenu(contextMenu)
 }
 
-function registerTrayActions() {
+function registerTrayTheme() {
   nativeTheme.on('updated', () => {
-    if (!tray) {
-      return
-    }
-
-    tray.setImage(getTrayIconPath())
+    tray?.setImage(getTrayIconPath())
   })
+}
+
+// 「메뉴 막대에 아이콘 보이기」를 끄면 아이콘을 없앤다. 다시 열 때는 Split 처럼 Draw 를 한 번 더 열면 설정이 뜬다.
+function updateTray() {
+  if (!store.get('show_tray_icon')) {
+    hidePanel()
+    tray?.destroy()
+    tray = null
+    return
+  }
+
+  if (tray) {
+    return
+  }
+
+  tray = new Tray(getTrayIconPath())
+  tray.setToolTip('Draw')
 
   if (isMac) {
     tray.on('click', togglePanel)
@@ -448,6 +470,33 @@ function registerTrayActions() {
     tray.on('click', () => {
       toggleDrawOrPointerMode()
     })
+  }
+
+  updateContextMenu()
+}
+
+function setShowTrayIcon(value: boolean) {
+  rawLog('Setting show tray icon:', value)
+
+  store.set('show_tray_icon', value)
+  updateTray()
+
+  return isTrayShown()
+}
+
+function isTrayShown() {
+  return !!tray && !tray.isDestroyed()
+}
+
+// Draw 를 다시 열었을 때: 아이콘을 숨겼으면 설정을 열어 되돌릴 길을 준다. 아이콘이 있으면 예전처럼 그리기를 켠다.
+function openedAgain() {
+  if (!store.get('show_tray_icon')) {
+    showSettingsWindow('general')
+    return
+  }
+
+  if (mainWindow) {
+    enableDrawMode()
   }
 }
 
@@ -503,6 +552,10 @@ function createPanelWindow() {
 }
 
 function placePanelUnderTray() {
+  if (!tray) {
+    return
+  }
+
   const [width, height] = panelWindow.getSize()
   const icon = tray.getBounds()
   const display = screen.getDisplayNearestPoint({ x: icon.x, y: icon.y })
@@ -567,8 +620,6 @@ function getPanelState() {
     version: app.getVersion(),
     drawing: drawingMode,
     showToolbar: store.get('show_tool_bar'),
-    launchOnLogin: store.get('launch_on_login'),
-    autoCheckUpdates: store.get('auto_check_updates'),
     keys: {
       draw: normalizeKeyForPanel(store.get('key_binding_show_hide_app')),
       toolbar: normalizeKeyForPanel(store.get('key_binding_show_hide_toolbar')),
@@ -609,8 +660,6 @@ const panelActions = {
   toggle_draw: () => toggleDrawOrPointerMode(),
   toggle_toolbar: () => toggleToolbar(),
   clear: () => resetScreen(),
-  about: () => showAboutWindow(),
-  check_update: () => checkNow(),
   settings: () => showSettingsWindow(),
   help: () => shell.openExternal(HELP_URL),
   quit: () => quitApp()
@@ -784,95 +833,23 @@ function createExtendedToolbarWindow() {
   })
 }
 
-function showAboutWindow() {
-  if (zoomModeStarting) {
-    return
-  }
-
-  withThrottle(() => {
-    if (aboutWindow) {
-      aboutWindow.focus()
-    } else {
-      createAboutWindow()
-    }
-
-    if (drawingMode) {
-      enablePointerMode()
-    }
-  })
-}
-
-function createAboutWindow() {
-  let hasDevTools = false
-
-  if (isDevelopment) {
-    hasDevTools = true
-  }
-
-  aboutWindow = new BrowserWindow({
-    show: false,
-    width: ABOUT_WIDTH,
-    height: ABOUT_HEIGHT,
-    useContentSize: true,
-    resizable: false,
-    minimizable: false,
-    maximizable: false,
-    fullscreenable: false,
-    autoHideMenuBar: true,
-    title: t('about.title'),
-    vibrancy: 'under-window',
-    visualEffectState: 'active',
-    backgroundColor: '#00000000',
-    webPreferences: {
-      devTools: hasDevTools,
-      nodeIntegration: false,
-      preload: preloadPath('about_page')
-    }
-  })
-  aboutWindow.center()
-  aboutWindow.on('page-title-updated', (event) => event.preventDefault())
-
-  aboutWindow.loadURL(pageUrl('about_page'))
-
-  aboutWindow.on('closed', () => {
-    aboutWindow = null
-  })
-
-  aboutWindow.webContents.on('did-finish-load', () => {
-    aboutWindow?.center()
-    if (isMac) {
-      app.focus({ steal: true })
-    }
-    aboutWindow?.show()
-    aboutWindow?.focus()
-  })
-
-  aboutWindow.webContents.setWindowOpenHandler((details) => {
-    shell.openExternal(details.url)
-
-    return { action: 'deny' }
-  })
-
-  aboutWindow.webContents.setVisualZoomLevelLimits(1, 1)
-  aboutWindow.webContents.on('before-input-event', (event, input) => {
-    if (
-      (input.control || input.meta) &&
-      ['+', '=', '-', '0', 'numadd', 'numsub'].includes(input.key.toLowerCase())
-    ) {
-      event.preventDefault()
-    }
-  })
-}
-
-function showSettingsWindow() {
+function showSettingsWindow(tab?: SettingsTab) {
   if (zoomModeStarting) {
     return
   }
 
   withThrottle(() => {
     if (settingsWindow) {
+      if (tab) {
+        settingsWindow.webContents.send('open_settings_tab', tab)
+      }
+      if (isMac) {
+        app.focus({ steal: true })
+      }
+      settingsWindow.show()
       settingsWindow.focus()
     } else {
+      settingsTab = tab ?? 'draw'
       createSettingsWindow()
     }
 
@@ -893,14 +870,17 @@ function createSettingsWindow() {
 
   settingsWindow = new BrowserWindow({
     show: false,
-    width: 800,
-    height: 560,
-    useContentSize: true,
-    resizable: false,
-    minimizable: false,
+    width: SETTINGS_WIDTH,
+    height: SETTINGS_HEIGHT,
+    minWidth: SETTINGS_WIDTH,
+    minHeight: SETTINGS_MIN_HEIGHT,
+    resizable: true,
     maximizable: false,
+    fullscreenable: false,
     autoHideMenuBar: true,
     title: t('settings.title'),
+    // 맥은 창 단추 옆에 제목을 그리지 않고, 화면이 가운데에 지금 탭 이름을 그린다(Split 과 같음).
+    ...(isMac ? { titleBarStyle: 'hidden' as const, trafficLightPosition: { x: 12, y: 10 } } : {}),
     webPreferences: {
       devTools: hasDevTools,
       nodeIntegration: false,
@@ -910,9 +890,17 @@ function createSettingsWindow() {
   settingsWindow.center()
 
   settingsWindow.loadURL(pageUrl('settings_page'))
+  settingsWindow.on('page-title-updated', (event) => event.preventDefault())
 
   settingsWindow.on('closed', () => {
     settingsWindow = null
+  })
+
+  // 정보 탭의 링크는 브라우저로 연다.
+  settingsWindow.webContents.setWindowOpenHandler((details) => {
+    shell.openExternal(details.url)
+
+    return { action: 'deny' }
   })
 
   settingsWindow.webContents.on('did-finish-load', () => {
@@ -941,11 +929,14 @@ if (!app.requestSingleInstanceLock()) {
 }
 
 app.on('second-instance', () => {
-  if (!mainWindow) {
-    return
-  }
+  openedAgain()
+})
 
-  enableDrawMode()
+// 맥에서 Finder · Launchpad 로 Draw 를 다시 열었을 때. 아이콘을 숨겼을 때만 설정을 연다.
+app.on('activate', () => {
+  if (!store.get('show_tray_icon')) {
+    showSettingsWindow('general')
+  }
 })
 
 app.commandLine.appendSwitch('disable-pinch')
@@ -968,9 +959,15 @@ app.whenReady().then(() => {
   createExtendedToolbarWindow()
   createPanelWindow()
 
-  tray = new Tray(getTrayIconPath())
+  setApplicationMenu()
+  registerTrayTheme()
+  updateTray()
   updateContextMenu()
-  registerTrayActions()
+
+  // 아이콘을 숨겨 둔 채 켜면 되돌릴 길이 보이도록 설정을 연다(Split 과 같음).
+  if (!store.get('show_tray_icon') && !startAsHidden) {
+    showSettingsWindow('general')
+  }
 
   startUpdates({
     store,
@@ -987,13 +984,15 @@ app.whenReady().then(() => {
       enablePointerMode,
       showPanel,
       hidePanel,
-      showAboutWindow,
       showSettingsWindow,
+      setShowTrayIcon,
+      isTrayShown,
+      openedAgain,
+      settingsAccelerator: settingsMenuAccelerator,
       getWindows: () => ({
         mainWindow,
         extendedToolbarWindow,
         panelWindow,
-        aboutWindow,
         settingsWindow
       }),
       isDrawing: () => drawingMode,
@@ -1079,12 +1078,6 @@ ipcMain.handle('fit_window_height', (event, height) => {
   return null
 })
 
-ipcMain.handle('close_window', (event) => {
-  BrowserWindow.fromWebContents(event.sender)?.close()
-
-  return null
-})
-
 // https 주소만 연다. 잘못된 값이 다른 프로그램을 띄우지 못하게 한다.
 ipcMain.handle('open_external', (_event, url) => {
   try {
@@ -1094,6 +1087,16 @@ ipcMain.handle('open_external', (_event, url) => {
   } catch {
     rawLog('Bad url:', url)
   }
+
+  return null
+})
+
+ipcMain.handle('set_show_tray_icon', (_event, value) => {
+  return setShowTrayIcon(!!value)
+})
+
+ipcMain.handle('check_update', () => {
+  checkNow()
 
   return null
 })
@@ -1266,6 +1269,9 @@ ipcMain.handle('get_configuration', () => {
 
   return {
     app_version: app.getVersion(),
+    is_mac: isMac,
+    open_tab: settingsTab,
+    show_tray_icon: store.get('show_tray_icon'),
 
     show_drawing_border: store.get('show_drawing_border'),
     cute_cursor_mode: store.get('cute_cursor_mode'),
@@ -1538,7 +1544,7 @@ ipcMain.handle('set_app_icon_color', (_event, value) => {
 
   store.set('app_icon_color', value)
 
-  tray.setImage(getTrayIconPath())
+  tray?.setImage(getTrayIconPath())
   return null
 })
 
@@ -1769,7 +1775,9 @@ function resetApp() {
       safeSetLoginItemSettings({ openAtLogin: false })
     }
 
-    tray.setImage(getTrayIconPath())
+    // 처음 설정으로 돌리면 아이콘 보이기도 켬으로 돌아온다.
+    updateTray()
+    tray?.setImage(getTrayIconPath())
 
     const { width, height } = getExtendedToolbarWindowSize()
     extendedToolbarWindow.setSize(width, height)
@@ -1780,6 +1788,8 @@ function resetApp() {
     extendedToolbarWindow.reload()
 
     if (settingsWindow) {
+      // 「처음 설정으로」 단추가 있는 일반 탭에 그대로 둔다.
+      settingsTab = 'general'
       settingsWindow.reload()
     }
   })
@@ -2066,11 +2076,6 @@ function releaseFocusBack() {
     return
   }
 
-  if (aboutWindow) {
-    aboutWindow.focus()
-    return
-  }
-
   app.hide()
 }
 
@@ -2319,6 +2324,49 @@ function safeRegisterGlobalShortcut(accelerator: string, callback: (...args: any
   } catch (error) {
     rawLog('Error registering global shortcut:', accelerator, error)
   }
+}
+
+// ⌘, 는 어느 Draw 창이 앞이든 설정을 연다. 맥은 앱 메뉴의 단축키로, 윈도우 · 리눅스는 창마다 키를 받아서 한다.
+const settingsMenuAccelerator = KEY_SETTINGS
+
+function setApplicationMenu() {
+  if (!isMac) {
+    app.on('web-contents-created', (_event, contents) => {
+      contents.on('before-input-event', (event, input) => {
+        if (input.type === 'keyDown' && input.control && !input.alt && input.key === ',') {
+          event.preventDefault()
+          showSettingsWindow()
+        }
+      })
+    })
+    return
+  }
+
+  // Draw 는 메뉴 막대에 자기 메뉴를 보이지 않지만, 앞에 있을 때 앱 메뉴의 단축키(⌘, · 복사 · 붙여넣기)는 쓴다.
+  Menu.setApplicationMenu(
+    Menu.buildFromTemplate([
+      {
+        label: 'Draw',
+        submenu: [
+          { label: t('panel.about'), click: () => showSettingsWindow('about') },
+          { type: 'separator' },
+          {
+            label: t('panel.settings'),
+            accelerator: settingsMenuAccelerator,
+            click: () => showSettingsWindow()
+          },
+          { type: 'separator' },
+          { role: 'hide' },
+          { role: 'hideOthers' },
+          { role: 'unhide' },
+          { type: 'separator' },
+          { label: t('panel.quit'), accelerator: KEY_Q, click: quitApp }
+        ]
+      },
+      { role: 'editMenu' },
+      { role: 'windowMenu' }
+    ])
+  )
 }
 
 function setApplicationName() {
