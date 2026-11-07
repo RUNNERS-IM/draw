@@ -37,7 +37,7 @@
   "about.line": "{{version}} · 免费开源",
   "about.website": "网站",
   "about.get": "获取",
-  "about.credit": "基于 Dmytro Vasin 的 DrawPen 构建(MIT 许可证)",
+  "about.license": "基于 Dmytro Vasin 的 DrawPen 构建(MIT 许可证)",
   "about.notices": "开源声明",
   "about.close": "关闭",
   "update.title": "有新版本可用",

@@ -37,7 +37,7 @@
   "about.line": "{{version}} · Free and open source",
   "about.website": "Website",
   "about.get": "Get",
-  "about.credit": "Built on DrawPen by Dmytro Vasin (MIT License)",
+  "about.license": "Built on DrawPen by Dmytro Vasin (MIT License)",
   "about.notices": "Open Source Notices",
   "about.close": "Close",
   "update.title": "A new version is available",

@@ -37,7 +37,7 @@
   "about.line": "{{version}} · 무료 오픈소스",
   "about.website": "웹사이트",
   "about.get": "받기",
-  "about.credit": "DrawPen(Dmytro Vasin, MIT 라이선스)을 바탕으로 만들었습니다",
+  "about.license": "DrawPen(Dmytro Vasin, MIT 라이선스)을 바탕으로 만들었습니다",
   "about.notices": "오픈소스 고지",
   "about.close": "닫기",
   "update.title": "새 버전이 나왔습니다",

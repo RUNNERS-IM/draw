@@ -7,25 +7,6 @@
     "THIRD_PARTY_NOTICES.md",
     "**/*.generated.*",
     "native/index.d.ts",
-    "native/index.js",
-    "src/runners-account/**",
-    "pnpm-lock.yaml",
-    "patches/**",
-    "src/renderer/public/**",
-    "locales/**",
-    "src/renderer/runners/runners-apps.json",
-    "src/renderer/runners/runners-window.css",
-    "src/renderer/runners/RunnersApps.css",
-    "src/shared/third-party-notices*",
-    "out/**",
-    "dist/**",
-    "dist.noindex/**",
-    "README.md",
-    ".github/**",
-    "version-parts.cjs",
-    "CHANGELOG.md",
-    "RELEASE_NOTES.md",
-    "AGENTS.md",
-    "PRIVACY.md"
+    "native/index.js"
   ]
 }

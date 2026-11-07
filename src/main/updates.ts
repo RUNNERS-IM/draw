@@ -1,38 +1,62 @@
 // GitHub 릴리스(RUNNERS-IM/draw)에서 새 판을 찾는다. 하루 한 번, 켠 지 1분 뒤부터 확인한다.
 // 내려받은 뒤에 묻기 때문에 「지금 설치」는 바로 재시작한다. 묻지 않고 깔지 않는다. 다른 RUNNERS 앱과 같은 규칙이다.
+// 창의 답 받기와 새 소식 줄은 kit 부품을 쓴다. 확인 흐름은 kit 의 createUpdates 가 electron-updater 의 autoUpdater 를
+// 타입에서 받지 못해 아직 여기에 있다(kit 쪽을 고친 뒤 옮긴다).
 import { app, BrowserWindow, dialog, ipcMain, powerMonitor } from 'electron'
 import { autoUpdater } from 'electron-updater'
 import { currentLocale, t } from '../shared/i18n'
 import { pageUrl, preloadPath } from './pages'
-import { releaseNoteLines } from './releaseNotes'
+import { releaseNoteLines } from './runners/release-notes'
+import { createUpdateWindow } from './runners/update-window'
 
 const FIRST_CHECK_MS = 60_000
 const CHECK_EVERY_MS = 24 * 60 * 60 * 1000
 const TICK_MS = 60 * 60 * 1000
 const UPDATE_WIDTH = 400
-const UPDATE_GUARD_MS = 1000
 
 type StoreLike = { get: (key: string) => any; set: (key: string, value: unknown) => void }
-export type UpdateOffer = {
-  version: string
-  notes: string[] | null
-  downloading: boolean
-  percent: number
-}
-type UpdateEntry = { window: BrowserWindow; offer: UpdateOffer; answer: (value: string) => void }
+
+const updateWindow = createUpdateWindow({
+  channel: 'update_offer_changed',
+  focusApp: () => app.focus({ steal: true }),
+  create: () => {
+    const window = new BrowserWindow({
+      width: UPDATE_WIDTH,
+      height: 200,
+      useContentSize: true,
+      show: false,
+      frame: false,
+      resizable: false,
+      minimizable: false,
+      maximizable: false,
+      fullscreenable: false,
+      hasShadow: true,
+      roundedCorners: true,
+      alwaysOnTop: true,
+      title: 'Draw',
+      vibrancy: 'menu',
+      visualEffectState: 'active',
+      backgroundColor: '#00000000',
+      webPreferences: { preload: preloadPath('update_page'), nodeIntegration: false }
+    })
+    window.loadURL(pageUrl('update_page'))
+    return window
+  }
+})
+
+export const askUpdate = updateWindow.askUpdate
 
 let busy = false
 let store: StoreLike
 let beforeInstall = () => {}
-let current: UpdateEntry | null = null
 
 export function startUpdates(options: { store: StoreLike; beforeInstall: () => void }) {
   store = options.store
   beforeInstall = options.beforeInstall
 
-  ipcMain.handle('update_offer', () => current?.offer ?? null)
+  ipcMain.handle('update_offer', () => updateWindow.offer())
   ipcMain.handle('update_answer', (_event, value) => {
-    current?.answer(value)
+    updateWindow.answer(value)
     return null
   })
 
@@ -89,7 +113,8 @@ async function check(asked: boolean) {
     }
 
     const version = result.updateInfo.version
-    const notes = releaseNoteLines(result.updateInfo.releaseNotes, currentLocale())
+    const language = currentLocale() === 'ko' ? 'ko' : 'en'
+    const notes = releaseNoteLines(result.updateInfo.releaseNotes, language)
     const answer = asked
       ? await askWhileDownloading(version, notes)
       : await askAfterDownload(version, notes)
@@ -150,98 +175,6 @@ async function askWhileDownloading(version: string, notes: string[] | null) {
   }
 
   return askUpdate({ version, notes, downloading: false, percent: 100 }, false).answer
-}
-
-// 업데이트 질문 창. 닫으면 「나중에」다. focus 가 false 면 포커스를 뺏지 않아, 다른 앱에서 치던 Enter 가 설치로 눌리지 않는다.
-export function askUpdate(offer: UpdateOffer, focus: boolean) {
-  if (current && !current.window.isDestroyed()) {
-    current.window.close()
-  }
-
-  let resolve: (value: string) => void = () => {}
-  const answerPromise = new Promise<string>((done) => {
-    resolve = done
-  })
-
-  const window = new BrowserWindow({
-    width: UPDATE_WIDTH,
-    height: 200,
-    useContentSize: true,
-    show: false,
-    frame: false,
-    resizable: false,
-    minimizable: false,
-    maximizable: false,
-    fullscreenable: false,
-    hasShadow: true,
-    roundedCorners: true,
-    alwaysOnTop: true,
-    title: 'Draw',
-    vibrancy: 'menu',
-    visualEffectState: 'active',
-    backgroundColor: '#00000000',
-    webPreferences: { preload: preloadPath('update_page'), nodeIntegration: false }
-  })
-
-  const entry: UpdateEntry = { window, offer: { ...offer }, answer: () => {} }
-  let answered = false
-  let shownAt = Number.POSITIVE_INFINITY
-
-  entry.answer = (value: string) => {
-    if (Date.now() - shownAt < UPDATE_GUARD_MS) {
-      return
-    }
-    if (answered || (value === 'install' && entry.offer.downloading)) {
-      return
-    }
-    answered = true
-    resolve(value)
-    if (value === 'later' && !window.isDestroyed()) {
-      window.close()
-    }
-  }
-  current = entry
-
-  window.once('ready-to-show', () => {
-    window.center()
-    shownAt = Date.now()
-    if (!focus) {
-      window.showInactive()
-      return
-    }
-    app.focus({ steal: true })
-    window.show()
-    window.focus()
-  })
-  window.on('closed', () => {
-    if (current === entry) {
-      current = null
-    }
-    if (!answered) {
-      answered = true
-      resolve('later')
-    }
-  })
-  window.loadURL(pageUrl('update_page'))
-
-  return {
-    window,
-    answer: answerPromise,
-    set: (change: Partial<UpdateOffer>) => {
-      if (entry.offer.downloading && change.downloading === false) {
-        shownAt = Date.now()
-      }
-      entry.offer = { ...entry.offer, ...change }
-      if (!window.isDestroyed()) {
-        window.webContents.send('update_offer_changed', entry.offer)
-      }
-    },
-    close: () => {
-      if (!window.isDestroyed()) {
-        window.close()
-      }
-    }
-  }
 }
 
 async function tell(message: string) {

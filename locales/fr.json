@@ -37,7 +37,7 @@
   "about.line": "{{version}} · Gratuit et open source",
   "about.website": "Site web",
   "about.get": "Obtenir",
-  "about.credit": "Basé sur DrawPen de Dmytro Vasin (licence MIT)",
+  "about.license": "Basé sur DrawPen de Dmytro Vasin (licence MIT)",
   "about.notices": "Mentions open source",
   "about.close": "Fermer",
   "update.title": "Une nouvelle version est disponible",

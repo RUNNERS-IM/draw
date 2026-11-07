@@ -37,7 +37,7 @@
   "about.line": "{{version}} · Ilmainen ja avointa lähdekoodia",
   "about.website": "Verkkosivusto",
   "about.get": "Hae",
-  "about.credit": "Perustuu Dmytro Vasinin DrawPeniin (MIT-lisenssi)",
+  "about.license": "Perustuu Dmytro Vasinin DrawPeniin (MIT-lisenssi)",
   "about.notices": "Avoimen lähdekoodin tiedot",
   "about.close": "Sulje",
   "update.title": "Uusi versio on saatavilla",

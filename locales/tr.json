@@ -37,7 +37,7 @@
   "about.line": "{{version}} · Ücretsiz ve açık kaynak",
   "about.website": "Web sitesi",
   "about.get": "Edin",
-  "about.credit": "Dmytro Vasin'in DrawPen'i temel alınmıştır (MIT Lisansı)",
+  "about.license": "Dmytro Vasin'in DrawPen'i temel alınmıştır (MIT Lisansı)",
   "about.notices": "Açık kaynak bildirimleri",
   "about.close": "Kapat",
   "update.title": "Yeni bir sürüm var",

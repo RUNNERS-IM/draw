@@ -1,6 +1,6 @@
 // 시험판 전용(DRAW_TEST_BUILD): 키보드 · 마우스를 흉내 내지 않고, 앱의 처리 함수를 불러 상태를 띄워 창마다 그림을 저장한다.
 // 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=<언어 코드>] Draw 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
-import { app as electronApp, nativeTheme, screen } from 'electron'
+import { BrowserWindow, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
 import { askUpdate } from './updates'
@@ -204,7 +204,7 @@ export async function runTestShots(app: any) {
       await shot(aboutWindow, `${theme}-7-정보창`)
       note(`[${theme}] 정보 창 크기=${JSON.stringify(aboutWindow.getContentSize())}`)
       await aboutWindow.webContents.executeJavaScript(
-        "document.querySelectorAll('.about-notices-link')[1].click()"
+        "document.querySelector('.about-notices-link').click()"
       )
       await wait(600)
       await shot(aboutWindow, `${theme}-7-정보창-오픈소스고지`)
@@ -229,18 +229,27 @@ export async function runTestShots(app: any) {
       settingsWindow.close()
       await wait(400)
 
+      const notes = ['왼쪽 도구 막대를 고쳤습니다.', '패널 글을 다듬었습니다.']
+      const updateWindow = () =>
+        BrowserWindow.getAllWindows().find((window) =>
+          window.webContents.getURL().includes('update_page')
+        )!
       const prompt = askUpdate(
-        {
-          version: '2.6.110602',
-          notes: ['왼쪽 도구 막대를 고쳤습니다.', '패널 글을 다듬었습니다.'],
-          downloading: false,
-          percent: 100
-        },
+        { version: '2.6.110602', notes, downloading: false, percent: 100 },
         false
       )
       await wait(1500)
-      await shot(prompt.window, `${theme}-9-업데이트창`)
+      await shot(updateWindow(), `${theme}-9-업데이트창`)
       prompt.close()
+      await wait(300)
+
+      const downloading = askUpdate(
+        { version: '2.6.110602', notes, downloading: true, percent: 42 },
+        false
+      )
+      await wait(1500)
+      await shot(updateWindow(), `${theme}-9-업데이트창-받는중`)
+      downloading.close()
       await wait(300)
     }
     note('끝')

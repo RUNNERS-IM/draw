@@ -26,7 +26,7 @@ pnpm typecheck     # 타입 검사
 pnpm lint          # 린트
 pnpm format:check  # 서식 확인
 pnpm test          # 단위 테스트
-pnpm check:account # 공용 키트 복사본 확인
+pnpm check:account # 공용 키트(runners-app-kit v0.1.7) 복사본 확인
 pnpm check:locales # 언어 파일 확인
 pnpm dev           # 개발 판 실행
 pnpm dist          # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기

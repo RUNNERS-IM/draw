@@ -71,7 +71,12 @@
     "typescript/consistent-type-assertions": "error",
     "typescript/consistent-type-definitions": ["error", "type"],
     "typescript/consistent-type-imports": "error",
-    "typescript/no-explicit-any": "off",
+    "typescript/no-explicit-any": [
+      "error",
+      {
+        "ignoreRestArgs": true
+      }
+    ],
     "typescript/no-confusing-non-null-assertion": "error",
     "typescript/no-import-type-side-effects": "error",
     "typescript/no-unnecessary-boolean-literal-compare": "error",
@@ -127,13 +132,6 @@
       "rules": {
         "react/globals": "off"
       }
-    },
-    {
-      "files": ["**/*.d.ts"],
-      "rules": {
-        "typescript/consistent-type-definitions": "off",
-        "typescript/consistent-indexed-object-style": "off"
-      }
     }
   ],
   "ignorePatterns": [
@@ -142,9 +140,6 @@
     "**/out",
     "**/*.generated.*",
     "native/index.js",
-    "native/index.d.ts",
-    "src/runners-account/**",
-    "src/renderer/runners/runners-account.tsx",
-    "version-parts.cjs"
+    "native/index.d.ts"
   ]
 }

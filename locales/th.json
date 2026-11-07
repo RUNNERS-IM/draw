@@ -37,7 +37,7 @@
   "about.line": "{{version}} · ฟรีและเป็นโอเพนซอร์ส",
   "about.website": "เว็บไซต์",
   "about.get": "รับ",
-  "about.credit": "สร้างจาก DrawPen โดย Dmytro Vasin (สัญญาอนุญาต MIT)",
+  "about.license": "สร้างจาก DrawPen โดย Dmytro Vasin (สัญญาอนุญาต MIT)",
   "about.notices": "ประกาศโอเพนซอร์ส",
   "about.close": "ปิด",
   "update.title": "มีเวอร์ชันใหม่",

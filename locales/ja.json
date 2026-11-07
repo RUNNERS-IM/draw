@@ -37,7 +37,7 @@
   "about.line": "{{version}} · 無料のオープンソース",
   "about.website": "Web サイト",
   "about.get": "入手",
-  "about.credit": "Dmytro Vasin 氏の DrawPen(MIT ライセンス)をもとに作られています",
+  "about.license": "Dmytro Vasin 氏の DrawPen(MIT ライセンス)をもとに作られています",
   "about.notices": "オープンソースの表示",
   "about.close": "閉じる",
   "update.title": "新しいバージョンがあります",

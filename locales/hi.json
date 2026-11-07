@@ -37,7 +37,7 @@
   "about.line": "{{version}} · मुफ़्त और ओपन सोर्स",
   "about.website": "वेबसाइट",
   "about.get": "पाएँ",
-  "about.credit": "Dmytro Vasin के DrawPen पर आधारित (MIT लाइसेंस)",
+  "about.license": "Dmytro Vasin के DrawPen पर आधारित (MIT लाइसेंस)",
   "about.notices": "ओपन सोर्स सूचनाएँ",
   "about.close": "बंद करें",
   "update.title": "नया संस्करण उपलब्ध है",
