@@ -269,6 +269,8 @@ const Application = (settings: any) => {
   const [textEditorContainer, setTextEditorContainer] = useState<any>(null)
   const [cursorType, setCursorType] = useState('crosshair')
   const [showToolbar, setShowToolbar] = useState(initialShowToolbar)
+  // 클릭 모드: 그림만 남기고 막대 · 커서 · 화이트보드는 숨긴다(클릭은 아래 앱으로 감).
+  const [pointerMode, setPointerMode] = useState(false)
   const [showWhiteboard, setShowWhiteboard] = useState(initialShowWhiteboard)
   const [whiteboardTheme, setWhiteboardTheme] = useState(initialWhiteboardTheme)
   const [whiteboardLayout, setWhiteboardLayout] = useState(initialWhiteboardLayout)
@@ -310,6 +312,7 @@ const Application = (settings: any) => {
 
   useEffect(() => {
     window.electronAPI.onResetScreen(handleReset)
+    window.electronAPI.onSetPointerMode(setPointerMode)
     window.electronAPI.onToggleToolbar(handleToggleToolbar)
     window.electronAPI.onToggleWhiteboard(handleToggleWhiteboard)
     window.electronAPI.onRefreshSettings(handleRefreshSettings)
@@ -2212,7 +2215,7 @@ const Application = (settings: any) => {
         <div className="screenshot-flash" onAnimationEnd={handleScreenshotFlashAnimationEnd} />
       )}
 
-      {zoomInfo.status === 'inactive' && showWhiteboard && (
+      {zoomInfo.status === 'inactive' && showWhiteboard && !pointerMode && (
         <Whiteboard
           theme={whiteboardTheme}
           layout={whiteboardLayout}
@@ -2227,7 +2230,9 @@ const Application = (settings: any) => {
         />
       )}
 
-      {zoomInfo.status === 'inactive' && showDrawingBorder && <div id="zone_borders" />}
+      {zoomInfo.status === 'inactive' && showDrawingBorder && !pointerMode && (
+        <div id="zone_borders" />
+      )}
 
       {toastInfo && (
         <Toast
@@ -2247,7 +2252,7 @@ const Application = (settings: any) => {
         />
       )}
 
-      {isCuteCursorVisible && (
+      {isCuteCursorVisible && !pointerMode && (
         <CuteCursor
           key={`${activeTool}:${activeColorIndex}:${activeWidthIndex}`}
           mouseCoordinates={mouseCoordinates}
@@ -2279,7 +2284,7 @@ const Application = (settings: any) => {
         colorList={colorList}
       />
 
-      {showSubToolbar && (
+      {showSubToolbar && !pointerMode && (
         <FigureToolbar
           key={activeFigure.id}
           figure={activeFigure}
@@ -2293,7 +2298,7 @@ const Application = (settings: any) => {
         />
       )}
 
-      {showToolbar && (
+      {showToolbar && !pointerMode && (
         <ToolBar
           orientation={initialToolbarOrientation}
           position={toolbarPosition}

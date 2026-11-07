@@ -143,6 +143,21 @@ export async function runTestShots(app: any) {
       await shot(mainWindow, `${theme}-4-그리기-그림`)
       await wait(Number(process.env.DRAW_TEST_HOLD_MS || 0))
 
+      // 그림이 있을 때 클릭 모드로 바꾸면 그림은 남고 큰 막대만 사라져야 한다.
+      app.enablePointerMode()
+      await wait(800)
+      const toolbarShown = () =>
+        mainWindow.webContents.executeJavaScript("Boolean(document.getElementById('toolbar'))")
+      note(
+        `[${theme}] 그림 있는 클릭 모드: 그림판 창 보임=${mainWindow.isVisible()}, 그림 수=${await count()}, 큰 막대 있음=${await toolbarShown()}, 작은 막대 보임=${extendedToolbarWindow.isVisible()}, 그림판 창 키 받음=${mainWindow.isFocusable()}`
+      )
+      await shot(mainWindow, `${theme}-4-클릭모드-그림남음`)
+      app.enableDrawMode()
+      await wait(800)
+      note(
+        `[${theme}] 다시 그리기 모드: 그림 수=${await count()}, 큰 막대 있음=${await toolbarShown()}`
+      )
+
       for (const tool of [
         'highlighter',
         'arrow',

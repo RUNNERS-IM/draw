@@ -1654,6 +1654,7 @@ function enableDrawMode() {
   exitZoomMode()
   flushExtendedToolbarPosition()
 
+  setMainWindowClickThrough(false)
   showMainWindow()
   hideWindow(extendedToolbarWindow)
 
@@ -1671,13 +1672,22 @@ function enablePointerMode() {
   exitZoomMode()
   resetScreenOnHide()
 
+  // 그린 그림은 화면에 남기고, 클릭만 아래 앱으로 통과시킨다.
+  if (mainWindow.isVisible()) {
+    setMainWindowClickThrough(true)
+  }
   showExtendedToolbarWindow()
-  hideWindow(mainWindow)
 
   drawingMode = false
   updateContextMenu()
 
   releaseFocusBack()
+}
+
+function setMainWindowClickThrough(on: boolean) {
+  mainWindow.setIgnoreMouseEvents(on)
+  mainWindow.setFocusable(!on)
+  mainWindow.webContents.send('set_pointer_mode', on)
 }
 
 function hideApp() {
@@ -1691,6 +1701,7 @@ function hideApp() {
   resetScreenOnHide()
 
   hideWindow(mainWindow)
+  setMainWindowClickThrough(false)
   hideWindow(extendedToolbarWindow)
 
   drawingMode = false

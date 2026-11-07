@@ -27,6 +27,9 @@ const api = {
   onResetScreen: (callback: (...args: any[]) => any) => {
     ipcRenderer.on('reset_screen', () => callback())
   },
+  onSetPointerMode: (callback: (...args: any[]) => any) => {
+    ipcRenderer.on('set_pointer_mode', (_event, on) => callback(on))
+  },
   onToggleToolbar: (callback: (...args: any[]) => any) => {
     ipcRenderer.on('toggle_toolbar', () => callback())
   },
