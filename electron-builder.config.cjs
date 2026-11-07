@@ -26,11 +26,8 @@ module.exports = {
     '!**/*.map',
     '!node_modules/{react,react-dom,react-i18next,html-parse-stringify,void-elements,use-sync-external-store,scheduler,lucide-react,react-icons,lazy-brush,perfect-freehand,ntcjs,lodash}/**'
   ],
-  // Why: 원본 DrawPen 의 MIT 라이선스는 사본에 함께 넣어야 한다(앱 안 Contents/Resources/LICENSE).
-  extraResources: [
-    { from: 'LICENSE', to: 'LICENSE' },
-    { from: 'THIRD_PARTY_NOTICES.md', to: 'THIRD_PARTY_NOTICES.md' }
-  ],
+  // Why: 원본 DrawPen 의 MIT 라이선스는 사본에 함께 넣어야 한다. THIRD_PARTY_NOTICES.md 맨 앞에 그 전문이 있다.
+  extraResources: [{ from: 'THIRD_PARTY_NOTICES.md', to: 'THIRD_PARTY_NOTICES.md' }],
   npmRebuild: false,
   mac: {
     category: 'public.app-category.productivity',

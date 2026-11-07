@@ -20,7 +20,7 @@ test('중국어는 지역에 따라 간체와 번체로 나눈다', () => {
 test('자리표시를 채우고 없는 열쇠는 그대로 돌려준다', () => {
   setLocale(['ko'])
   assert.equal(t('update.downloading', { percent: 42 }), '내려받는 중… 42%')
-  assert.equal(t('about.line', { version: '1.0.0 <b>' }), '1.0.0 <b> · 무료 오픈소스')
+  assert.equal(t('about.line', { version: '1.0.0 <b>' }), 'Draw 1.0.0 <b> · 무료')
   assert.equal(t('없는.열쇠'), '없는.열쇠')
   setLocale(['fr-CA'])
   assert.equal(t('tool.eraser'), 'Gomme')

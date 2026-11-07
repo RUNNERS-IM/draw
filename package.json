@@ -4,7 +4,7 @@
   "private": true,
   "description": "Draw on your screen while you present, by RUNNERS",
   "homepage": "https://runners.im/draw",
-  "license": "MIT",
+  "license": "UNLICENSED",
   "author": {
     "name": "RUNNERS",
     "email": "sun@runners.im"
@@ -22,7 +22,7 @@
     "lint": "oxlint -c .oxlintrc.draw.json",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check:account": "node src/runners-account/check.mjs --kit 0.1.7 && node src/main/runners/check.mjs --kit 0.1.7 && node scripts/check.mjs --kit 0.1.7",
+    "check:account": "node src/runners-account/check.mjs --kit 0.1.9 && node src/main/runners/check.mjs --kit 0.1.9 && node scripts/check.mjs --kit 0.1.9",
     "check:locales": "node scripts/check-locales.mjs",
     "notices": "node scripts/third-party-notices.mjs Draw && node scripts/drawpen-notice.mjs",
     "dist": "pnpm build && electron-builder --config electron-builder.config.cjs"

@@ -26,7 +26,7 @@ pnpm typecheck     # 타입 검사
 pnpm lint          # 린트
 pnpm format:check  # 서식 확인
 pnpm test          # 단위 테스트
-pnpm check:account # 공용 키트(runners-app-kit v0.1.7) 복사본 확인
+pnpm check:account # 공용 키트(runners-app-kit v0.1.9) 복사본 확인
 pnpm check:locales # 언어 파일 확인
 pnpm dev           # 개발 판 실행
 pnpm dist          # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
@@ -36,4 +36,4 @@ pnpm dist          # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
 
 ## 원본과 라이선스
 
-Draw 는 Dmytro Vasin 의 [DrawPen](https://github.com/DmytroVasin/DrawPen)(MIT 라이선스)을 바탕으로 만들었습니다. 원본의 저작권 표시와 라이선스 전문은 [LICENSE](LICENSE) 에 그대로 있고, 원본의 변경 기록은 [CHANGELOG.md](CHANGELOG.md) 에 있습니다. 함께 싣는 오픈소스 패키지의 고지는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 에 있고, 앱의 정보 창에서도 볼 수 있습니다.
+Draw 는 Dmytro Vasin 의 [DrawPen](https://github.com/DmytroVasin/DrawPen)(MIT 라이선스)을 바탕으로 만들었습니다. 원본의 저작권 표시와 MIT 라이선스 전문은 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 맨 앞에 그대로 있고, 앱 정보 창의 「오픈소스 고지」에서도 볼 수 있습니다. 원본의 변경 기록은 [CHANGELOG.md](CHANGELOG.md) 에 있습니다. Draw 자체의 저작권은 [LICENSE.md](LICENSE.md) 에 있습니다.
