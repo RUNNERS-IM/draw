@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Kısayollar",
   "settings.tabAppearance": "Görünüm",
   "settings.tabApplication": "Uygulama",
+  "settings.tabAccount": "Hesap",
+  "settings.accountOptional": "Giriş yapmadan da çizebilirsiniz.",
   "settings.resetDefault": "Varsayılana döndür",
   "settings.removeShortcut": "Kısayolu kaldır",
   "settings.globalHint": "Her uygulamada çalışır",

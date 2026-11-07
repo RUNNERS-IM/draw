@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "ปุ่มลัด",
   "settings.tabAppearance": "รูปลักษณ์",
   "settings.tabApplication": "แอป",
+  "settings.tabAccount": "บัญชี",
+  "settings.accountOptional": "วาดได้โดยไม่ต้องลงชื่อเข้าใช้",
   "settings.resetDefault": "คืนค่าเริ่มต้น",
   "settings.removeShortcut": "ลบปุ่มลัด",
   "settings.globalHint": "ใช้ได้ในทุกแอป",

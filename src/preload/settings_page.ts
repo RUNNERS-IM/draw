@@ -3,6 +3,14 @@ console.log('[DRAW]: Settings page preloading...')
 import { contextBridge, ipcRenderer } from 'electron'
 const { platform } = process
 
+// 로그인 창의 세 함수는 실패하면 SignInProblem 코드를 메시지로 던져야 한다. 메인은 그 코드를 값으로 돌려준다.
+const attempt = async (channel: string, ...args: unknown[]) => {
+  const problem = await ipcRenderer.invoke(channel, ...args)
+  if (problem) {
+    throw new Error(problem)
+  }
+}
+
 const api = {
   locale: ipcRenderer.sendSync('get_locale'),
 
@@ -36,6 +44,21 @@ const api = {
   chooseScreenshotDirectory: () => ipcRenderer.invoke('choose_screenshot_directory'),
   resetScreenshotDirectory: () => ipcRenderer.invoke('reset_screenshot_directory'),
   openScreenshotDirectory: () => ipcRenderer.invoke('open_screenshot_directory'),
+
+  accountEmail: (): Promise<string | null> => ipcRenderer.invoke('account_email'),
+  signIn: (mode: string, email: string, password: string, code?: string) =>
+    attempt('account_sign_in', mode, email, password, code),
+  sendCode: (purpose: string, email: string) => attempt('account_send_code', purpose, email),
+  resetPassword: (email: string, code: string, password: string) =>
+    attempt('account_reset_password', email, code, password),
+  signOut: () => ipcRenderer.invoke('account_sign_out'),
+  onAccountChanged: (callback: (email: string | null) => void) => {
+    const listener = (_event: unknown, email: string | null) => callback(email)
+    ipcRenderer.on('account_changed', listener)
+    return () => {
+      ipcRenderer.removeListener('account_changed', listener)
+    }
+  },
 
   isMac: platform === 'darwin'
 }

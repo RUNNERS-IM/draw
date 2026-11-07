@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "الاختصارات",
   "settings.tabAppearance": "المظهر",
   "settings.tabApplication": "التطبيق",
+  "settings.tabAccount": "الحساب",
+  "settings.accountOptional": "يمكنك الرسم دون تسجيل الدخول.",
   "settings.resetDefault": "إعادة إلى الافتراضي",
   "settings.removeShortcut": "إزالة الاختصار",
   "settings.globalHint": "يعمل في كل التطبيقات",

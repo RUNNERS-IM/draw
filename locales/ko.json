@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "단축키",
   "settings.tabAppearance": "모양",
   "settings.tabApplication": "앱",
+  "settings.tabAccount": "계정",
+  "settings.accountOptional": "로그인하지 않아도 그리기는 그대로 씁니다.",
   "settings.resetDefault": "기본값으로",
   "settings.removeShortcut": "단축키 지우기",
   "settings.globalHint": "어느 앱에서나 듣는 단축키",

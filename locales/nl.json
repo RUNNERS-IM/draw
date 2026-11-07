@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Sneltoetsen",
   "settings.tabAppearance": "Weergave",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "Account",
+  "settings.accountOptional": "Je kunt tekenen zonder in te loggen.",
   "settings.resetDefault": "Standaardwaarde herstellen",
   "settings.removeShortcut": "Sneltoets verwijderen",
   "settings.globalHint": "Werkt in elke app",

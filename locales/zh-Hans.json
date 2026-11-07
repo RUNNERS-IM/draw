@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "快捷键",
   "settings.tabAppearance": "外观",
   "settings.tabApplication": "应用",
+  "settings.tabAccount": "账户",
+  "settings.accountOptional": "不登录也可以照常绘制。",
   "settings.resetDefault": "恢复默认",
   "settings.removeShortcut": "移除快捷键",
   "settings.globalHint": "在所有应用中有效",

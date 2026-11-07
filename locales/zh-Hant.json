@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "快速鍵",
   "settings.tabAppearance": "外觀",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "帳號",
+  "settings.accountOptional": "不登入也可以照常繪製。",
   "settings.resetDefault": "回復預設值",
   "settings.removeShortcut": "移除快速鍵",
   "settings.globalHint": "在所有 App 中都有效",

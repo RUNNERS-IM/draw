@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Pikanäppäimet",
   "settings.tabAppearance": "Ulkoasu",
   "settings.tabApplication": "Appi",
+  "settings.tabAccount": "Tili",
+  "settings.accountOptional": "Voit piirtää kirjautumatta sisään.",
   "settings.resetDefault": "Palauta oletus",
   "settings.removeShortcut": "Poista pikanäppäin",
   "settings.globalHint": "Toimii kaikissa apeissa",

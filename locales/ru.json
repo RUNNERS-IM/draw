@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Сочетания клавиш",
   "settings.tabAppearance": "Оформление",
   "settings.tabApplication": "Приложение",
+  "settings.tabAccount": "Аккаунт",
+  "settings.accountOptional": "Рисовать можно и без входа.",
   "settings.resetDefault": "Вернуть значение по умолчанию",
   "settings.removeShortcut": "Удалить сочетание",
   "settings.globalHint": "Работает в любом приложении",

@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Skróty",
   "settings.tabAppearance": "Wygląd",
   "settings.tabApplication": "Aplikacja",
+  "settings.tabAccount": "Konto",
+  "settings.accountOptional": "Możesz rysować bez logowania.",
   "settings.resetDefault": "Przywróć domyślny",
   "settings.removeShortcut": "Usuń skrót",
   "settings.globalHint": "Działa w każdej aplikacji",

@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Scorciatoie",
   "settings.tabAppearance": "Aspetto",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "Account",
+  "settings.accountOptional": "Puoi disegnare senza accedere.",
   "settings.resetDefault": "Ripristina predefinito",
   "settings.removeShortcut": "Rimuovi scorciatoia",
   "settings.globalHint": "Funziona in tutte le app",

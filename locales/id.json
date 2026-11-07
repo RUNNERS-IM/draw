@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Pintasan",
   "settings.tabAppearance": "Tampilan",
   "settings.tabApplication": "Aplikasi",
+  "settings.tabAccount": "Akun",
+  "settings.accountOptional": "Anda bisa menggambar tanpa masuk.",
   "settings.resetDefault": "Kembalikan ke bawaan",
   "settings.removeShortcut": "Hapus pintasan",
   "settings.globalHint": "Berfungsi di semua aplikasi",

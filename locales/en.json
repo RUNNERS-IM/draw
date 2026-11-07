@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Shortcuts",
   "settings.tabAppearance": "Appearance",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "Account",
+  "settings.accountOptional": "You can draw without signing in.",
   "settings.resetDefault": "Reset to default",
   "settings.removeShortcut": "Remove shortcut",
   "settings.globalHint": "Works in every app",

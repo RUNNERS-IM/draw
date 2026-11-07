@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Raccourcis",
   "settings.tabAppearance": "Apparence",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "Compte",
+  "settings.accountOptional": "Vous pouvez dessiner sans vous connecter.",
   "settings.resetDefault": "Rétablir la valeur par défaut",
   "settings.removeShortcut": "Supprimer le raccourci",
   "settings.globalHint": "Fonctionne dans toutes les apps",

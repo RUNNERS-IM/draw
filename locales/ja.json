@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "ショートカット",
   "settings.tabAppearance": "外観",
   "settings.tabApplication": "アプリ",
+  "settings.tabAccount": "アカウント",
+  "settings.accountOptional": "ログインしなくても描画はそのまま使えます。",
   "settings.resetDefault": "デフォルトに戻す",
   "settings.removeShortcut": "ショートカットを削除",
   "settings.globalHint": "どのアプリでも使えます",

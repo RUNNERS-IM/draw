@@ -2,6 +2,7 @@ import { useState } from 'react'
 import './Settings.scss'
 import ShortcutRecorder from './ShortcutRecorder'
 import ColorPicker from './ColorPicker'
+import AccountTab from './AccountTab'
 import { useTranslation } from 'react-i18next'
 import {
   createApplicationColorList,
@@ -22,7 +23,8 @@ import {
   IoChevronDown,
   IoChevronForward,
   IoColorPaletteOutline,
-  IoApps
+  IoApps,
+  IoPersonCircleOutline
 } from 'react-icons/io5'
 import { HiSwitchHorizontal } from 'react-icons/hi'
 import { FaRegKeyboard } from 'react-icons/fa6'
@@ -414,6 +416,14 @@ const Settings = (config: any) => {
           >
             <IoApps className="icon" />
             {t('settings.tabApplication')}
+          </div>
+
+          <div
+            className={`settings-sidebar-item ${activeTab === 'account' ? 'active' : ''}`}
+            onClick={() => selectTab('account')}
+          >
+            <IoPersonCircleOutline className="icon" />
+            {t('settings.tabAccount')}
           </div>
 
           <div className="settings-sidebar-version">Draw {appVersion}</div>
@@ -912,6 +922,8 @@ const Settings = (config: any) => {
             </div>
           </div>
         )}
+
+        {activeTab === 'account' && <AccountTab />}
       </div>
     </div>
   )

@@ -24,6 +24,7 @@ import { getPointerToolbarOffset, isToolbarReversed } from '../shared/toolbarPos
 import { t, setLocale, currentLocale } from '../shared/i18n'
 import { loginItemsAllowed } from './loginItems'
 import { startUpdates, checkNow } from './updates'
+import { startAccount, accountForTest } from './account'
 import { runTestShots } from './testShots'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
@@ -959,6 +960,8 @@ app.whenReady().then(() => {
 
   applyLaunchOnLoginDefault()
 
+  startAccount()
+
   logDisplays()
 
   createMainWindow()
@@ -994,6 +997,7 @@ app.whenReady().then(() => {
         settingsWindow
       }),
       isDrawing: () => drawingMode,
+      account: accountForTest,
       quit: quitApp
     })
   }

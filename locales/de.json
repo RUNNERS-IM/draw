@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Kurzbefehle",
   "settings.tabAppearance": "Darstellung",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "Konto",
+  "settings.accountOptional": "Zeichnen geht auch ohne Anmeldung.",
   "settings.resetDefault": "Auf Standard zurücksetzen",
   "settings.removeShortcut": "Kurzbefehl entfernen",
   "settings.globalHint": "Funktioniert in jeder App",

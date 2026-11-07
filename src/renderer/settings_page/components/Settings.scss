@@ -557,3 +557,10 @@ body {
   font-style: normal;
   font-display: swap;
 }
+
+// kit 의 계정 메뉴는 right: 0 으로 고정돼 있어, 아랍어처럼 오른쪽에서 왼쪽으로 쓰는 화면에서는
+// 왼쪽 끝 배지에서 창 밖으로 펼쳐져 잘린다. kit 이 고쳐질 때까지 여기서만 배지 쪽에 붙인다.
+[dir='rtl'] .ra-menu {
+  right: auto;
+  left: 0;
+}

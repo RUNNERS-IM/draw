@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Atajos",
   "settings.tabAppearance": "Apariencia",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "Cuenta",
+  "settings.accountOptional": "Puedes dibujar sin iniciar sesión.",
   "settings.resetDefault": "Restablecer valor predeterminado",
   "settings.removeShortcut": "Quitar atajo",
   "settings.globalHint": "Funciona en todas las apps",

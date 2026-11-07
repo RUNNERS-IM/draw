@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "शॉर्टकट",
   "settings.tabAppearance": "रूप",
   "settings.tabApplication": "ऐप",
+  "settings.tabAccount": "खाता",
+  "settings.accountOptional": "साइन इन किए बिना भी आप ड्रॉ कर सकते हैं।",
   "settings.resetDefault": "डिफ़ॉल्ट पर लौटाएँ",
   "settings.removeShortcut": "शॉर्टकट हटाएँ",
   "settings.globalHint": "हर ऐप में काम करता है",

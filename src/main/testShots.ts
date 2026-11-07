@@ -84,6 +84,66 @@ export async function runTestShots(app: any) {
   const note = (line: string) => log.push(line)
   fs.mkdirSync(app.dir, { recursive: true })
 
+  // 설정 › 계정 칸. 서버 없이 되는 것(로그인 창 · 비밀번호 모양 검사)은 언제나 보고,
+  // DRAW_API_URL 로 이 컴퓨터 안의 시험 서버를 줬을 때만 틀린 비밀번호 · 로그인 · 로그아웃까지 창으로 해 본다.
+  const accountScenes = async (settingsWindow: Electron.BrowserWindow, theme: string) => {
+    const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+    const fill = (selector: string, value: string) =>
+      page(`(() => {
+        const field = document.querySelector(${JSON.stringify(selector)});
+        Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(field, ${JSON.stringify(value)});
+        field.dispatchEvent(new Event('input', { bubbles: true }));
+      })()`)
+    const problem = () =>
+      page("document.querySelector('.ra-error')?.textContent ?? '(없음)'") as Promise<string>
+
+    await page("document.querySelectorAll('.settings-sidebar-item')[3].click()")
+    await wait(500)
+    await shot(settingsWindow, `${theme}-8-설정-계정`)
+    await page("document.querySelector('.settings-item-control .button').click()")
+    await wait(500)
+    await shot(settingsWindow, `${theme}-8-계정-로그인창`)
+
+    // 계정 만들기에서 모양이 틀린 비밀번호는 메일을 보내기 전에 창이 막는다(서버에 가지 않음).
+    await page("[...document.querySelectorAll('.ra-link')].at(-1).click()")
+    await wait(300)
+    await fill('.ra-field[type=email]', 'kim@example.com')
+    await fill('.ra-field[type=password]', 'abc')
+    await page("document.querySelector('.ra-submit').click()")
+    await wait(400)
+    note(`[${theme}] 계정 만들기 · 비밀번호 abc: 알림=${await problem()}`)
+    await shot(settingsWindow, `${theme}-8-계정-비밀번호모양`)
+
+    if (!process.env.DRAW_API_URL) {
+      note(`[${theme}] 시험 서버 없음: 로그인 · 로그아웃은 건너뜀`)
+      return
+    }
+    await page("[...document.querySelectorAll('.ra-link')].at(-1).click()")
+    await wait(300)
+    await fill('.ra-field[type=email]', 'kim@example.com')
+    await fill('.ra-field[type=password]', 'wrong123')
+    await page("document.querySelector('.ra-submit').click()")
+    await wait(800)
+    note(`[${theme}] 로그인 · 틀린 비밀번호: 알림=${await problem()}`)
+    await shot(settingsWindow, `${theme}-8-계정-비밀번호틀림`)
+
+    await fill('.ra-field[type=password]', 'draw1234')
+    await page("document.querySelector('.ra-submit').click()")
+    await wait(1000)
+    note(
+      `[${theme}] 로그인: 메인 계정=${app.account().current()}, 창 제목 줄=${await page("document.querySelector('.settings-item-title')?.textContent")}, 로그인 창 남음=${await page("Boolean(document.querySelector('.ra-sheet'))")}`
+    )
+    await shot(settingsWindow, `${theme}-8-계정-로그인됨`)
+    await page("document.querySelector('.ra-badge').click()")
+    await wait(400)
+    await shot(settingsWindow, `${theme}-8-계정-메뉴`)
+    await page("[...document.querySelectorAll('.ra-menu-item')].at(-1).click()")
+    await wait(800)
+    note(
+      `[${theme}] 로그아웃: 메인 계정=${app.account().current()}, 로그인 단추=${await page("Boolean(document.querySelector('.settings-item-control .button'))")}`
+    )
+  }
+
   const shot = async (window: Electron.BrowserWindow, name: string) => {
     note(
       `  [${name}] 숨김=${electronApp.isHidden()} 보임=${window.isVisible()} 자리=${JSON.stringify(window.getBounds())} 맨앞=${window.isFocused()}`
@@ -241,6 +301,7 @@ export async function runTestShots(app: any) {
         await wait(400)
         await shot(settingsWindow, `${theme}-8-설정-${name}`)
       }
+      await accountScenes(settingsWindow, theme)
       settingsWindow.close()
       await wait(400)
 

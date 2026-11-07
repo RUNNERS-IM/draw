@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Phím tắt",
   "settings.tabAppearance": "Giao diện",
   "settings.tabApplication": "Ứng dụng",
+  "settings.tabAccount": "Tài khoản",
+  "settings.accountOptional": "Bạn vẫn vẽ được mà không cần đăng nhập.",
   "settings.resetDefault": "Đặt lại mặc định",
   "settings.removeShortcut": "Xóa phím tắt",
   "settings.globalHint": "Hoạt động trong mọi ứng dụng",

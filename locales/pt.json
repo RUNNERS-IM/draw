@@ -53,6 +53,8 @@
   "settings.tabShortcuts": "Atalhos",
   "settings.tabAppearance": "Aparência",
   "settings.tabApplication": "App",
+  "settings.tabAccount": "Conta",
+  "settings.accountOptional": "Você pode desenhar sem entrar.",
   "settings.resetDefault": "Restaurar padrão",
   "settings.removeShortcut": "Remover atalho",
   "settings.globalHint": "Funciona em todos os apps",
