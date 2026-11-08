@@ -1933,7 +1933,7 @@ function screenshotFilename(withUniqSuffix = false) {
   const code = screenshotTimecode4(date)
   const suffix = withUniqSuffix ? `-${Date.now()}` : ''
 
-  return `DRWPN-${yyyy}${mm}${dd}-${code}${suffix}.png`
+  return `Draw-${yyyy}${mm}${dd}-${code}${suffix}.png`
 }
 
 async function captureDisplayImage(display: Electron.Display) {
