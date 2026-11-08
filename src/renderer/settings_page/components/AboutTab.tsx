@@ -8,9 +8,6 @@ const loadNotices = () =>
 
 const { getVersion, openExternal } = window.electronAPI
 
-// 탭 안에서는 창을 닫거나 창 높이를 내용에 맞추지 않는다(설정 창은 크기를 사람이 정한다).
-const keepWindow = () => undefined
-
 const AboutTab = () => (
   <RunnersAbout
     appId="draw"
@@ -22,9 +19,8 @@ const AboutTab = () => (
     t={t}
     version={getVersion}
     openExternal={openExternal}
-    closeWindow={keepWindow}
-    fitHeight={keepWindow}
     loadNotices={loadNotices}
+    embedded
   />
 )
 
