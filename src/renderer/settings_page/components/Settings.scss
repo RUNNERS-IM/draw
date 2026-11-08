@@ -144,6 +144,16 @@ body {
   }
 }
 
+// 오른쪽→왼쪽 화면이면 크로미움이 맥의 얇은 막대 대신 늘 보이는 굵은 막대를 왼쪽에 그린다.
+// 스크롤되는 칸만 왼쪽→오른쪽으로 두어 얇은 막대를 쓰고, 안의 내용은 다시 오른쪽→왼쪽으로 돌린다.
+:root[dir='rtl'] .settings-scroll {
+  direction: ltr;
+
+  > * {
+    direction: rtl;
+  }
+}
+
 .settings-group {
   flex: none;
 }
