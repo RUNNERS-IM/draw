@@ -976,7 +976,7 @@ const Settings = (config: any) => {
                 </div>
 
                 <div className="settings-item-control">
-                  <button className="button" onClick={resetToOriginals}>
+                  <button className="button danger" onClick={resetToOriginals}>
                     {t('settings.resetAllButton')}
                   </button>
                 </div>

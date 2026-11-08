@@ -686,8 +686,8 @@
         &.active {
           border: 0;
           border-radius: 8px;
-          color: #ffffff;
-          background-color: var(--toolbar-accent-color);
+          color: var(--rw-on-primary);
+          background-color: var(--rw-primary);
         }
 
         &.cross-line {
@@ -718,7 +718,7 @@
       }
 
       li.active .toolbar__color-picker {
-        box-shadow: 0 0 0 1.5px #ffffff;
+        box-shadow: 0 0 0 1.5px var(--rw-on-primary);
       }
 
       .toolbar__color-hint-wrapper .toolbar__color-hint {

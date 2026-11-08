@@ -48,7 +48,7 @@
     transition: border-color 0.3s ease;
 
     &:hover {
-      border-color: var(--blue-500);
+      border-color: var(--rw-primary);
     }
   }
 
@@ -64,10 +64,10 @@
 
     &:hover {
       .whiteboard-resize-frame__snap-preview {
-        border-color: var(--blue-500);
+        border-color: var(--rw-primary);
 
         .whiteboard-resize-frame__snap-preview-fill {
-          background-color: var(--blue-500);
+          background-color: var(--rw-primary);
         }
       }
     }

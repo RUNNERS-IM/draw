@@ -1,5 +1,6 @@
 import type { ComponentType } from 'react'
 import type { Figure, Point } from './types'
+import '../../../runners-account/runners-window.css'
 import './Application.scss'
 
 import { useCallback, useState, useEffect, useLayoutEffect, useRef } from 'react'

@@ -168,7 +168,7 @@ export async function runTestShots(app: any) {
       })()`)}`
     )
     note(
-      `[${theme}] 설정 › 그리기 첫 줄: 설명 칸 높이=${await page("document.querySelector('.settings-item-description').offsetHeight")}, 설명 글자 넘침=${await page("[...document.querySelectorAll('.settings-item-info')].filter((el) => el.scrollWidth > el.clientWidth).length")}, 단축키 칸 방향=${await page("getComputedStyle(document.querySelector('.hotkey-pill')).direction")}`
+      `[${theme}] 설정 › 그리기 첫 줄: 설명 칸 높이=${await page("document.querySelector('.settings-item-description').offsetHeight")}, 설명 글자 넘침=${await page("[...document.querySelectorAll('.settings-item-info')].filter((el) => el.scrollWidth > el.clientWidth).length")}, 단축키 칸 방향=${await page("getComputedStyle(document.querySelector('.hotkey-pill')).direction")}, 글꼴 들어옴=${await page("document.fonts.check('13px Pretendard')")}, 단추 글꼴=${await page("getComputedStyle(document.querySelector('.settings-item-control .button, .settings-item-control select') ?? document.body).fontFamily.split(',')[0]")}`
     )
     await shot(settingsWindow, `${theme}-8-설정-그리기-위`)
     await page("document.querySelector('.settings-scroll').scrollTop = 99999")

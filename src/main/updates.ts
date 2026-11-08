@@ -34,9 +34,6 @@ const updateWindow = createUpdateWindow({
       roundedCorners: true,
       alwaysOnTop: true,
       title: 'Draw',
-      vibrancy: 'menu',
-      visualEffectState: 'active',
-      backgroundColor: '#00000000',
       webPreferences: { preload: preloadPath('update_page'), nodeIntegration: false }
     })
     window.loadURL(pageUrl('update_page'))

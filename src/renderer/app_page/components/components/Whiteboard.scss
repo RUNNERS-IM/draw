@@ -281,7 +281,7 @@
               font-weight: 500;
 
               &.whiteboard-sidebar__label-link {
-                color: var(--blue-500);
+                color: var(--rw-primary);
                 text-decoration: underline;
               }
             }
@@ -320,7 +320,7 @@
           color: var(--gray-700);
 
           .whiteboard-sidebar__theme-preview {
-            border-color: var(--blue-500);
+            border-color: var(--rw-primary);
           }
         }
 
@@ -370,7 +370,7 @@
           color: var(--gray-700);
 
           .whiteboard-sidebar__style-preview-wrapper {
-            border-color: var(--blue-500);
+            border-color: var(--rw-primary);
           }
         }
 
@@ -427,7 +427,7 @@
         margin: 0;
 
         &:active ~ .whiteboard-slider__thumb {
-          box-shadow: 0 0 0 6px rgb(from var(--blue-500) r g b / 16%);
+          box-shadow: 0 0 0 6px rgb(from var(--rw-primary) r g b / 16%);
         }
       }
 
@@ -448,8 +448,8 @@
 
       .whiteboard-slider__track {
         width: var(--whiteboard-slider-progress);
-        background-color: var(--blue-500);
-        border: 1px solid var(--blue-500);
+        background-color: var(--rw-primary);
+        border: 1px solid var(--rw-primary);
       }
 
       .whiteboard-slider__mark {
@@ -473,7 +473,7 @@
         width: 16px;
         height: 16px;
         border-radius: 50%;
-        background-color: var(--blue-500);
+        background-color: var(--rw-primary);
         transform: translate(-50%, -50%);
         transition: box-shadow 150ms cubic-bezier(0.4, 0, 0.2, 1);
       }

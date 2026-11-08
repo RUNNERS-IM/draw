@@ -11,9 +11,7 @@
   --gray-600: #6c757d;
   --gray-700: #2e3439;
 
-  --blue-500: #1d76dc;
-
-  --font-primary: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --font-primary: var(--rw-font-family);
 
   --shadow-ambient: rgba(0, 0, 0, 0.1);
 
@@ -21,7 +19,6 @@
   --toolbar-border-color: rgba(0, 0, 0, 0.14);
   --toolbar-icon-color: rgba(0, 0, 0, 0.85);
   --toolbar-hover-color: rgba(0, 0, 0, 0.06);
-  --toolbar-accent-color: #007aff;
 
   --border-size: 5px; // Equals to ZONE_BORDER
   --border-color: #b2f2bb;
@@ -35,7 +32,6 @@
     --toolbar-border-color: rgba(255, 255, 255, 0.16);
     --toolbar-icon-color: rgba(255, 255, 255, 0.88);
     --toolbar-hover-color: rgba(255, 255, 255, 0.1);
-    --toolbar-accent-color: #0a84ff;
   }
 }
 
@@ -46,6 +42,11 @@ body {
   margin: 0;
   overflow: hidden;
   background: transparent;
+}
+
+// 공용 창 값은 글꼴과 색 이름만 쓴다. 그림판의 글자 크기는 창 기본값(13px)을 받지 않는다.
+html {
+  font-size: 16px;
 }
 
 body {
