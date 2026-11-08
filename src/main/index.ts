@@ -255,6 +255,10 @@ const schema = {
     type: 'boolean',
     default: false
   },
+  first_launch_done: {
+    type: 'boolean',
+    default: false
+  },
   show_tray_icon: {
     type: 'boolean',
     default: true
@@ -819,7 +823,14 @@ function createExtendedToolbarWindow() {
       return
     }
 
-    enablePointerMode()
+    if (store.get('first_launch_done')) {
+      enablePointerMode()
+      return
+    }
+
+    // 설치 뒤 맨 처음 켤 때만 바로 그려 볼 수 있게 그리기 모드로 시작한다.
+    store.set('first_launch_done', true)
+    startDrawingWhenMainWindowLoaded()
   })
 
   extendedToolbarWindow.webContents.setVisualZoomLevelLimits(1, 1)
@@ -1034,6 +1045,15 @@ app.on('window-all-closed', () => {
 
 function testLanguage() {
   return DRAW_TEST_BUILD ? process.env.DRAW_TEST_LANG : undefined
+}
+
+function startDrawingWhenMainWindowLoaded() {
+  if (mainWindow.webContents.isLoading()) {
+    mainWindow.webContents.once('did-finish-load', enableDrawMode)
+    return
+  }
+
+  enableDrawMode()
 }
 
 function startAsHiddenCheck() {
@@ -1768,6 +1788,8 @@ function resetApp() {
     unRegisterGlobalShortcuts()
 
     store.clear()
+    // 처음 설정으로 돌려도 다음 실행을 맨 처음 실행으로 치지 않는다.
+    store.set('first_launch_done', true)
 
     registerGlobalShortcuts()
 

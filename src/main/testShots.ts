@@ -167,6 +167,9 @@ export async function runTestShots(app: any) {
           + ', 오른쪽 여백=' + Math.round(bar.right - tabs[tabs.length - 1].right);
       })()`)}`
     )
+    note(
+      `[${theme}] 설정 › 그리기 첫 줄: 설명 칸 높이=${await page("document.querySelector('.settings-item-description').offsetHeight")}, 설명 글자 넘침=${await page("[...document.querySelectorAll('.settings-item-info')].filter((el) => el.scrollWidth > el.clientWidth).length")}, 단축키 칸 방향=${await page("getComputedStyle(document.querySelector('.hotkey-pill')).direction")}`
+    )
     await shot(settingsWindow, `${theme}-8-설정-그리기-위`)
     await page("document.querySelector('.settings-scroll').scrollTop = 99999")
     await wait(300)
@@ -257,6 +260,13 @@ export async function runTestShots(app: any) {
     electronApp.on('browser-window-created', (_event, window) => watch(window))
     await wait(2500)
     note(`화면들: ${JSON.stringify(screen.getAllDisplays().map((d) => d.bounds))}`)
+    {
+      const { mainWindow, extendedToolbarWindow } = app.getWindows()
+      note(
+        `켠 직후: 그리는 중=${app.isDrawing()}, 그림판 창 보임=${mainWindow.isVisible()}, 작은 막대 보임=${extendedToolbarWindow.isVisible()}`
+      )
+      await shot(mainWindow, '0-켠직후-그림판')
+    }
 
     for (const theme of ['light', 'dark'] as const) {
       nativeTheme.themeSource = theme

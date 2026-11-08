@@ -22,7 +22,6 @@ import {
 import {
   IoRefreshCircleOutline,
   IoCloseCircleOutline,
-  IoGlobeOutline,
   IoChevronDown,
   IoChevronForward
 } from 'react-icons/io5'
@@ -100,7 +99,6 @@ const HideTrayAlert = ({
 const ShortcutRow = ({
   title,
   description,
-  hint,
   shortcut,
   onCheck,
   onChange,
@@ -109,7 +107,6 @@ const ShortcutRow = ({
 }: {
   title: string
   description: string
-  hint?: string
   shortcut: any
   onCheck: (...args: any[]) => any
   onChange: (...args: any[]) => any
@@ -123,10 +120,7 @@ const ShortcutRow = ({
   return (
     <div className="settings-item">
       <div className="settings-item-info">
-        <div className="settings-item-title">
-          {title}
-          {hint && <IoGlobeOutline className="settings-item-hint" title={hint} />}
-        </div>
+        <div className="settings-item-title">{title}</div>
         <div className="settings-item-description">{description}</div>
       </div>
 
@@ -513,7 +507,6 @@ const Settings = (config: any) => {
               <ShortcutRow
                 title={t('settings.showHideApp')}
                 description={t('settings.showHideAppDesc')}
-                hint={t('settings.globalHint')}
                 shortcut={showHideApp}
                 onCheck={canRegisterShortcut}
                 onChange={(acc: any) => applyShortcut('key_binding_show_hide_app', acc)}
@@ -803,7 +796,7 @@ const Settings = (config: any) => {
 
         {activeTab === 'general' && (
           <>
-            <Group>
+            <Group title={t('settings.groupBehavior')}>
               <div className="settings-item">
                 <div className="settings-item-info">
                   <div className="settings-item-title">{t('settings.launchOnLogin')}</div>
