@@ -22,7 +22,7 @@
     "lint": "oxlint -c .oxlintrc.draw.json",
     "format": "oxfmt",
     "format:check": "oxfmt --check",
-    "check:account": "node src/runners-account/check.mjs --kit 0.1.20 && node src/main/runners/check.mjs --kit 0.1.20 && node scripts/check.mjs --kit 0.1.20",
+    "check:account": "node src/runners-account/check.mjs --kit 0.1.22 && node src/main/runners/check.mjs --kit 0.1.22 && node scripts/check.mjs --kit 0.1.22",
     "check:locales": "node scripts/check-locales.mjs",
     "notices": "node scripts/third-party-notices.mjs Draw && node scripts/drawpen-notice.mjs",
     "dist": "pnpm build && electron-builder --config electron-builder.config.cjs"

@@ -20,6 +20,7 @@ const create = () =>
     version: app.getVersion(),
     filePath: filePath(),
     token: freshToken,
+    userAgent: `Draw/${app.getVersion()}`,
     ...(DRAW_TEST_BUILD ? { endpoint: testEndpoint } : {})
   })
 

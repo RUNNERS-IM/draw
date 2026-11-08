@@ -10,13 +10,6 @@ import { createAccount, type Account } from './runners/account'
 const testServer = DRAW_TEST_BUILD ? process.env.DRAW_API_URL : undefined
 const API_URL = testServer || 'https://server.system.runners.im'
 
-// Why: 시험 서버의 토큰은 가짜이고, 서명 없는 시험판이 키체인을 쓰면 묻는 창이 뜰 수 있어 시험 서버일 때는 암호화하지 않는다.
-const plainStorage = {
-  isEncryptionAvailable: () => false,
-  encryptString: (text: string) => Buffer.from(text),
-  decryptString: (bytes: Buffer) => bytes.toString('utf8')
-}
-
 let account: Account
 
 /** 실패를 공통 로그인 창이 읽는 코드(SignInProblem)로 돌려준다. 성공이면 null.
@@ -35,7 +28,9 @@ export function startAccount() {
     project: 'DRAW',
     filePath: path.join(app.getPath('userData'), 'account.bin'),
     apiUrl: API_URL,
-    safeStorage: testServer ? plainStorage : safeStorage
+    safeStorage,
+    isPackaged: app.isPackaged,
+    userAgent: `Draw/${app.getVersion()}`
   })
   account.onChange(() => {
     for (const window of BrowserWindow.getAllWindows()) {

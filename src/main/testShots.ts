@@ -1,5 +1,7 @@
 // 시험판 전용(DRAW_TEST_BUILD): 키보드 · 마우스를 흉내 내지 않고, 앱의 처리 함수를 불러 상태를 띄워 창마다 그림을 저장한다.
-// 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=<언어 코드>] Draw 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
+// 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=<언어 코드>] Draw --use-mock-keychain 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
+// --use-mock-keychain: 서명 없는 시험판이 진짜 키체인에 항목을 만들거나 묻는 창을 띄우지 않게 한다.
+// DRAW_TEST_ACCOUNT=signin|check 를 주면 그림은 찍지 않고 로그인 또는 로그인 유지만 보고 끝난다.
 import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -138,7 +140,7 @@ export async function runTestShots(app: any) {
     await wait(400)
     await shot(settingsWindow, `${theme}-8-계정-메뉴`)
     note(
-      `[${theme}] 계정 동그라미: 판다 그림 폭=${await page("[...document.querySelectorAll('.ra-badge img')].map((img) => img.naturalWidth).join('/')")}`
+      `[${theme}] 계정 동그라미: 판다 그림 폭=${await page("[...document.querySelectorAll('.ra-badge img')].map((img) => img.naturalWidth).join('/')")}, 로그아웃 화살표=${await page("getComputedStyle(document.querySelector('.ra-out')).transform")}`
     )
     await page("[...document.querySelectorAll('.ra-menu-item')].at(-1).click()")
     await wait(800)
@@ -331,6 +333,20 @@ export async function runTestShots(app: any) {
       (window) => window && watch(window)
     )
     electronApp.on('browser-window-created', (_event, window) => watch(window))
+    if (process.env.DRAW_TEST_ACCOUNT) {
+      await wait(1000)
+      if (process.env.DRAW_TEST_ACCOUNT === 'signin') {
+        await app.account().signIn('login', 'kim@example.com', 'draw1234')
+      }
+      const file = path.join(electronApp.getPath('userData'), 'account.bin')
+      const bytes = fs.existsSync(file) ? fs.readFileSync(file) : null
+      note(
+        `계정: 설치한 판=${electronApp.isPackaged}, 로그인=${app.account().current()}, 파일=${bytes ? (bytes.toString('utf8').includes('kim@example.com') ? '평문' : '암호화') : '없음'}`
+      )
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
     await wait(2500)
     note(`화면들: ${JSON.stringify(screen.getAllDisplays().map((d) => d.bounds))}`)
     {
