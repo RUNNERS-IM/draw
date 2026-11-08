@@ -157,6 +157,16 @@ export async function runTestShots(app: any) {
     note(
       `[${theme}] 설정 창: 크기=${JSON.stringify(settingsWindow.getContentSize())}, 탭=${await page("[...document.querySelectorAll('.settings-toolbar-item')].map((b) => b.textContent).join(' · ')")}, 제목 줄=${await page("document.querySelector('.settings-titlebar')?.textContent ?? '(없음)'")}`
     )
+    note(
+      `[${theme}] 설정 탭 줄: ${await page(`(() => {
+        const bar = document.querySelector('.settings-toolbar').getBoundingClientRect();
+        const tabs = [...document.querySelectorAll('.settings-toolbar-item')].map((b) => b.getBoundingClientRect());
+        return 'toolbar 폭=' + Math.round(bar.width)
+          + ', 탭 폭=' + tabs.map((r) => Math.round(r.width)).join('/')
+          + ', 왼쪽 여백=' + Math.round(tabs[0].left - bar.left)
+          + ', 오른쪽 여백=' + Math.round(bar.right - tabs[tabs.length - 1].right);
+      })()`)}`
+    )
     await shot(settingsWindow, `${theme}-8-설정-그리기-위`)
     await page("document.querySelector('.settings-scroll').scrollTop = 99999")
     await wait(300)

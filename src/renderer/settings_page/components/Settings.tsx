@@ -122,14 +122,11 @@ const ShortcutRow = ({
 
   return (
     <div className="settings-item">
-      {hint && (
-        <div className="settings-item-hint">
-          <IoGlobeOutline className="icon" title={hint} />
-        </div>
-      )}
-
       <div className="settings-item-info">
-        <div className="settings-item-title">{title}</div>
+        <div className="settings-item-title">
+          {title}
+          {hint && <IoGlobeOutline className="settings-item-hint" title={hint} />}
+        </div>
         <div className="settings-item-description">{description}</div>
       </div>
 
@@ -669,7 +666,6 @@ const Settings = (config: any) => {
               <div className="settings-item">
                 <div className="settings-item-info">
                   <div className="settings-item-title">{t('settings.hideExtended')}</div>
-                  <div className="settings-item-description">{t('settings.hideExtendedDesc')}</div>
                 </div>
 
                 <div className="settings-item-control">
