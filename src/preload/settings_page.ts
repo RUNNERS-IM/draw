@@ -64,10 +64,6 @@ const api = {
     }
   },
 
-  usageConsent: (): Promise<'unasked' | 'granted' | 'denied'> =>
-    ipcRenderer.invoke('usage_consent'),
-  setUsageConsent: (granted: boolean) => ipcRenderer.invoke('set_usage_consent', granted),
-
   // 정보 탭(kit RunnersAbout)이 쓰는 값.
   getVersion: (): Promise<string> => ipcRenderer.invoke('get_app_version'),
   openExternal: (url: string) => ipcRenderer.invoke('open_external', url),

@@ -149,76 +149,6 @@ export async function runTestShots(app: any) {
     )
   }
 
-  // 사용 통계 동의: 묻는 창과 일반 탭의 줄. 로그인한 채로도 동의 전 · 거절 뒤에는 시험 서버에 아무것도 가지 않아야 한다.
-  const usageScenes = async (theme: string) => {
-    const usage = app.usage
-    const server = process.env.DRAW_API_URL
-    const sent = async () =>
-      server
-        ? ((await fetch(`${server}/__usage`).then((r) => r.text())) as string)
-        : '(시험 서버 없음)'
-    const savedFile = () =>
-      fs.readFileSync(path.join(electronApp.getPath('userData'), 'usage-stats.json'), 'utf8')
-
-    if (server) {
-      await app.account().signIn('login', 'kim@example.com', 'draw1234')
-    }
-    app.restartUsage()
-    app.showSettingsWindow()
-    await wait(1500)
-    const { settingsWindow } = app.getWindows()
-    const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
-    note(
-      `[${theme}] 동의 창: 있음=${await page("Boolean(document.querySelector('.ra-usage-sheet'))")}, 제목=${await page("document.querySelector('.ra-usage-sheet .ra-title').textContent")}, 넘침=${await page("(() => { const s = document.querySelector('.ra-usage-sheet'); return s.scrollWidth > s.clientWidth || s.scrollHeight > s.clientHeight })()")}, 방향=${await page('getComputedStyle(document.querySelector(".ra-usage-sheet")).direction')}`
-    )
-    await shot(settingsWindow, `${theme}-7-동의창`)
-
-    usage().count('draw.start')
-    note(
-      `[${theme}] 답하기 전: 동의=${usage().consent()}, 저장 파일 있음=${fs.existsSync(path.join(electronApp.getPath('userData'), 'usage-stats.json'))}, flush=${await usage().flush()}, 시험 서버=${await sent()}`
-    )
-    await page("document.querySelector('.ra-usage-deny').click()")
-    await wait(500)
-    usage().count('draw.start')
-    usage().save()
-    note(
-      `[${theme}] 거절 뒤: 동의=${usage().consent()}, 창 남음=${await page("Boolean(document.querySelector('.ra-usage-sheet'))")}, flush=${await usage().flush()}, 파일=${savedFile()}, 시험 서버=${await sent()}`
-    )
-
-    await page("document.querySelectorAll('.settings-toolbar-item')[1].click()")
-    await wait(500)
-    await shot(settingsWindow, `${theme}-7-설정-통계줄-꺼짐`)
-    await page("document.querySelector('.usage-toggle').click()")
-    await wait(500)
-    note(`[${theme}] 스위치 켬: 동의=${usage().consent()}`)
-    await shot(settingsWindow, `${theme}-7-설정-통계줄-켜짐`)
-
-    // 끝난 날 치가 있을 때: 서버 주소가 아직 없어 404 가 와도 앱은 그대로이고 횟수는 남아야 한다.
-    const at = new Date(Date.now() - 86400000)
-    const two = (n: number) => String(n).padStart(2, '0')
-    const yesterday = `${at.getFullYear()}-${two(at.getMonth() + 1)}-${two(at.getDate())}`
-    app.restartUsage({
-      consent: 'granted',
-      decidedAt: new Date().toISOString(),
-      days: { [yesterday]: { 'draw.start': 3 } },
-      deviceId: 'test-device',
-      deleteOnServer: false
-    })
-    note(
-      `[${theme}] 동의 뒤 보내기: flush=${await usage().flush()}, 파일=${savedFile()}, 시험 서버=${await sent()}`
-    )
-    await page("document.querySelector('.usage-toggle').click()")
-    await wait(1000)
-    note(
-      `[${theme}] 스위치 끔: 동의=${usage().consent()}, 파일=${savedFile()}, 시험 서버=${await sent()}`
-    )
-    if (server) {
-      await app.account().signOut()
-    }
-    settingsWindow.close()
-    await wait(400)
-  }
-
   // 설정 창 하나(2026-11-08 창 통일): 그리기 · 일반 · 계정 · 정보 탭, 메뉴 막대 아이콘 끄기 · 켜기, ⌘, 메뉴.
   const settingsScenes = async (theme: string) => {
     app.showSettingsWindow()
@@ -252,6 +182,9 @@ export async function runTestShots(app: any) {
 
     await tab(1)
     await shot(settingsWindow, `${theme}-8-설정-일반`)
+    note(
+      `[${theme}] 설정 › 일반: 묻는 창=${await page("Boolean(document.querySelector('.ra-usage-sheet'))")}, 줄=${await page("[...document.querySelectorAll('.settings-item-title')].map((el) => el.textContent).join(' | ')")}`
+    )
 
     // 메뉴 막대 아이콘 끄기: 스위치를 누르면 묻는 창이 뜨고, 확인을 누르면 메인이 아이콘을 없앤다.
     const toggle =
@@ -352,13 +285,8 @@ export async function runTestShots(app: any) {
     {
       const { mainWindow, extendedToolbarWindow } = app.getWindows()
       note(
-        `켠 직후: 그리는 중=${app.isDrawing()}, 그림판 창 보임=${mainWindow.isVisible()}, 작은 막대 보임=${extendedToolbarWindow.isVisible()}, 설정 창 보임=${Boolean(app.getWindows().settingsWindow?.isVisible())}, 동의 창=${(await app.getWindows().settingsWindow?.webContents.executeJavaScript("Boolean(document.querySelector('.ra-usage-sheet'))")) ?? false}`
+        `켠 직후: 그리는 중=${app.isDrawing()}, 그림판 창 보임=${mainWindow.isVisible()}, 작은 막대 보임=${extendedToolbarWindow.isVisible()}, 설정 창 보임=${Boolean(app.getWindows().settingsWindow?.isVisible())}`
       )
-      if (app.getWindows().settingsWindow) {
-        await shot(app.getWindows().settingsWindow, '0-켠직후-설정창-동의')
-        app.getWindows().settingsWindow.close()
-        await wait(400)
-      }
       await shot(mainWindow, '0-켠직후-그림판')
     }
 
@@ -478,7 +406,6 @@ export async function runTestShots(app: any) {
       note(`[${theme}] 패널 줄(그리는 중): ${await panelRows()}`)
       app.hidePanel()
 
-      await usageScenes(theme)
       await settingsScenes(theme)
 
       const notes = ['왼쪽 도구 막대를 고쳤습니다.', '패널 글을 다듬었습니다.']

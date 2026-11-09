@@ -26,14 +26,6 @@ import { loginItemsAllowed } from './loginItems'
 import { startUpdates, checkNow } from './updates'
 import { startAccount, accountForTest } from './account'
 import { runTestShots } from './testShots'
-import {
-  countUsage,
-  restartUsageForTest,
-  saveUsage,
-  shouldAskUsage,
-  startUsage,
-  usageForTest
-} from './usage'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isDebugLoggingEnabled = process.env.DRAW_DEBUG === '1'
@@ -601,8 +593,6 @@ function togglePanel() {
 }
 
 function showPanel() {
-  countUsage('panel.open')
-
   // 클릭 모드로 돌아올 때 앱을 숨기므로(releaseFocusBack), 먼저 숨김을 풀어야 패널이 보인다.
   if (isMac && app.isHidden()) {
     app.show()
@@ -835,9 +825,6 @@ function createExtendedToolbarWindow() {
 
     if (store.get('first_launch_done')) {
       enablePointerMode()
-      if (shouldAskUsage()) {
-        showSettingsWindow()
-      }
       return
     }
 
@@ -861,8 +848,6 @@ function showSettingsWindow(tab?: SettingsTab) {
   if (zoomModeStarting) {
     return
   }
-
-  countUsage('settings.open')
 
   withThrottle(() => {
     if (settingsWindow) {
@@ -978,7 +963,6 @@ app.whenReady().then(() => {
   applyLaunchOnLoginDefault()
 
   startAccount()
-  startUsage()
 
   logDisplays()
 
@@ -1024,8 +1008,6 @@ app.whenReady().then(() => {
       }),
       isDrawing: () => drawingMode,
       account: accountForTest,
-      usage: usageForTest,
-      restartUsage: restartUsageForTest,
       quit: quitApp
     })
   }
@@ -1042,7 +1024,6 @@ app.whenReady().then(() => {
 app.on('before-quit', () => {
   isQuitting = true
   flushExtendedToolbarPosition()
-  saveUsage()
 })
 
 autoUpdater.on('before-quit-for-update', () => {
@@ -1700,10 +1681,6 @@ function enableDrawMode() {
 
   rawLog('Enable drawing mode...')
 
-  if (!drawingMode) {
-    countUsage('draw.start')
-  }
-
   exitZoomMode()
   flushExtendedToolbarPosition()
 
@@ -2038,8 +2015,6 @@ async function makeScreenshot() {
   if (!drawingMode) {
     enableDrawMode()
   }
-
-  countUsage('screenshot')
 
   try {
     rawLog('Exporting as PNG...')

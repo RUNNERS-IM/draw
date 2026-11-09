@@ -60,11 +60,5 @@ export function startAccount() {
   ipcMain.handle('account_sign_out', () => account.signOut())
 }
 
-/** 사용 통계를 보낼 때 쓰는 토큰. 로그아웃 상태면 null, 서버에 닿지 못하면 지금 토큰을 그대로 준다. */
-export async function freshToken() {
-  const result = await account.refresh()
-  return result.ok ? result.token : account.accessToken()
-}
-
 /** 시험 모드가 로그인 · 로그아웃을 부른다(시험 서버로만). */
 export const accountForTest = () => account

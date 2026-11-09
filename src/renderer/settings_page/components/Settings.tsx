@@ -6,7 +6,6 @@ import ShortcutRecorder from './ShortcutRecorder'
 import ColorPicker from './ColorPicker'
 import AccountTab from './AccountTab'
 import AboutTab from './AboutTab'
-import { UsageConsentSheet, usageText } from '../../../runners-account/runners-usage'
 import { useTranslation } from 'react-i18next'
 import {
   createApplicationColorList,
@@ -216,17 +215,6 @@ const Settings = (config: any) => {
   const selectTab = (tab: Tab) => {
     setEditingColorId(null)
     setActiveTab(tab)
-  }
-
-  const [usageConsent, setUsageConsent] = useState<'unasked' | 'granted' | 'denied' | null>(null)
-
-  useEffect(() => {
-    void window.electronAPI.usageConsent().then(setUsageConsent)
-  }, [])
-
-  const chooseUsage = (granted: boolean) => {
-    setUsageConsent(granted ? 'granted' : 'denied')
-    void window.electronAPI.setUsageConsent(granted)
   }
 
   // 이미 열린 창에 다른 탭을 열라고 할 때(앱 메뉴의 「Draw 정보」, 아이콘을 숨긴 채 Draw 를 다시 열 때).
@@ -850,24 +838,6 @@ const Settings = (config: any) => {
                   />
                 </div>
               </div>
-
-              <div className="settings-item">
-                <div className="settings-item-info">
-                  <div className="settings-item-title">
-                    {usageText(window.electronAPI.locale, 'rowTitle')}
-                  </div>
-                  <div className="settings-item-description">
-                    {usageText(window.electronAPI.locale, 'rowHint')}
-                  </div>
-                </div>
-
-                <div className="settings-item-control">
-                  <div
-                    className={`toggle usage-toggle ${usageConsent === 'granted' ? 'active' : ''}`}
-                    onClick={() => chooseUsage(usageConsent !== 'granted')}
-                  />
-                </div>
-              </div>
             </Group>
 
             <Group title="Draw">
@@ -1019,10 +989,6 @@ const Settings = (config: any) => {
 
         {activeTab === 'about' && <AboutTab />}
       </main>
-
-      {usageConsent === 'unasked' && (
-        <UsageConsentSheet lang={window.electronAPI.locale} app="Draw" onChoose={chooseUsage} />
-      )}
 
       {confirmHideTray && (
         <HideTrayAlert
