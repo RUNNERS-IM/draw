@@ -5,6 +5,7 @@
 // DRAW_TEST_MIN_HEIGHT=1 을 주면 설정 창을 보이지 않게(투명) 띄워 가장 작은 높이의 탭마다 찍고 끝난다.
 // DRAW_TEST_BORDER=1 을 주면 밝은 · 어두운 · 연두 바탕 위의 그리기 테두리와 선택 표시만 찍고 끝난다.
 // DRAW_TEST_ICON=1 을 주면 창을 보이지 않게(투명) 띄워 앱 아이콘이 나오는 자리(정보 탭 · 묻는 창 · 업데이트 창 · 알림)만 찍고 끝난다.
+// DRAW_TEST_HIDDEN=1 을 함께 주면 모든 창을 투명하게 두어 화면을 가리지 않고 찍는다. 앱 메뉴 글자도 result.txt 에 남긴다.
 import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -269,6 +270,22 @@ export async function runTestShots(app: any) {
       (window) => window && watch(window)
     )
     electronApp.on('browser-window-created', (_event, window) => watch(window))
+    if (process.env.DRAW_TEST_HIDDEN) {
+      // 창을 보이고 숨길 때 앱이 투명도를 1 로 되돌리므로, 시험 동안은 늘 0 이 되게 막는다.
+      const hide = (window: Electron.BrowserWindow) => {
+        const setOpacity = window.setOpacity.bind(window)
+        window.setOpacity = () => setOpacity(0)
+        setOpacity(0)
+      }
+      BrowserWindow.getAllWindows().forEach(hide)
+      electronApp.on('browser-window-created', (_event, window) => hide(window))
+      const labels = (items: Electron.MenuItem[], depth = 0): string[] =>
+        items.flatMap((item) => [
+          `${'  '.repeat(depth)}${item.type === 'separator' ? '—' : `${item.label}${item.accelerator ? ` (${item.accelerator})` : ''}`}`,
+          ...labels(item.submenu?.items ?? [], depth + 1)
+        ])
+      note(`앱 메뉴:\n${labels(Menu.getApplicationMenu()?.items ?? []).join('\n')}`)
+    }
     if (process.env.DRAW_TEST_MIN_HEIGHT) {
       electronApp.on('browser-window-created', (_event, window) => window.setOpacity(0))
       for (const theme of ['light', 'dark'] as const) {
