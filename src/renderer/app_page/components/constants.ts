@@ -54,8 +54,9 @@ export const dotRadius = 5
 export const dotStrokeWidth = 1
 export const dotHoverRadius = 10
 export const sideHoverTolerance = 5
-export const dotBorderColor = '#6CC3E2'
-export const dotHoverColor = `${dotBorderColor}99`
+export const dotBorderColor = '#000000'
+export const dotOutlineColor = '#FFFFFF'
+export const dotHoverColor = '#80808099'
 export const activeSelectionBoxLineWidth = 1
 export const dotTextMargin = 5
 
