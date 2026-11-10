@@ -4,6 +4,7 @@
 // DRAW_TEST_ACCOUNT=signin|check 를 주면 그림은 찍지 않고 로그인 또는 로그인 유지만 보고 끝난다.
 // DRAW_TEST_MIN_HEIGHT=1 을 주면 설정 창을 보이지 않게(투명) 띄워 가장 작은 높이의 탭마다 찍고 끝난다.
 // DRAW_TEST_BORDER=1 을 주면 밝은 · 어두운 · 연두 바탕 위의 그리기 테두리와 선택 표시만 찍고 끝난다.
+// DRAW_TEST_ICON=1 을 주면 창을 보이지 않게(투명) 띄워 앱 아이콘이 나오는 자리(정보 탭 · 묻는 창 · 업데이트 창 · 알림)만 찍고 끝난다.
 import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -290,6 +291,65 @@ export async function runTestShots(app: any) {
         await page("document.querySelector('.settings-scroll').scrollTop = 99999")
         settingsWindow.close()
         await wait(400)
+      }
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
+    if (process.env.DRAW_TEST_ICON) {
+      electronApp.on('browser-window-created', (_event, window) => window.setOpacity(0))
+      for (const theme of ['light', 'dark'] as const) {
+        nativeTheme.themeSource = theme
+        app.showSettingsWindow()
+        await wait(1500)
+        const { settingsWindow, mainWindow } = app.getWindows()
+        const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+        const tab = (index: number) =>
+          page(`document.querySelectorAll('.settings-toolbar-item')[${index}].click()`)
+        await tab(3)
+        await wait(600)
+        await shot(settingsWindow, `${theme}-정보탭`)
+        await tab(1)
+        await wait(500)
+        await page(
+          "document.querySelectorAll('.settings-section')[0].querySelectorAll('.settings-item')[2].querySelector('.toggle').click()"
+        )
+        await wait(400)
+        await shot(settingsWindow, `${theme}-아이콘끄기확인`)
+        await page("document.querySelector('.alert-buttons .rw-button:not(.default)').click()")
+        settingsWindow.close()
+        await wait(400)
+
+        const prompt = askUpdate(
+          {
+            version: '2.6.110602',
+            notes: ['왼쪽 도구 막대를 고쳤습니다.'],
+            downloading: false,
+            percent: 100
+          },
+          false
+        )
+        await wait(1500)
+        await shot(
+          BrowserWindow.getAllWindows().find((window) =>
+            window.webContents.getURL().includes('update_page')
+          )!,
+          `${theme}-업데이트창`
+        )
+        prompt.close()
+        await wait(300)
+
+        mainWindow.setOpacity(0)
+        mainWindow.showInactive()
+        mainWindow.webContents.send('show_notification', {
+          title: 'Draw',
+          body: `그리기 모드가 켜졌습니다. (${theme})`
+        })
+        await wait(900)
+        await shot(mainWindow, `${theme}-알림`)
+        mainWindow.hide()
+        await wait(300)
       }
       note('끝')
       fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
