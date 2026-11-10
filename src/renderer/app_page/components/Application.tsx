@@ -244,6 +244,9 @@ const Application = (settings: any) => {
       if (action.type === 'clear') {
         handleReset()
       }
+      if (action.type === 'select') {
+        testActionRef.current.setActiveFigureInfo({ id: action.id, x: 0, y: 0 })
+      }
       if (action.type === 'figures') {
         setAllFigures(action.figures)
         setUndoStackFigures(
@@ -2329,6 +2332,7 @@ const Application = (settings: any) => {
   )
 
   testActionRef.current = {
+    setActiveFigureInfo,
     handleChangeTool,
     handleUndo,
     handleRedo,

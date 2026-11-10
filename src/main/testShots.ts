@@ -2,6 +2,8 @@
 // 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=<언어 코드>] Draw --use-mock-keychain 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
 // --use-mock-keychain: 서명 없는 시험판이 진짜 키체인에 항목을 만들거나 묻는 창을 띄우지 않게 한다.
 // DRAW_TEST_ACCOUNT=signin|check 를 주면 그림은 찍지 않고 로그인 또는 로그인 유지만 보고 끝난다.
+// DRAW_TEST_MIN_HEIGHT=1 을 주면 설정 창을 보이지 않게(투명) 띄워 가장 작은 높이의 탭마다 찍고 끝난다.
+// DRAW_TEST_BORDER=1 을 주면 밝은 · 어두운 · 연두 바탕 위의 그리기 테두리와 선택 표시만 찍고 끝난다.
 import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -266,6 +268,64 @@ export async function runTestShots(app: any) {
       (window) => window && watch(window)
     )
     electronApp.on('browser-window-created', (_event, window) => watch(window))
+    if (process.env.DRAW_TEST_MIN_HEIGHT) {
+      electronApp.on('browser-window-created', (_event, window) => window.setOpacity(0))
+      for (const theme of ['light', 'dark'] as const) {
+        nativeTheme.themeSource = theme
+        app.showSettingsWindow()
+        await wait(1500)
+        const { settingsWindow } = app.getWindows()
+        settingsWindow.setSize(656, 1)
+        await wait(400)
+        const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+        note(`[${theme}] 가장 작은 창: 크기=${JSON.stringify(settingsWindow.getContentSize())}`)
+        for (let index = 0; index < 4; index += 1) {
+          await page(`document.querySelectorAll('.settings-toolbar-item')[${index}].click()`)
+          await wait(500)
+          note(
+            `[${theme}] 탭 ${index}: ${await page("(() => { const s = document.querySelector('.settings-scroll'); return '스크롤 높이=' + s.scrollHeight + ', 보이는 높이=' + s.clientHeight + ', 가로 넘침=' + (document.documentElement.scrollWidth > innerWidth) })()")}`
+          )
+          await shot(settingsWindow, `${theme}-최소높이-탭${index}`)
+        }
+        await page("document.querySelector('.settings-scroll').scrollTop = 99999")
+        settingsWindow.close()
+        await wait(400)
+      }
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
+    if (process.env.DRAW_TEST_BORDER) {
+      nativeTheme.themeSource = 'light'
+      const { mainWindow } = app.getWindows()
+      app.enableDrawMode()
+      await wait(1500)
+      const list = figures()
+      const send = (action: unknown) => mainWindow.webContents.send('test_action', action)
+      send({ type: 'figures', figures: list })
+      await wait(500)
+      const selected = { 사각형: list[3].id, 글자: list[5].id }
+      for (const [name, color] of [
+        ['흰바탕', '#ffffff'],
+        ['어두운바탕', '#1e1e1e'],
+        ['연두바탕', '#b7e4c0']
+      ]) {
+        const key = await mainWindow.webContents.insertCSS(
+          `html { background: ${color} !important; }`
+        )
+        for (const [label, id] of Object.entries(selected)) {
+          send({ type: 'select', id })
+          await wait(500)
+          await shot(mainWindow, `${name}-${label}선택`)
+        }
+        await mainWindow.webContents.removeInsertedCSS(key)
+      }
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
     if (process.env.DRAW_TEST_ACCOUNT) {
       await wait(1000)
       if (process.env.DRAW_TEST_ACCOUNT === 'signin') {
