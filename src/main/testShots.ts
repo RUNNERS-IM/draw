@@ -5,6 +5,7 @@
 // DRAW_TEST_MIN_HEIGHT=1 을 주면 설정 창을 보이지 않게(투명) 띄워 가장 작은 높이의 탭마다 찍고 끝난다.
 // DRAW_TEST_BORDER=1 을 주면 밝은 · 어두운 · 연두 바탕 위의 그리기 테두리와 선택 표시만 찍고 끝난다.
 // DRAW_TEST_ICON=1 을 주면 창을 보이지 않게(투명) 띄워 앱 아이콘이 나오는 자리(정보 탭 · 묻는 창 · 업데이트 창 · 알림)만 찍고 끝난다.
+// DRAW_TEST_TOAST=1 을 주면 알림이 떠 있는 채로 창을 숨겼다가 다시 띄워 새 알림을 보내고, 새 알림이 보이는지 찍고 끝난다.
 // DRAW_TEST_HIDDEN=1 을 함께 주면 모든 창을 투명하게 두어 화면을 가리지 않고 찍는다. 앱 메뉴 글자도 result.txt 에 남긴다.
 // DRAW_TEST_TABS=1 을 주면 설정 창을 보이지 않게(투명) 띄워 탭 4개를 위 · 아래로 찍고, 잘린 글 · 겹친 줄 · 글 방향을 result.txt 에 남긴다.
 import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
@@ -378,6 +379,37 @@ export async function runTestShots(app: any) {
       }
       settingsWindow.close()
       await wait(400)
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
+    if (process.env.DRAW_TEST_TOAST) {
+      const { mainWindow } = app.getWindows()
+      const toastText = () =>
+        mainWindow.webContents.executeJavaScript(
+          "document.querySelector('#toast-block')?.textContent ?? '없음'"
+        )
+      const notify = (body: string) =>
+        mainWindow.webContents.send('show_notification', { title: 'Draw', body })
+      mainWindow.setOpacity(0)
+      mainWindow.showInactive()
+      await wait(1500)
+      notify('앞 알림')
+      for (let tries = 0; tries < 20 && !(await toastText()).includes('앞 알림'); tries += 1) {
+        await wait(300)
+      }
+      note(`앞 알림 뒤: ${await toastText()}`)
+      mainWindow.hide()
+      await wait(6000)
+      mainWindow.showInactive()
+      notify('새 알림')
+      await wait(1500)
+      note(`다시 띄운 뒤: ${await toastText()}`)
+      await shot(mainWindow, '알림-다시띄움')
+      await wait(4500)
+      note(`다시 띄우고 6초 뒤: ${await toastText()}`)
+      mainWindow.hide()
       note('끝')
       fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
       app.quit()
