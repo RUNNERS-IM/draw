@@ -6,6 +6,7 @@ import ShortcutRecorder from './ShortcutRecorder'
 import ColorPicker from './ColorPicker'
 import AccountTab from './AccountTab'
 import AboutTab from './AboutTab'
+import { useAppIcon } from '../../appIcon'
 import { useTranslation } from 'react-i18next'
 import {
   createApplicationColorList,
@@ -60,6 +61,7 @@ const HideTrayAlert = ({
   onConfirm: () => void
 }) => {
   const { t } = useTranslation()
+  const appIcon = useAppIcon()
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -80,7 +82,7 @@ const HideTrayAlert = ({
         aria-modal="true"
         aria-label={t('settings.hideTrayTitle')}
       >
-        <img className="alert-icon" src="../assets/icon.png" alt="" draggable={false} />
+        <img className="alert-icon" src={appIcon} alt="" draggable={false} />
         <div className="alert-message">{t('settings.hideTrayTitle')}</div>
         <div className="alert-informative">{t('settings.hideTrayDetail')}</div>
         <div className="alert-buttons">

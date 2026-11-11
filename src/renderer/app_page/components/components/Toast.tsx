@@ -1,3 +1,4 @@
+import { useAppIcon } from '../../../appIcon'
 import type { Callback } from '../types'
 import './Toast.scss'
 
@@ -10,6 +11,8 @@ const Toast = ({
   handleToastClicked: Callback
   handleToastHidden: Callback
 }) => {
+  const appIcon = useAppIcon()
+
   const handleAnimationEnd = (event: any) => {
     if (event.animationName !== 'toastHide') {
       return
@@ -20,7 +23,7 @@ const Toast = ({
 
   return (
     <div id="toast-block" key={`${info.title}-${info.body}`} onAnimationEnd={handleAnimationEnd}>
-      <img src="../assets/icon.png" alt="Draw" className="toast-icon" />
+      <img src={appIcon} alt="Draw" className="toast-icon" />
 
       <div className="toast-main">
         <div className="toast-main-title">{info.title}</div>
