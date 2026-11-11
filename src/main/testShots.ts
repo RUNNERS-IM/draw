@@ -6,6 +6,7 @@
 // DRAW_TEST_BORDER=1 을 주면 밝은 · 어두운 · 연두 바탕 위의 그리기 테두리와 선택 표시만 찍고 끝난다.
 // DRAW_TEST_ICON=1 을 주면 창을 보이지 않게(투명) 띄워 앱 아이콘이 나오는 자리(정보 탭 · 묻는 창 · 업데이트 창 · 알림)만 찍고 끝난다.
 // DRAW_TEST_HIDDEN=1 을 함께 주면 모든 창을 투명하게 두어 화면을 가리지 않고 찍는다. 앱 메뉴 글자도 result.txt 에 남긴다.
+// DRAW_TEST_TABS=1 을 주면 설정 창을 보이지 않게(투명) 띄워 탭 4개를 위 · 아래로 찍고, 잘린 글 · 겹친 줄 · 글 방향을 result.txt 에 남긴다.
 import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -309,6 +310,74 @@ export async function runTestShots(app: any) {
         settingsWindow.close()
         await wait(400)
       }
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
+    if (process.env.DRAW_TEST_TABS) {
+      electronApp.on('browser-window-created', (_event, window) => window.setOpacity(0))
+      nativeTheme.themeSource = 'light'
+      app.showSettingsWindow()
+      await wait(1500)
+      const { settingsWindow } = app.getWindows()
+      const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+      // 글이 칸보다 넓어 잘린 곳, 줄의 설명 칸과 단추 칸이 겹친 곳, 창 밖으로 나간 곳을 찾는다.
+      const inspect = `(() => {
+        const rtl = document.documentElement.dir === 'rtl'
+        const name = (el) => (el.textContent || '').trim().slice(0, 40)
+        const found = []
+        for (const el of document.querySelectorAll('body *')) {
+          const own = [...el.childNodes].some((node) => node.nodeType === 3 && node.textContent.trim())
+          if (!own || !el.getClientRects().length) continue
+          const rect = el.getBoundingClientRect()
+          if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflow !== 'visible') found.push('잘림: ' + name(el))
+          if (rect.right > innerWidth + 1 || rect.left < -1) found.push('창 밖: ' + name(el))
+        }
+        for (const item of document.querySelectorAll('.settings-item')) {
+          const info = item.querySelector('.settings-item-info')
+          const control = item.querySelector('.settings-item-control')
+          if (!info || !control) continue
+          const a = info.getBoundingClientRect()
+          const b = control.getBoundingClientRect()
+          if (rtl ? a.left < b.right - 1 : a.right > b.left + 1) found.push('겹침: ' + name(info))
+        }
+        return '방향=' + document.documentElement.dir + ', 가로 넘침=' + (document.documentElement.scrollWidth > innerWidth) + (found.length ? ', ' + found.join(' / ') : ', 문제 없음')
+      })()`
+      for (let index = 0; index < 4; index += 1) {
+        await page(`document.querySelectorAll('.settings-toolbar-item')[${index}].click()`)
+        await wait(600)
+        note(`탭 ${index}: ${await page(inspect)}`)
+        await shot(settingsWindow, `탭${index}-위`)
+        if (
+          await page(
+            "(() => { const s = document.querySelector('.settings-scroll'); return s.scrollHeight > s.clientHeight })()"
+          )
+        ) {
+          await page("document.querySelector('.settings-scroll').scrollTop = 99999")
+          await wait(300)
+          note(`탭 ${index} 아래: ${await page(inspect)}`)
+          await shot(settingsWindow, `탭${index}-아래`)
+        }
+        if (index === 1) {
+          await page("document.querySelector('.settings-scroll').scrollTop = 0")
+          await page(
+            "document.querySelectorAll('.settings-section')[0].querySelectorAll('.settings-item')[2].querySelector('.toggle').click()"
+          )
+          await wait(400)
+          note(`아이콘 끄기 묻는 창: ${await page(inspect)}`)
+          await shot(settingsWindow, '탭1-묻는창')
+          await page("document.querySelector('.alert-buttons .rw-button:not(.default)').click()")
+        }
+        if (index === 2) {
+          await page("document.querySelector('.settings-item-control .button')?.click()")
+          await wait(600)
+          note(`로그인 창: ${await page(inspect)}`)
+          await shot(settingsWindow, '탭2-로그인창')
+        }
+      }
+      settingsWindow.close()
+      await wait(400)
       note('끝')
       fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
       app.quit()

@@ -214,7 +214,7 @@ const Application = (settings: any) => {
   const testActionRef = useRef<any>(null)
 
   useEffect(() => {
-    if (!window.electronAPI.onTestAction) {
+    if (!DRAW_TEST_BUILD || !window.electronAPI.onTestAction) {
       return
     }
 
@@ -2341,7 +2341,7 @@ const Application = (settings: any) => {
     setAllFigures,
     setUndoStackFigures
   }
-  if (typeof window !== 'undefined') {
+  if (DRAW_TEST_BUILD && typeof window !== 'undefined') {
     window.__drawFigureCount = allFigures.length
   }
 

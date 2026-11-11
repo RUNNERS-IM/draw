@@ -50,7 +50,8 @@ module.exports = {
     }
   },
   dmg: { artifactName: `Draw-${tag}-mac-\${arch}.\${ext}` },
-  forceCodeSigning: isRelease,
+  // Why: 출시 빌드는 세 운영체제 모두 DRAW_RELEASE=1 로 돌지만 서명 인증서는 macOS 것만 있다.
+  forceCodeSigning: isRelease && process.platform === 'darwin',
   win: {
     icon: 'build/icon.ico',
     target: [{ target: 'nsis', arch: ['x64'] }],

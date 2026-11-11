@@ -1,15 +1,16 @@
 import { createRoot } from 'react-dom/client'
 import { RunnersUpdate } from '../../runners-account/runners-update'
 import { t } from '../../shared/i18n'
+import { useAppIcon } from '../appIcon'
 import { applyTextDirection } from '../i18n'
 
 applyTextDirection()
 
 const { answerUpdate, fitHeight, onUpdateOffer, updateOffer } = window.electronAPI
 
-createRoot(document.getElementById('root')!).render(
+const Update = () => (
   <RunnersUpdate
-    appIcon="../assets/icon.png"
+    appIcon={useAppIcon()}
     t={t}
     offer={updateOffer}
     onOffer={onUpdateOffer}
@@ -17,3 +18,5 @@ createRoot(document.getElementById('root')!).render(
     fitHeight={fitHeight}
   />
 )
+
+createRoot(document.getElementById('root')!).render(<Update />)

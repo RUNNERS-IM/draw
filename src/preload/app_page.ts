@@ -21,9 +21,11 @@ const api = {
     ipcRenderer.invoke('commit_toolbar_position', position),
 
   // Main -> Renderer
-  onTestAction: (callback: (...args: any[]) => any) => {
-    ipcRenderer.on('test_action', (_event, action) => callback(action))
-  },
+  onTestAction: DRAW_TEST_BUILD
+    ? (callback: (...args: any[]) => any) => {
+        ipcRenderer.on('test_action', (_event, action) => callback(action))
+      }
+    : undefined,
   onResetScreen: (callback: (...args: any[]) => any) => {
     ipcRenderer.on('reset_screen', () => callback())
   },
