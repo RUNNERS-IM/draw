@@ -19,7 +19,6 @@ import {
   dotStrokeWidth,
   dotHoverRadius,
   dotBorderColor,
-  dotOutlineColor,
   dotHoverColor,
   activeSelectionBoxLineWidth,
   erasedFigureColor,
@@ -867,16 +866,13 @@ const drawTextAutoResizeHandle = (ctx: CanvasRenderingContext2D, figure: Figure)
     return
   }
 
+  ctx.lineWidth = dotStrokeWidth
+  ctx.strokeStyle = dotBorderColor
   ctx.lineCap = 'round'
 
   ctx.beginPath()
   ctx.moveTo(...(handle.startAt as [number, number]))
   ctx.lineTo(...(handle.endAt as [number, number]))
-  ctx.lineWidth = dotStrokeWidth + 2
-  ctx.strokeStyle = dotOutlineColor
-  ctx.stroke()
-  ctx.lineWidth = dotStrokeWidth
-  ctx.strokeStyle = dotBorderColor
   ctx.stroke()
 }
 
@@ -917,10 +913,6 @@ const drawSelectionBox = (
   endX: number,
   endY: number
 ) => {
-  // 어두운 화면에서도 보이도록 흰 선 위에 검정 선을 그린다.
-  ctx.strokeStyle = dotOutlineColor
-  ctx.lineWidth = activeSelectionBoxLineWidth + 2
-  ctx.strokeRect(startX, startY, endX - startX, endY - startY)
   ctx.strokeStyle = dotBorderColor
   ctx.lineWidth = activeSelectionBoxLineWidth
   ctx.strokeRect(startX, startY, endX - startX, endY - startY)
