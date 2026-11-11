@@ -44,6 +44,7 @@
   "update.latest": "お使いの Draw は最新バージョンです。",
   "update.failed": "アップデートを確認できませんでした: {{error}}",
   "settings.groupBehavior": "動作",
+  "settings.groupScreen": "画面",
   "settings.title": "Draw の設定",
   "settings.tabShortcuts": "ショートカット",
   "settings.tabAppearance": "外観",

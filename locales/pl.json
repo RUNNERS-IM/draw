@@ -44,6 +44,7 @@
   "update.latest": "Masz najnowszą wersję Draw.",
   "update.failed": "Nie udało się sprawdzić aktualizacji: {{error}}",
   "settings.groupBehavior": "Działanie",
+  "settings.groupScreen": "Ekran",
   "settings.title": "Ustawienia Draw",
   "settings.tabShortcuts": "Skróty",
   "settings.tabAppearance": "Wygląd",

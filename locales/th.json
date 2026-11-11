@@ -44,6 +44,7 @@
   "update.latest": "คุณใช้ Draw เวอร์ชันล่าสุดแล้ว",
   "update.failed": "ตรวจหาอัปเดตไม่ได้: {{error}}",
   "settings.groupBehavior": "การทำงาน",
+  "settings.groupScreen": "หน้าจอ",
   "settings.title": "การตั้งค่า Draw",
   "settings.tabShortcuts": "ปุ่มลัด",
   "settings.tabAppearance": "รูปลักษณ์",

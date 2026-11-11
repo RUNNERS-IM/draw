@@ -44,6 +44,7 @@
   "update.latest": "Käytössäsi on Drawn uusin versio.",
   "update.failed": "Päivityksiä ei voitu tarkistaa: {{error}}",
   "settings.groupBehavior": "Toiminta",
+  "settings.groupScreen": "Näyttö",
   "settings.title": "Drawn asetukset",
   "settings.tabShortcuts": "Pikanäppäimet",
   "settings.tabAppearance": "Ulkoasu",

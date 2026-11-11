@@ -44,6 +44,7 @@
   "update.latest": "Du verwendest die neueste Version von Draw.",
   "update.failed": "Nach Updates konnte nicht gesucht werden: {{error}}",
   "settings.groupBehavior": "Verhalten",
+  "settings.groupScreen": "Anzeige",
   "settings.title": "Draw-Einstellungen",
   "settings.tabShortcuts": "Kurzbefehle",
   "settings.tabAppearance": "Darstellung",

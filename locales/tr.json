@@ -44,6 +44,7 @@
   "update.latest": "Draw'un en son sürümünü kullanıyorsunuz.",
   "update.failed": "Güncellemeler denetlenemedi: {{error}}",
   "settings.groupBehavior": "Davranış",
+  "settings.groupScreen": "Ekran",
   "settings.title": "Draw ayarları",
   "settings.tabShortcuts": "Kısayollar",
   "settings.tabAppearance": "Görünüm",

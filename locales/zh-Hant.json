@@ -44,6 +44,7 @@
   "update.latest": "目前已是最新版本的 Draw。",
   "update.failed": "無法檢查更新:{{error}}",
   "settings.groupBehavior": "行為",
+  "settings.groupScreen": "螢幕",
   "settings.title": "Draw 設定",
   "settings.tabShortcuts": "快速鍵",
   "settings.tabAppearance": "外觀",

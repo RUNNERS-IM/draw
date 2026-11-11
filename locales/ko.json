@@ -44,6 +44,7 @@
   "update.latest": "지금 쓰는 Draw 가 최신 버전입니다.",
   "update.failed": "업데이트를 확인하지 못했습니다: {{error}}",
   "settings.groupBehavior": "동작",
+  "settings.groupScreen": "화면",
   "settings.title": "Draw 설정",
   "settings.tabShortcuts": "단축키",
   "settings.tabAppearance": "모양",

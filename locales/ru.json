@@ -44,6 +44,7 @@
   "update.latest": "У вас последняя версия Draw.",
   "update.failed": "Не удалось проверить обновления: {{error}}",
   "settings.groupBehavior": "Поведение",
+  "settings.groupScreen": "Экран",
   "settings.title": "Настройки Draw",
   "settings.tabShortcuts": "Сочетания клавиш",
   "settings.tabAppearance": "Оформление",

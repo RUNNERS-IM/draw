@@ -44,6 +44,7 @@
   "update.latest": "Bạn đang dùng phiên bản Draw mới nhất.",
   "update.failed": "Không thể kiểm tra cập nhật: {{error}}",
   "settings.groupBehavior": "Hoạt động",
+  "settings.groupScreen": "Màn hình",
   "settings.title": "Cài đặt Draw",
   "settings.tabShortcuts": "Phím tắt",
   "settings.tabAppearance": "Giao diện",

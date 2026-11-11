@@ -44,6 +44,7 @@
   "update.latest": "Anda menggunakan versi terbaru Draw.",
   "update.failed": "Tidak dapat memeriksa pembaruan: {{error}}",
   "settings.groupBehavior": "Perilaku",
+  "settings.groupScreen": "Layar",
   "settings.title": "Pengaturan Draw",
   "settings.tabShortcuts": "Pintasan",
   "settings.tabAppearance": "Tampilan",

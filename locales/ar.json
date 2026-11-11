@@ -44,6 +44,7 @@
   "update.latest": "أنت تستخدم أحدث إصدار من Draw.",
   "update.failed": "تعذّر التحقق من التحديثات: {{error}}",
   "settings.groupBehavior": "السلوك",
+  "settings.groupScreen": "الشاشة",
   "settings.title": "إعدادات Draw",
   "settings.tabShortcuts": "الاختصارات",
   "settings.tabAppearance": "المظهر",

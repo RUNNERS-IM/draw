@@ -44,6 +44,7 @@
   "update.latest": "Je gebruikt de nieuwste versie van Draw.",
   "update.failed": "Kan niet op updates controleren: {{error}}",
   "settings.groupBehavior": "Gedrag",
+  "settings.groupScreen": "Scherm",
   "settings.title": "Draw-instellingen",
   "settings.tabShortcuts": "Sneltoetsen",
   "settings.tabAppearance": "Weergave",

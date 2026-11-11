@@ -44,6 +44,7 @@
   "update.latest": "आप Draw का नवीनतम संस्करण चला रहे हैं।",
   "update.failed": "अपडेट नहीं जाँचे जा सके: {{error}}",
   "settings.groupBehavior": "व्यवहार",
+  "settings.groupScreen": "डिस्प्ले",
   "settings.title": "Draw सेटिंग्स",
   "settings.tabShortcuts": "शॉर्टकट",
   "settings.tabAppearance": "रूप",

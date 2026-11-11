@@ -842,7 +842,7 @@ const Settings = (config: any) => {
               </div>
             </Group>
 
-            <Group title="Draw">
+            <Group title={t('settings.groupScreen')}>
               <div className="settings-item">
                 <div className="settings-item-info">
                   <div className="settings-item-title">{t('settings.lockMonitor')}</div>

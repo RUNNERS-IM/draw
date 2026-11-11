@@ -44,6 +44,7 @@
   "update.latest": "Você está na versão mais recente do Draw.",
   "update.failed": "Não foi possível verificar atualizações: {{error}}",
   "settings.groupBehavior": "Comportamento",
+  "settings.groupScreen": "Tela",
   "settings.title": "Configurações do Draw",
   "settings.tabShortcuts": "Atalhos",
   "settings.tabAppearance": "Aparência",
