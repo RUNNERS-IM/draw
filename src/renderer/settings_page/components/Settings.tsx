@@ -53,10 +53,16 @@ const Group = ({ title, children }: { title?: string; children: ReactNode }) => 
 )
 
 // 메뉴 막대 아이콘을 끄기 전에 묻는 창. Split 설정 창의 같은 알림과 같은 글 · 같은 단추 차례다.
+// 메뉴 막대는 Mac 말이라 Windows 는 알림 영역, Linux 는 시스템 트레이 문구를 쓴다(열쇠 끝 Win · Linux).
+const traySuffixFor = (platform: string) =>
+  platform === 'darwin' ? '' : platform === 'win32' ? 'Win' : 'Linux'
+
 const HideTrayAlert = ({
+  traySuffix,
   onCancel,
   onConfirm
 }: {
+  traySuffix: string
   onCancel: () => void
   onConfirm: () => void
 }) => {
@@ -80,11 +86,11 @@ const HideTrayAlert = ({
         className="alert"
         role="alertdialog"
         aria-modal="true"
-        aria-label={t('settings.hideTrayTitle')}
+        aria-label={t(`settings.hideTrayTitle${traySuffix}`)}
       >
         <img className="alert-icon" src={appIcon} alt="" draggable={false} />
-        <div className="alert-message">{t('settings.hideTrayTitle')}</div>
-        <div className="alert-informative">{t('settings.hideTrayDetail')}</div>
+        <div className="alert-message">{t(`settings.hideTrayTitle${traySuffix}`)}</div>
+        <div className="alert-informative">{t(`settings.hideTrayDetail${traySuffix}`)}</div>
         <div className="alert-buttons">
           <button className="rw-button" onClick={onCancel}>
             {t('settings.cancel')}
@@ -209,6 +215,7 @@ const Settings = (config: any) => {
 
   const displays = config.displays || []
   const isMac = config.is_mac
+  const traySuffix = traySuffixFor(config.platform)
 
   const resetToOriginals = () => {
     window.electronAPI.resetToOriginals()
@@ -830,7 +837,9 @@ const Settings = (config: any) => {
 
               <div className="settings-item">
                 <div className="settings-item-info">
-                  <div className="settings-item-title">{t('settings.showTrayIcon')}</div>
+                  <div className="settings-item-title">
+                    {t(`settings.showTrayIcon${traySuffix}`)}
+                  </div>
                 </div>
 
                 <div className="settings-item-control">
@@ -994,6 +1003,7 @@ const Settings = (config: any) => {
 
       {confirmHideTray && (
         <HideTrayAlert
+          traySuffix={traySuffix}
           onCancel={() => setConfirmHideTray(false)}
           onConfirm={() => void applyShowTrayIcon(false)}
         />

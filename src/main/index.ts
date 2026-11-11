@@ -1290,6 +1290,8 @@ ipcMain.handle('get_configuration', () => {
   return {
     app_version: app.getVersion(),
     is_mac: isMac,
+    // 시험판은 DRAW_TEST_PLATFORM 으로 다른 운영체제 문구를 Mac 에서 띄워 볼 수 있다.
+    platform: (DRAW_TEST_BUILD && process.env.DRAW_TEST_PLATFORM) || process.platform,
     open_tab: settingsTab,
     show_tray_icon: store.get('show_tray_icon'),
 
