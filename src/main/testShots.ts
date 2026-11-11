@@ -432,8 +432,34 @@ export async function runTestShots(app: any) {
           title: 'Draw',
           body: `그리기 모드가 켜졌습니다. (${theme})`
         })
-        await wait(900)
+        // 숨겼다 다시 띄운 창은 알림을 늦게 그릴 때가 있어, 이번 알림 글이 보일 때까지 기다린 뒤 찍는다.
+        for (let tries = 0; tries < 20; tries += 1) {
+          await wait(300)
+          const shown = await mainWindow.webContents.executeJavaScript(
+            `document.querySelector('#toast-block')?.textContent.includes('(${theme})') ?? false`
+          )
+          if (shown) {
+            break
+          }
+        }
+        await wait(400)
+        note(
+          `[${theme}-알림] ${await mainWindow.webContents.executeJavaScript(
+            `(() => { const t = document.querySelector('#toast-block'); if (!t) return '없음'; const s = getComputedStyle(t); return t.textContent + ' 투명도=' + s.opacity + ' 움직임=' + s.animationName + ' 보임=' + document.visibilityState })()`
+          )}`
+        )
         await shot(mainWindow, `${theme}-알림`)
+        // 알림은 5초 뒤 스스로 사라진다. 사라지기 전에 숨기면 다음 테마 알림이 그려지지 않아, 다 사라진 뒤 숨긴다.
+        for (let tries = 0; tries < 30; tries += 1) {
+          if (
+            !(await mainWindow.webContents.executeJavaScript(
+              "!!document.querySelector('#toast-block')"
+            ))
+          ) {
+            break
+          }
+          await wait(300)
+        }
         mainWindow.hide()
         await wait(300)
       }
