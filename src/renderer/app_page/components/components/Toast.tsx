@@ -18,7 +18,7 @@ const Toast = ({
       return
     }
 
-    handleToastHidden()
+    handleToastHidden(info)
   }
 
   return (

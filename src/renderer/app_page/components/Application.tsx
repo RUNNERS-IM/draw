@@ -2135,8 +2135,9 @@ const Application = (settings: any) => {
     setToastInfo(null)
   }
 
-  const handleToastHidden = () => {
-    setToastInfo(null)
+  // 숨긴 창에서 멈춰 있던 앞 알림의 사라짐이 새 알림 뒤에 끝나도 새 알림은 지우지 않는다.
+  const handleToastHidden = (hiddenInfo: any) => {
+    setToastInfo((current: any) => (current === hiddenInfo ? null : current))
   }
 
   const handleTextEditorBlur = (text: string) => {
