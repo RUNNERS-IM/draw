@@ -32,6 +32,9 @@ module.exports = {
   mac: {
     category: 'public.app-category.productivity',
     icon: 'build/icon.icns',
+    // Why: macOS 26 은 Assets.car 의 아이콘을 읽어 어두운 모양일 때 블랙 판을 보인다. 그 전 macOS 는 icon.icns 를 읽는다.
+    // Assets.car 는 build/icon-source/generate.sh 가 만들어 저장소에 둔다(CI 맥에 Xcode 26 이 없어도 되게).
+    extraResources: [{ from: 'build/Assets.car', to: 'Assets.car' }],
     target: [
       { target: 'dmg', arch: ['arm64', 'x64'] },
       { target: 'zip', arch: ['arm64', 'x64'] }
@@ -46,6 +49,7 @@ module.exports = {
     extendInfo: {
       // Draw 는 메뉴 막대에만 산다: Dock 아이콘 없음.
       LSUIElement: true,
+      CFBundleIconName: 'icon',
       CFBundleShortVersionString: shownVersion
     }
   },
