@@ -111,6 +111,15 @@ export async function runTestShots(app: any) {
     await wait(500)
     await shot(settingsWindow, `${theme}-8-계정-로그인창`)
 
+    // 빈 칸이어도 단추는 밝고, 누르면 칸 아래에 무엇이 빠졌는지 알린다(kit 0.1.32, 휴대폰 앱과 같은 규칙).
+    note(
+      `[${theme}] 로그인 창 빈 칸: 단추 막힘=${await page("document.querySelector('.ra-submit').disabled")}`
+    )
+    await page("document.querySelector('.ra-submit').click()")
+    await wait(400)
+    note(`[${theme}] 로그인 창 빈 칸 누름: 알림=${await problem()}`)
+    await shot(settingsWindow, `${theme}-8-계정-빈칸누름`)
+
     // 계정 만들기에서 모양이 틀린 비밀번호는 메일을 보내기 전에 창이 막는다(서버에 가지 않음).
     await page("[...document.querySelectorAll('.ra-link')].at(-1).click()")
     await wait(300)
