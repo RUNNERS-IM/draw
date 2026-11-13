@@ -1,0 +1,235 @@
+# Release 워크플로가 부르는 빌드 한 벌(운영체제 하나). 같은 단계를 GitHub 기계와 사무실 맥 스튜디오가 같이 쓰려고
+# 떼어 냈다(Split 과 같은 짜임). 버전 · 서명 · 공증 설명은 release.yml 맨 위에 있다.
+name: Build
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: "macos · windows · linux"
+        type: string
+        required: true
+      runner:
+        description: "runs-on 값을 JSON 으로 (\"macos-15\" 또는 [\"self-hosted\", …])"
+        type: string
+        required: true
+      builder:
+        description: "electron-builder 의 운영체제 인자 (--mac · --win · --linux)"
+        type: string
+        required: true
+      version:
+        type: string
+        required: true
+      sha:
+        type: string
+        required: true
+
+jobs:
+  build:
+    runs-on: ${{ fromJSON(inputs.runner) }}
+    timeout-minutes: 60
+    env:
+      VERSION: ${{ inputs.version }}
+      DRAW_TAG: ${{ inputs.version }}
+      # 시험판 전용 코드(src/main/testShots.js)를 빼고, hardened runtime · 서명 · 공증을 켠다
+      DRAW_RELEASE: "1"
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          ref: ${{ inputs.sha }}
+
+      # pnpm 판은 package.json 의 packageManager 칸을 읽는다
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 24
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+
+      # 사무실 맥 스튜디오에서는 그 맥의 휴대폰 빌드 · Claude 세션 뒤에 차례를 기다린다(heavy-run 은 맥마다
+      # 무거운 일을 하나씩만 돌린다). GitHub 기계는 이 작업만 돌리므로 기다릴 것이 없다.
+      - name: 사무실 맥에서 차례 기다리기
+        if: runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          HEAVY="$HOME/git/claude-config/bin/heavy-run"
+          [ -x "$HEAVY" ] && echo "HEAVY=$HEAVY --name Draw-release" >> "$GITHUB_ENV" || true
+
+      - run: ${HEAVY:-} pnpm test
+        shell: bash
+
+      - run: ${HEAVY:-} pnpm build
+        shell: bash
+
+      # 사무실 맥의 서명 차례. 앱마다 저장소 러너가 따로 있어 Mac 판 작업이 동시에 돌 수 있는데, 작업마다 같은 사용자의
+      # 키체인 검색 목록을 바꾼다. 그래서 한 작업이 목록을 고치는 순간 아직 서명 중인 다른 작업의 임시 키체인이 빠져
+      # 서명이 깨졌다(2026-11-12 Draw 실행 43197226028 · Split · Prompt: errSecInternalComponent, no identity found).
+      # 키체인 준비부터 잠금 돌려주기까지를 그 맥 전체에서 한 번에 하나만 돌게 한다(Split 과 같은 경로 · 같은 방식).
+      #   잠금: ~/.runners/signing.lock 디렉터리(mkdir 은 한 번에 한 작업만 성공). 안의 owner 파일에 누가 잡았는지 적는다.
+      #   풀기: 맨 끝 always 단계에서, owner 가 자기일 때만 지운다.
+      #   오래된 잠금: 150분이 지난 것은 주인이 죽은 것으로 보고 치운다. 60분을 기다려도 못 잡으면 실패.
+      - name: 사무실 맥에서 서명 차례 기다리기
+        if: inputs.os == 'macos' && runner.environment == 'self-hosted'
+        shell: bash
+        run: |
+          set -euo pipefail
+          LOCK="$HOME/.runners/signing.lock"
+          OWNER="$GITHUB_REPOSITORY run $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT"
+          mkdir -p "$HOME/.runners"
+          START=$(date +%s)
+          until mkdir "$LOCK" 2>/dev/null; do
+            NOW=$(date +%s)
+            HELD=$(( NOW - $(stat -f %m "$LOCK" 2>/dev/null || echo "$NOW") ))
+            if [ "$HELD" -gt 9000 ]; then
+              echo "::warning::$HELD 초 동안 잡혀 있던 서명 잠금을 치웁니다: $(cat "$LOCK/owner" 2>/dev/null)"
+              rm -rf "$LOCK"
+              continue
+            fi
+            if [ $(( NOW - START )) -gt 3600 ]; then
+              echo "::error::서명 잠금을 60분 기다렸습니다: $(cat "$LOCK/owner" 2>/dev/null)"
+              exit 1
+            fi
+            echo "서명 잠금을 기다립니다: $(cat "$LOCK/owner" 2>/dev/null), $HELD 초째"
+            sleep 20
+          done
+          echo "$OWNER" > "$LOCK/owner"
+          echo "SIGNING_LOCK_OWNER=$OWNER" >> "$GITHUB_ENV"
+          echo "$(( $(date +%s) - START )) 초 만에 서명 잠금을 잡았습니다"
+
+      - name: 임시 서명 키체인 준비
+        if: inputs.os == 'macos'
+        env:
+          DEVELOPER_ID_P12_BASE64: ${{ secrets.DEVELOPER_ID_P12_BASE64 }}
+          DEVELOPER_ID_P12_PASSWORD: ${{ secrets.DEVELOPER_ID_P12_PASSWORD }}
+          ASC_API_KEY_P8: ${{ secrets.ASC_API_KEY_P8 }}
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+        run: |
+          set -euo pipefail
+          SECRETS="$RUNNER_TEMP/draw-secrets"
+          mkdir -p "$SECRETS" && chmod 700 "$SECRETS"
+          KEYCHAIN="$RUNNER_TEMP/draw-signing.keychain-db"
+          KEYCHAIN_PASSWORD="$(uuidgen)"
+          # 검색 목록을 통째로 저장했다 되돌리면 그사이 다른 작업이 넣은 키체인이 빠진다. 이 키체인만 넣고 빼고,
+          # 서명 직전마다 다시 넣는다. bash 로 돌려야 따옴표 없는 $OTHERS 가 낱말로 나뉜다(zsh 는 한 항목으로 뭉친다).
+          cat > "$RUNNER_TEMP/draw-keychain-on.sh" <<'SH'
+          #!/bin/bash
+          set -euo pipefail
+          K="$RUNNER_TEMP/draw-signing.keychain-db"
+          OTHERS=$(security list-keychains -d user | tr -d '" ' | grep -vxF "$K" || true)
+          security list-keychains -d user -s "$K" $OTHERS
+          SH
+          chmod 700 "$RUNNER_TEMP/draw-keychain-on.sh"
+          security create-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          security set-keychain-settings -lut 3600 "$KEYCHAIN"
+          security unlock-keychain -p "$KEYCHAIN_PASSWORD" "$KEYCHAIN"
+          echo "$DEVELOPER_ID_P12_BASE64" | base64 --decode > "$SECRETS/developer-id.p12"
+          security import "$SECRETS/developer-id.p12" -k "$KEYCHAIN" -P "$DEVELOPER_ID_P12_PASSWORD" -T /usr/bin/codesign -T /usr/bin/security
+          security set-key-partition-list -S apple-tool:,apple:,codesign: -s -k "$KEYCHAIN_PASSWORD" "$KEYCHAIN" >/dev/null
+          "$RUNNER_TEMP/draw-keychain-on.sh"
+          rm "$SECRETS/developer-id.p12"
+          security find-identity -v -p codesigning "$KEYCHAIN"
+          printf '%s' "$ASC_API_KEY_P8" > "$SECRETS/AuthKey_${ASC_API_KEY_ID}.p8"
+          chmod 600 "$SECRETS/"*
+          echo "APPLE_API_KEY_PATH=$SECRETS/AuthKey_${ASC_API_KEY_ID}.p8" >> "$GITHUB_ENV"
+          # 사무실 맥에는 같은 인증서가 하나 더 있을 수 있다. 이 키체인에서만 찾게 해서 codesign 이 같은 이름 둘을
+          # 보고 멈추지 않게 한다.
+          echo "CSC_KEYCHAIN=$KEYCHAIN" >> "$GITHUB_ENV"
+          # codesign 은 이름을 모든 키체인에서 찾는데, 맥 스튜디오 로그인 키체인에 같은 이름의 Developer ID 가 있다
+          # (2026-11-12 Split: 「ambiguous」). 인증서 SHA-1 로 이 키체인의 것을 고른다.
+          echo "DEVELOPER_ID_SHA1=$(security find-identity -v -p codesigning "$KEYCHAIN" | awk '/Developer ID Application/ {print $2; exit}')" >> "$GITHUB_ENV"
+
+      # 위 키체인의 Developer ID 로 서명하고(CSC_NAME), APPLE_API_* 로 앱을 공증한다.
+      # 올리기는 publish 작업이 하므로 여기서는 --publish never.
+      - name: 앱 묶기
+        shell: bash
+        env:
+          CSC_NAME: ${{ inputs.os == 'macos' && 'Runners Co., Ltd (RGWVXJ8URP)' || '' }}
+          CSC_IDENTITY_AUTO_DISCOVERY: ${{ inputs.os == 'macos' && 'true' || 'false' }}
+          APPLE_API_KEY_ID: ${{ inputs.os == 'macos' && secrets.ASC_API_KEY_ID || '' }}
+          APPLE_API_ISSUER: ${{ inputs.os == 'macos' && secrets.ASC_API_ISSUER_ID || '' }}
+        run: |
+          set -euo pipefail
+          if [ "${{ inputs.os }}" = macos ]; then export APPLE_API_KEY="$APPLE_API_KEY_PATH"; fi
+          # Apple 티켓 서버가 연결을 끊으면 electron-builder 안의 스테이플이 실패한다. 조금 뒤 다시 하면 된다.
+          for TRY in 1 2 3; do
+            # heavy-run 차례를 기다리는 동안 다른 작업이 목록을 바꿀 수 있어, 부르기 바로 앞에 키체인을 다시 넣는다
+            ${HEAVY:-} bash -c '[ "${{ inputs.os }}" != macos ] || "$RUNNER_TEMP/draw-keychain-on.sh"; exec pnpm exec electron-builder --config electron-builder.config.cjs ${{ inputs.builder }} --publish never' && break
+            [ "$TRY" = 3 ] && exit 1
+            echo "::warning::electron-builder 실패($TRY 번째), 30초 뒤 다시 합니다"
+            sleep 30
+          done
+
+      # 앱은 electron-builder 가 공증했지만 DMG 자체도 서명 · 공증 · 스테이플해야 오프라인에서도 경고 없이 열린다
+      - name: DMG 공증
+        if: inputs.os == 'macos'
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+        run: |
+          set -euo pipefail
+          for DMG in dist.noindex/*.dmg; do
+            "$RUNNER_TEMP/draw-keychain-on.sh"
+            # electron-builder 는 안의 앱만 서명하고 DMG 는 서명하지 않는다. Gatekeeper 는 DMG 서명도 본다.
+            codesign --sign "$DEVELOPER_ID_SHA1" --keychain "$CSC_KEYCHAIN" --timestamp "$DMG"
+            xcrun notarytool submit "$DMG" --key "$APPLE_API_KEY_PATH" --key-id "$ASC_API_KEY_ID" --issuer "$ASC_API_ISSUER_ID" --wait
+            # Apple 티켓 서버가 연결을 끊는 일이 있어 스테이플은 세 번까지 해 본다.
+            for TRY in 1 2 3; do
+              xcrun stapler staple "$DMG" && break
+              [ "$TRY" = 3 ] && exit 1
+              echo "::warning::stapler 실패($TRY 번째), 30초 뒤 다시 합니다"
+              sleep 30
+            done
+            spctl -a -t open --context context:primary-signature -v "$DMG"
+          done
+
+      - name: 파일 모으기
+        shell: bash
+        run: |
+          set -euo pipefail
+          OUT=dist-release && mkdir -p $OUT
+          shopt -s nullglob
+          for f in dist.noindex/*.{dmg,zip,exe,AppImage,deb,blockmap,yml}; do
+            case "$(basename "$f")" in builder-debug.yml|builder-effective-config.yaml) continue ;; esac
+            cp "$f" "$OUT/"
+          done
+          ls -la $OUT
+
+      - uses: actions/upload-artifact@v7
+        with:
+          name: draw-${{ inputs.os }}
+          # 늦게 실패한 GitHub Mac 빌드의 파일이 남아 있으면 맥 스튜디오 빌드가 덮어쓴다.
+          overwrite: true
+          path: dist-release/*
+          retention-days: 3
+
+      - name: 임시 키체인과 키 지우기
+        if: always() && inputs.os == 'macos'
+        run: |
+          SECRETS="$RUNNER_TEMP/draw-secrets"
+          K="$RUNNER_TEMP/draw-signing.keychain-db"
+          # 이 키체인만 지금 목록에서 뺀다. 다른 작업이 넣은 키체인은 그대로 둔다.
+          OTHERS=$(security list-keychains -d user | tr -d '" ' | grep -vxF "$K" || true)
+          security list-keychains -d user -s $OTHERS
+          rm -f "$RUNNER_TEMP/draw-keychain-on.sh"
+          security delete-keychain "$RUNNER_TEMP/draw-signing.keychain-db" 2>/dev/null || true
+          rm -rf "$SECRETS"
+          # 사무실 맥은 작업이 끝나도 남는다. 서명 키가 아직 닿으면 실패로 끝내서, 남은 인증서가 그 맥에 묻히지
+          # 않고 드러나게 한다.
+          if [ -e "$RUNNER_TEMP/draw-signing.keychain-db" ] || security list-keychains -d user | grep -q draw-signing; then
+            echo "::error::서명 키체인이 이 맥에 남아 있습니다"; exit 1
+          fi
+          echo "이 맥에 남은 키체인:"; security list-keychains -d user
+
+      # 앞 단계가 실패해도 잠금은 돌려준다. 자기가 잡은 잠금일 때만 지운다.
+      - name: 서명 잠금 돌려주기
+        if: always() && env.SIGNING_LOCK_OWNER != ''
+        shell: bash
+        run: |
+          LOCK="$HOME/.runners/signing.lock"
+          if [ "$(cat "$LOCK/owner" 2>/dev/null)" = "$SIGNING_LOCK_OWNER" ]; then
+            rm -rf "$LOCK"
+            echo "서명 잠금을 돌려줬습니다"
+          else
+            echo "::warning::서명 잠금이 더는 이 작업 것이 아닙니다: $(cat "$LOCK/owner" 2>/dev/null)"
+          fi

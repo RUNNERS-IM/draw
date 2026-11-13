@@ -104,6 +104,10 @@ export function AccountButton(props: {
   /** One line under the email, such as how many computers of the account are on. */
   line?: ReactNode
   items?: AccountMenuItem[]
+  /** The sign-out reaches every RUNNERS app on this Mac (account.sharedLogin()). */
+  sharedLogin?: boolean
+  /** The app this one followed into the account (account.signedInFrom()). */
+  signedInFrom?: string | null
   onSignOut: () => void
 }) {
   const [open, setOpen] = useState(false)
@@ -159,6 +163,11 @@ export function AccountButton(props: {
               <span className="ra-hint">{accountText(props.lang, 'title')}</span>
             </span>
           </div>
+          {props.signedInFrom && (
+            <div className="ra-menu-line ra-hint">
+              {accountText(props.lang, 'signedInFrom').replace('{app}', props.signedInFrom)}
+            </div>
+          )}
           {props.line && <div className="ra-menu-line ra-hint">{props.line}</div>}
           <div className="ra-menu-sep" />
           {props.items?.map((item) => (
@@ -180,7 +189,7 @@ export function AccountButton(props: {
             onClick={choose(props.onSignOut)}
           >
             <LogOutIcon />
-            <span>{accountText(props.lang, 'signOut')}</span>
+            <span>{accountText(props.lang, props.sharedLogin ? 'signOutAll' : 'signOut')}</span>
           </button>
         </div>
       )}
@@ -263,9 +272,19 @@ export function SignInSheet(props: {
           ? code.length === 6 && !!password
           : !!password))
 
+  // Why: the button stays bright on empty fields and says what is missing when pressed, like the phone apps'
+  // sign-in screen. The code and reset steps keep a dimmed button since they have no such words.
+  const asksMissing = step === 'login' || step === 'signup'
+
   const submit = (event: FormEvent) => {
     event.preventDefault()
-    if (!ready || busy) {
+    if (busy) {
+      return
+    }
+    if (!ready) {
+      if (asksMissing) {
+        setProblem('missing')
+      }
       return
     }
     if (step === 'login') {
@@ -417,7 +436,7 @@ export function SignInSheet(props: {
           </>
         ) : (
           <>
-            <button className="ra-submit" type="submit" disabled={!ready || busy}>
+            <button className="ra-submit" type="submit" disabled={busy || (!ready && !asksMissing)}>
               {text(
                 step === 'login'
                   ? 'signIn'

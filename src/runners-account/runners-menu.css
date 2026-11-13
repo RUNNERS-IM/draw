@@ -31,7 +31,8 @@
   --rm-sep-gap: 8px;
 
   --rm-text: rgba(0, 0, 0, 0.85);
-  --rm-text-secondary: rgba(0, 0, 0, 0.5);
+  /* 작은 회색 글자(머리글 · 아래 줄 · 설명 · 단축키). macOS 값 0.5 는 고른 줄 바탕에서 대비 3.64 라, 어디서나 4.5 를 넘도록 진하게 한다(2026-11-11). */
+  --rm-text-secondary: rgba(0, 0, 0, 0.6);
   --rm-separator: rgba(0, 0, 0, 0.1);
   --rm-group-bg: rgba(0, 0, 0, 0.04);
   --rm-hover: rgba(0, 0, 0, 0.06);
@@ -39,6 +40,7 @@
   --rm-solid-bg: #ffffff;
   --rm-primary: #0a0a0a;
   --rm-on-primary: #ffffff;
+  --rm-switch-on: #34c759;
   --rm-selected: color-mix(in srgb, var(--rm-primary) 14%, transparent);
   --rm-ok: #34c759;
   --rm-high: #ff9f0a;
@@ -53,7 +55,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --rm-text: rgba(255, 255, 255, 0.85);
-    --rm-text-secondary: rgba(255, 255, 255, 0.5);
+    --rm-text-secondary: rgba(255, 255, 255, 0.55);
     --rm-separator: rgba(255, 255, 255, 0.1);
     --rm-group-bg: rgba(255, 255, 255, 0.05);
     --rm-hover: rgba(255, 255, 255, 0.08);
@@ -61,6 +63,7 @@
     --rm-solid-bg: #0a0a0a;
     --rm-primary: #ffffff;
     --rm-on-primary: #0a0a0a;
+    --rm-switch-on: #30d158;
   }
 }
 
@@ -216,7 +219,8 @@ button.rm-item:hover {
 
 /* On/off switch at the right of a line. Sizes are the macOS 26 NSSwitch "small" control, measured by drawing one
    (2026-11-06): track 44 x 20, a pill knob 26 x 16 two in from the edge. The old 26 x 16 was the pre-26 "mini" one,
-   which the apps found too small. On is the primary colour. */
+   which the apps found too small. On is the system green (light #34c759, dark #30d158) with a white knob in every state,
+   the same in all five apps (2026-11-12). */
 .rm-switch {
   position: relative;
   cursor: pointer;
@@ -255,11 +259,10 @@ button.rm-item:hover {
 }
 
 .rm-switch input:checked + .rm-knob {
-  background: var(--rm-primary);
+  background: var(--rm-switch-on);
 }
 
 .rm-switch input:checked + .rm-knob::after {
-  background: var(--rm-on-primary);
   transform: translateX(calc(var(--rm-switch-w) - var(--rm-knob-w) - 4px));
 }
 

@@ -2,6 +2,11 @@
 // 쓰는 법: DRAW_TEST_SHOTS=<폴더> [DRAW_TEST_LANG=<언어 코드>] Draw --use-mock-keychain 실행. 끝나면 스스로 꺼지고 그 폴더에 result.txt 를 남긴다.
 // --use-mock-keychain: 서명 없는 시험판이 진짜 키체인에 항목을 만들거나 묻는 창을 띄우지 않게 한다.
 // DRAW_TEST_ACCOUNT=signin|check 를 주면 그림은 찍지 않고 로그인 또는 로그인 유지만 보고 끝난다.
+// DRAW_TEST_MIN_HEIGHT=1 을 주면 설정 창을 보이지 않게(투명) 띄워 가장 작은 높이의 탭마다 찍고 끝난다.
+// DRAW_TEST_BORDER=1 을 주면 밝은 · 어두운 · 연두 바탕 위의 그리기 테두리와 선택 표시만 찍고 끝난다.
+// DRAW_TEST_ICON=1 을 주면 창을 보이지 않게(투명) 띄워 앱 아이콘이 나오는 자리(정보 탭 · 묻는 창 · 업데이트 창 · 알림)만 찍고 끝난다.
+// DRAW_TEST_HIDDEN=1 을 함께 주면 모든 창을 투명하게 두어 화면을 가리지 않고 찍는다. 앱 메뉴 글자도 result.txt 에 남긴다.
+// DRAW_TEST_TABS=1 을 주면 설정 창을 보이지 않게(투명) 띄워 탭 4개를 위 · 아래로 찍고, 잘린 글 · 겹친 줄 · 글 방향을 result.txt 에 남긴다.
 import { BrowserWindow, Menu, app as electronApp, nativeTheme, screen } from 'electron'
 import fs from 'node:fs'
 import path from 'node:path'
@@ -105,6 +110,45 @@ export async function runTestShots(app: any) {
     await page("document.querySelector('.settings-item-control .button').click()")
     await wait(500)
     await shot(settingsWindow, `${theme}-8-계정-로그인창`)
+
+    // 시트가 좁아져도 한국어 안내 글은 낱말 사이에서만 줄이 바뀐다(kit 0.1.34 word-break: keep-all).
+    // 설정 창은 기본 폭보다 좁힐 수 없어 시트 폭만 줄여 찍고, 글마다 줄을 나눠 적는다.
+    const lines = () =>
+      page(`[...document.querySelectorAll('.ra-sheet :is(.ra-title, .ra-sub, .ra-intro, .ra-note, .ra-hint, .ra-forgot, .ra-submit, .ra-link)')]
+        .filter((el) => el.textContent.trim())
+        .map((el) => {
+          const rows = []
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            for (let i = 0; i < node.length; i++) {
+              const range = document.createRange()
+              range.setStart(node, i)
+              range.setEnd(node, i + 1)
+              const top = Math.round(range.getBoundingClientRect().top)
+              const row = rows.find((r) => Math.abs(r.top - top) < 4)
+              if (row) row.text += node.data[i]
+              else rows.push({ top, text: node.data[i] })
+            }
+          }
+          return rows.map((r) => r.text.trim()).filter(Boolean).join(' / ')
+        })
+        .join(' | ')`) as Promise<string>
+    note(`[${theme}] 로그인 창 줄(360): ${await lines()}`)
+    await page("document.querySelector('.ra-sheet').style.width = '240px'")
+    await wait(300)
+    note(`[${theme}] 로그인 창 줄(240): ${await lines()}`)
+    await shot(settingsWindow, `${theme}-8-계정-좁은폭`)
+    await page("document.querySelector('.ra-sheet').style.width = ''")
+    await wait(200)
+
+    // 빈 칸이어도 단추는 밝고, 누르면 칸 아래에 무엇이 빠졌는지 알린다(kit 0.1.32, 휴대폰 앱과 같은 규칙).
+    note(
+      `[${theme}] 로그인 창 빈 칸: 단추 막힘=${await page("document.querySelector('.ra-submit').disabled")}`
+    )
+    await page("document.querySelector('.ra-submit').click()")
+    await wait(400)
+    note(`[${theme}] 로그인 창 빈 칸 누름: 알림=${await problem()}`)
+    await shot(settingsWindow, `${theme}-8-계정-빈칸누름`)
 
     // 계정 만들기에서 모양이 틀린 비밀번호는 메일을 보내기 전에 창이 막는다(서버에 가지 않음).
     await page("[...document.querySelectorAll('.ra-link')].at(-1).click()")
@@ -266,6 +310,233 @@ export async function runTestShots(app: any) {
       (window) => window && watch(window)
     )
     electronApp.on('browser-window-created', (_event, window) => watch(window))
+    if (process.env.DRAW_TEST_HIDDEN) {
+      // 창을 보이고 숨길 때 앱이 투명도를 1 로 되돌리므로, 시험 동안은 늘 0 이 되게 막는다.
+      const hide = (window: Electron.BrowserWindow) => {
+        const setOpacity = window.setOpacity.bind(window)
+        window.setOpacity = () => setOpacity(0)
+        setOpacity(0)
+      }
+      BrowserWindow.getAllWindows().forEach(hide)
+      electronApp.on('browser-window-created', (_event, window) => hide(window))
+      const labels = (items: Electron.MenuItem[], depth = 0): string[] =>
+        items.flatMap((item) => [
+          `${'  '.repeat(depth)}${item.type === 'separator' ? '—' : `${item.label}${item.accelerator ? ` (${item.accelerator})` : ''}`}`,
+          ...labels(item.submenu?.items ?? [], depth + 1)
+        ])
+      note(`앱 메뉴:\n${labels(Menu.getApplicationMenu()?.items ?? []).join('\n')}`)
+    }
+    if (process.env.DRAW_TEST_MIN_HEIGHT) {
+      electronApp.on('browser-window-created', (_event, window) => window.setOpacity(0))
+      for (const theme of ['light', 'dark'] as const) {
+        nativeTheme.themeSource = theme
+        app.showSettingsWindow()
+        await wait(1500)
+        const { settingsWindow } = app.getWindows()
+        settingsWindow.setSize(656, 1)
+        await wait(400)
+        const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+        note(`[${theme}] 가장 작은 창: 크기=${JSON.stringify(settingsWindow.getContentSize())}`)
+        for (let index = 0; index < 4; index += 1) {
+          await page(`document.querySelectorAll('.settings-toolbar-item')[${index}].click()`)
+          await wait(500)
+          note(
+            `[${theme}] 탭 ${index}: ${await page("(() => { const s = document.querySelector('.settings-scroll'); return '스크롤 높이=' + s.scrollHeight + ', 보이는 높이=' + s.clientHeight + ', 가로 넘침=' + (document.documentElement.scrollWidth > innerWidth) })()")}`
+          )
+          await shot(settingsWindow, `${theme}-최소높이-탭${index}`)
+        }
+        await page("document.querySelector('.settings-scroll').scrollTop = 99999")
+        settingsWindow.close()
+        await wait(400)
+      }
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
+    if (process.env.DRAW_TEST_TABS) {
+      electronApp.on('browser-window-created', (_event, window) => window.setOpacity(0))
+      nativeTheme.themeSource = 'light'
+      app.showSettingsWindow()
+      await wait(1500)
+      const { settingsWindow } = app.getWindows()
+      const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+      // 글이 칸보다 넓어 잘린 곳, 줄의 설명 칸과 단추 칸이 겹친 곳, 창 밖으로 나간 곳을 찾는다.
+      const inspect = `(() => {
+        const rtl = document.documentElement.dir === 'rtl'
+        const name = (el) => (el.textContent || '').trim().slice(0, 40)
+        const found = []
+        for (const el of document.querySelectorAll('body *')) {
+          const own = [...el.childNodes].some((node) => node.nodeType === 3 && node.textContent.trim())
+          if (!own || !el.getClientRects().length) continue
+          const rect = el.getBoundingClientRect()
+          if (el.scrollWidth > el.clientWidth + 1 && getComputedStyle(el).overflow !== 'visible') found.push('잘림: ' + name(el))
+          if (rect.right > innerWidth + 1 || rect.left < -1) found.push('창 밖: ' + name(el))
+        }
+        for (const item of document.querySelectorAll('.settings-item')) {
+          const info = item.querySelector('.settings-item-info')
+          const control = item.querySelector('.settings-item-control')
+          if (!info || !control) continue
+          const a = info.getBoundingClientRect()
+          const b = control.getBoundingClientRect()
+          if (rtl ? a.left < b.right - 1 : a.right > b.left + 1) found.push('겹침: ' + name(info))
+        }
+        return '방향=' + document.documentElement.dir + ', 가로 넘침=' + (document.documentElement.scrollWidth > innerWidth) + (found.length ? ', ' + found.join(' / ') : ', 문제 없음')
+      })()`
+      for (let index = 0; index < 4; index += 1) {
+        await page(`document.querySelectorAll('.settings-toolbar-item')[${index}].click()`)
+        await wait(600)
+        note(`탭 ${index}: ${await page(inspect)}`)
+        await shot(settingsWindow, `탭${index}-위`)
+        if (
+          await page(
+            "(() => { const s = document.querySelector('.settings-scroll'); return s.scrollHeight > s.clientHeight })()"
+          )
+        ) {
+          await page("document.querySelector('.settings-scroll').scrollTop = 99999")
+          await wait(300)
+          note(`탭 ${index} 아래: ${await page(inspect)}`)
+          await shot(settingsWindow, `탭${index}-아래`)
+        }
+        if (index === 1) {
+          await page("document.querySelector('.settings-scroll').scrollTop = 0")
+          await page(
+            "document.querySelectorAll('.settings-section')[0].querySelectorAll('.settings-item')[2].querySelector('.toggle').click()"
+          )
+          await wait(400)
+          note(`아이콘 끄기 묻는 창: ${await page(inspect)}`)
+          await shot(settingsWindow, '탭1-묻는창')
+          await page("document.querySelector('.alert-buttons .rw-button:not(.default)').click()")
+        }
+        if (index === 2) {
+          await page("document.querySelector('.settings-item-control .button')?.click()")
+          await wait(600)
+          note(`로그인 창: ${await page(inspect)}`)
+          await shot(settingsWindow, '탭2-로그인창')
+        }
+      }
+      settingsWindow.close()
+      await wait(400)
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
+    if (process.env.DRAW_TEST_ICON) {
+      electronApp.on('browser-window-created', (_event, window) => window.setOpacity(0))
+      for (const theme of ['light', 'dark'] as const) {
+        nativeTheme.themeSource = theme
+        app.showSettingsWindow()
+        await wait(1500)
+        const { settingsWindow, mainWindow } = app.getWindows()
+        const page = (code: string) => settingsWindow.webContents.executeJavaScript(code)
+        const tab = (index: number) =>
+          page(`document.querySelectorAll('.settings-toolbar-item')[${index}].click()`)
+        await tab(3)
+        await wait(600)
+        await shot(settingsWindow, `${theme}-정보탭`)
+        await tab(1)
+        await wait(500)
+        await page(
+          "document.querySelectorAll('.settings-section')[0].querySelectorAll('.settings-item')[2].querySelector('.toggle').click()"
+        )
+        await wait(400)
+        await shot(settingsWindow, `${theme}-아이콘끄기확인`)
+        await page("document.querySelector('.alert-buttons .rw-button:not(.default)').click()")
+        settingsWindow.close()
+        await wait(400)
+
+        const prompt = askUpdate(
+          {
+            version: '2.6.110602',
+            notes: ['왼쪽 도구 막대를 고쳤습니다.'],
+            downloading: false,
+            percent: 100
+          },
+          false
+        )
+        await wait(1500)
+        await shot(
+          BrowserWindow.getAllWindows().find((window) =>
+            window.webContents.getURL().includes('update_page')
+          )!,
+          `${theme}-업데이트창`
+        )
+        prompt.close()
+        await wait(300)
+
+        mainWindow.setOpacity(0)
+        mainWindow.showInactive()
+        mainWindow.webContents.send('show_notification', {
+          title: 'Draw',
+          body: `그리기 모드가 켜졌습니다. (${theme})`
+        })
+        // 숨겼다 다시 띄운 창은 알림을 늦게 그릴 때가 있어, 이번 알림 글이 보일 때까지 기다린 뒤 찍는다.
+        for (let tries = 0; tries < 20; tries += 1) {
+          await wait(300)
+          const shown = await mainWindow.webContents.executeJavaScript(
+            `document.querySelector('#toast-block')?.textContent.includes('(${theme})') ?? false`
+          )
+          if (shown) {
+            break
+          }
+        }
+        await wait(400)
+        note(
+          `[${theme}-알림] ${await mainWindow.webContents.executeJavaScript(
+            `(() => { const t = document.querySelector('#toast-block'); if (!t) return '없음'; const s = getComputedStyle(t); return t.textContent + ' 투명도=' + s.opacity + ' 움직임=' + s.animationName + ' 보임=' + document.visibilityState })()`
+          )}`
+        )
+        await shot(mainWindow, `${theme}-알림`)
+        // 알림은 5초 뒤 스스로 사라진다. 사라지기 전에 숨기면 다음 테마 알림이 그려지지 않아, 다 사라진 뒤 숨긴다.
+        for (let tries = 0; tries < 30; tries += 1) {
+          if (
+            !(await mainWindow.webContents.executeJavaScript(
+              "!!document.querySelector('#toast-block')"
+            ))
+          ) {
+            break
+          }
+          await wait(300)
+        }
+        mainWindow.hide()
+        await wait(300)
+      }
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
+    if (process.env.DRAW_TEST_BORDER) {
+      nativeTheme.themeSource = 'light'
+      const { mainWindow } = app.getWindows()
+      app.enableDrawMode()
+      await wait(1500)
+      const list = figures()
+      const send = (action: unknown) => mainWindow.webContents.send('test_action', action)
+      send({ type: 'figures', figures: list })
+      await wait(500)
+      const selected = { 사각형: list[3].id, 글자: list[5].id }
+      for (const [name, color] of [
+        ['흰바탕', '#ffffff'],
+        ['어두운바탕', '#1e1e1e'],
+        ['연두바탕', '#b7e4c0']
+      ]) {
+        const key = await mainWindow.webContents.insertCSS(
+          `html { background: ${color} !important; }`
+        )
+        for (const [label, id] of Object.entries(selected)) {
+          send({ type: 'select', id })
+          await wait(500)
+          await shot(mainWindow, `${name}-${label}선택`)
+        }
+        await mainWindow.webContents.removeInsertedCSS(key)
+      }
+      note('끝')
+      fs.writeFileSync(path.join(app.dir, 'result.txt'), `${log.join('\n')}\n`)
+      app.quit()
+      return
+    }
     if (process.env.DRAW_TEST_ACCOUNT) {
       await wait(1000)
       if (process.env.DRAW_TEST_ACCOUNT === 'signin') {
