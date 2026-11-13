@@ -4,7 +4,7 @@
 
 - 도구: 펜 · 형광펜 · 화살표 · 네모 · 동그라미 · 글자 · 지우개
 - 되돌리기 · 전체 지우기 · 색 고르기
-- 그리기를 끄면 클릭이 아래 앱으로 그대로 갑니다(클릭 모드). 이때 그림판 창은 숨겨지므로 그린 그림도 함께 사라졌다가, 다시 켜면 돌아옵니다
+- 그리기를 끄면 클릭이 아래 앱으로 그대로 갑니다(클릭 모드). 그린 그림은 화면에 그대로 남고, 큰 도구 막대만 사라집니다. 작은 막대는 떠 있으며, 설정에서 숨길 수 있습니다
 - 20개 언어(`locales/`), 다크 · 라이트
 
 Draw on your screen while you present. Draw is a macOS menu bar app with a vertical toolbar on the left.
@@ -26,7 +26,7 @@ pnpm typecheck     # 타입 검사
 pnpm lint          # 린트
 pnpm format:check  # 서식 확인
 pnpm test          # 단위 테스트
-pnpm check:account # 공용 키트(runners-app-kit v0.1.9) 복사본 확인
+pnpm check:account # 공용 키트(runners-app-kit v0.1.34) 복사본 확인
 pnpm check:locales # 언어 파일 확인
 pnpm dev           # 개발 판 실행
 pnpm dist          # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
