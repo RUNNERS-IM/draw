@@ -111,6 +111,36 @@ export async function runTestShots(app: any) {
     await wait(500)
     await shot(settingsWindow, `${theme}-8-계정-로그인창`)
 
+    // 시트가 좁아져도 한국어 안내 글은 낱말 사이에서만 줄이 바뀐다(kit 0.1.34 word-break: keep-all).
+    // 설정 창은 기본 폭보다 좁힐 수 없어 시트 폭만 줄여 찍고, 글마다 줄을 나눠 적는다.
+    const lines = () =>
+      page(`[...document.querySelectorAll('.ra-sheet :is(.ra-title, .ra-sub, .ra-intro, .ra-note, .ra-hint, .ra-forgot, .ra-submit, .ra-link)')]
+        .filter((el) => el.textContent.trim())
+        .map((el) => {
+          const rows = []
+          const walker = document.createTreeWalker(el, NodeFilter.SHOW_TEXT)
+          for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+            for (let i = 0; i < node.length; i++) {
+              const range = document.createRange()
+              range.setStart(node, i)
+              range.setEnd(node, i + 1)
+              const top = Math.round(range.getBoundingClientRect().top)
+              const row = rows.find((r) => Math.abs(r.top - top) < 4)
+              if (row) row.text += node.data[i]
+              else rows.push({ top, text: node.data[i] })
+            }
+          }
+          return rows.map((r) => r.text.trim()).filter(Boolean).join(' / ')
+        })
+        .join(' | ')`) as Promise<string>
+    note(`[${theme}] 로그인 창 줄(360): ${await lines()}`)
+    await page("document.querySelector('.ra-sheet').style.width = '240px'")
+    await wait(300)
+    note(`[${theme}] 로그인 창 줄(240): ${await lines()}`)
+    await shot(settingsWindow, `${theme}-8-계정-좁은폭`)
+    await page("document.querySelector('.ra-sheet').style.width = ''")
+    await wait(200)
+
     // 빈 칸이어도 단추는 밝고, 누르면 칸 아래에 무엇이 빠졌는지 알린다(kit 0.1.32, 휴대폰 앱과 같은 규칙).
     note(
       `[${theme}] 로그인 창 빈 칸: 단추 막힘=${await page("document.querySelector('.ra-submit').disabled")}`
