@@ -18,7 +18,7 @@ Draw does not read what is on your screen, and it does not ask for the Screen Re
 
 When Draw runs into an error, it sends a report to Runners' error tracker (Sentry, sentry.io) so we can fix it. A report holds the kind of error, the lines of Draw's code where it happened, the Draw version and the macOS version.
 
-Before a report leaves the computer, Draw replaces anything that could identify you with `[가림]`: email addresses, sign-in tokens, the user name in folder paths, the computer name and the system user name. It also drops the account, request headers, cookies and the computer name from the report, and does not send the IP address. Draw never sends screenshots, screen recordings, what you draw or console logs.
+Before a report leaves the computer, Draw replaces anything that could identify you with `[가림]`: email addresses, sign-in tokens, the user name in folder paths, the computer name and the system user name. It also drops the account, request headers, cookies and the computer name from the report, and does not send the IP address. Draw never sends screenshots, screen recordings, what you draw or console logs. If Draw crashes outright, it does not send a crash dump (a copy of the app's memory) either.
 
 ## Updates
 
@@ -58,7 +58,7 @@ Draw 는 화면 내용을 읽지 않고, 화면 기록 권한이나 손쉬운 �
 
 Draw 가 오류를 만나면, 고칠 수 있도록 Runners 의 오류 기록 서비스(Sentry, sentry.io)로 보고를 보냅니다. 보고에는 오류 종류, 오류가 난 Draw 코드 줄, Draw 판, macOS 판이 들어갑니다.
 
-보고가 컴퓨터를 떠나기 전에 사람을 알아볼 수 있는 것은 `[가림]` 으로 바꿉니다: 이메일 주소, 로그인 토큰, 폴더 경로 속 사용자 이름, 컴퓨터 이름, 시스템 사용자 이름. 계정 · 요청 머리글 · 쿠키 · 컴퓨터 이름 칸은 보고에서 빼고, IP 주소는 보내지 않습니다. 스크린샷 · 화면 녹화 · 그린 그림 · 콘솔 기록은 보내지 않습니다.
+보고가 컴퓨터를 떠나기 전에 사람을 알아볼 수 있는 것은 `[가림]` 으로 바꿉니다: 이메일 주소, 로그인 토큰, 폴더 경로 속 사용자 이름, 컴퓨터 이름, 시스템 사용자 이름. 계정 · 요청 머리글 · 쿠키 · 컴퓨터 이름 칸은 보고에서 빼고, IP 주소는 보내지 않습니다. 스크린샷 · 화면 녹화 · 그린 그림 · 콘솔 기록은 보내지 않습니다. 앱이 통째로 죽을 때 남는 충돌 기록(앱 메모리를 그대로 담은 파일)도 보내지 않습니다.
 
 ## 업데이트
 
