@@ -33,6 +33,9 @@ jobs:
       DRAW_TAG: ${{ inputs.version }}
       # 시험판 전용 코드(src/main/testShots.js)를 빼고, hardened runtime · 서명 · 공증을 켠다
       DRAW_RELEASE: "1"
+      # 오류 자동 수집(Sentry)이 보낼 곳. 비밀값이 없으면 빈 값으로 빌드되어 아무것도 보내지 않는다.
+      MAIN_VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+      VITE_SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
     steps:
       - uses: actions/checkout@v6
         with:

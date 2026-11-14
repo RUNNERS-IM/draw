@@ -1,3 +1,4 @@
+import '../errorReport'
 import type { ComponentType } from 'react'
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
