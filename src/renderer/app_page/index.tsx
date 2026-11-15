@@ -1,3 +1,4 @@
+import '../errorReport'
 import '../i18n'
 import { createRoot } from 'react-dom/client'
 import Application from './components/Application'

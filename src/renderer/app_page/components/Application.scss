@@ -19,6 +19,8 @@
   --toolbar-border-color: rgba(0, 0, 0, 0.14);
   --toolbar-icon-color: rgba(0, 0, 0, 0.85);
   --toolbar-hover-color: rgba(0, 0, 0, 0.06);
+  // 색 칸 테두리. 흰 칸 · 검정 칸도 막대 바탕과 대비 3:1 이 넘게 보이도록 진하게 둔다(디자인 시스템 전수 검사 D1).
+  --toolbar-swatch-ring: rgba(10, 10, 10, 0.5);
 
   --border-size: 5px; // Equals to ZONE_BORDER
   --border-color: #b2f2bb;
@@ -32,6 +34,7 @@
     --toolbar-border-color: rgba(255, 255, 255, 0.16);
     --toolbar-icon-color: rgba(255, 255, 255, 0.88);
     --toolbar-hover-color: rgba(255, 255, 255, 0.1);
+    --toolbar-swatch-ring: rgba(255, 255, 255, 0.5);
   }
 }
 
