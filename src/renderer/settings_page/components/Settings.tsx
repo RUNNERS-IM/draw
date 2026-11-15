@@ -493,7 +493,7 @@ const Settings = (config: any) => {
             type="button"
             role="tab"
             aria-selected={activeTab === id}
-            className={`settings-toolbar-item ${activeTab === id ? 'selected' : ''}`}
+            className={`settings-toolbar-item ${activeTab === id ? 'rw-selected' : ''}`}
             onClick={() => selectTab(id)}
           >
             <Icon size={22} strokeWidth={1.5} aria-hidden />
@@ -596,7 +596,7 @@ const Settings = (config: any) => {
                       return (
                         <li
                           key={colorId}
-                          className={`toolbar-color-slot-anchor ${isEditing ? 'active' : ''}`}
+                          className={`toolbar-color-slot-anchor ${isEditing ? 'rw-picked' : ''}`}
                         >
                           <button
                             type="button"

@@ -683,11 +683,12 @@
           }
         }
 
+        // 고른 도구는 kit 파랑(2026-11-16 켜짐 부가 색 2A)
         &.active {
           border: 0;
           border-radius: 8px;
-          color: var(--rw-on-primary);
-          background-color: var(--rw-primary);
+          color: var(--r-on-active);
+          background-color: var(--r-active);
         }
 
         &.cross-line {
@@ -718,7 +719,7 @@
       }
 
       li.active .toolbar__color-picker {
-        box-shadow: 0 0 0 1.5px var(--rw-on-primary);
+        box-shadow: 0 0 0 1.5px var(--r-on-active);
       }
 
       .toolbar__color-hint-wrapper .toolbar__color-hint {

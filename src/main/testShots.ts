@@ -250,7 +250,7 @@ export async function runTestShots(app: any) {
     app.openedAgain()
     await wait(800)
     note(
-      `[${theme}] 아이콘 숨김 중 다시 열기: 설정 창 보임=${settingsWindow.isVisible()}, 탭=${await page("document.querySelector('.settings-toolbar-item.selected')?.textContent")}, 그리는 중=${app.isDrawing()}`
+      `[${theme}] 아이콘 숨김 중 다시 열기: 설정 창 보임=${settingsWindow.isVisible()}, 탭=${await page("document.querySelector('.settings-toolbar-item.rw-selected')?.textContent")}, 그리는 중=${app.isDrawing()}`
     )
     await page(`${toggle}.click()`)
     await wait(600)
@@ -282,7 +282,7 @@ export async function runTestShots(app: any) {
     await wait(1500)
     const reopened = app.getWindows().settingsWindow
     note(
-      `[${theme}] ⌘, 처리 함수: 설정 창 열림=${Boolean(reopened?.isVisible())}, 탭=${reopened ? await reopened.webContents.executeJavaScript("document.querySelector('.settings-toolbar-item.selected')?.textContent") : '(없음)'}`
+      `[${theme}] ⌘, 처리 함수: 설정 창 열림=${Boolean(reopened?.isVisible())}, 탭=${reopened ? await reopened.webContents.executeJavaScript("document.querySelector('.settings-toolbar-item.rw-selected')?.textContent") : '(없음)'}`
     )
     reopened?.close()
     await wait(400)

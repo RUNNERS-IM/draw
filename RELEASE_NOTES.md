@@ -1,9 +1,7 @@
 ## 한국어
 
-- RUNNERS 계정을 만들 때 비밀번호가 규칙에 맞지 않으면, 같은 안내가 두 번 나오지 않고 고칠 방법 한 줄만 보이게 했습니다.
-- 오픈소스 고지 창의 첫 문장 띄어쓰기를 다듬었습니다.
+- 켜진 스위치와 고른 탭 · 도구 · 색을 파랑으로 표시하고, 카드와 창의 둘레 선을 또렷하게 해 무엇이 켜지고 골라졌는지 한눈에 보이게 했습니다.
 
 ## English
 
-- When you create a RUNNERS account with a password that does not fit the rules, Draw now shows one line on how to fix it instead of the same hint twice.
-- Tidied the first sentence of the open source notices window in Korean.
+- Switches that are on and the tab, tool or color you picked now show in blue, and cards and windows have clearer edges, so you can see at a glance what is on and selected.

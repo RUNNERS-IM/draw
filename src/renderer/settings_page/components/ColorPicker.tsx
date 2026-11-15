@@ -35,7 +35,7 @@ const ColorSwatch = ({
   isActive: boolean
   onClick: (...args: any[]) => any
 }) => (
-  <div className={`color-picker-swatch ${isActive ? 'active' : ''}`} onClick={onClick}>
+  <div className={`color-picker-swatch ${isActive ? 'rw-picked' : ''}`} onClick={onClick}>
     <div className="color-picker-swatch-color" style={{ backgroundColor: color }} />
   </div>
 )

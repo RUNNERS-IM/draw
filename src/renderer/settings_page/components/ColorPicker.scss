@@ -4,7 +4,7 @@
   top: 40px;
   right: -10px;
   padding: 16px;
-  border: 2px solid var(--gray-75);
+  border: 1px solid var(--r-border);
   border-radius: 20px;
   background-color: var(--gray-100);
   box-shadow: 2px 2px 8px var(--shadow-ambient-strong);
@@ -18,8 +18,8 @@
     right: 17px;
     width: 10px;
     height: 10px;
-    border-top: 2px solid var(--gray-75);
-    border-left: 2px solid var(--gray-75);
+    border-top: 1px solid var(--r-border);
+    border-left: 1px solid var(--r-border);
     background: var(--gray-100);
     transform: rotate(45deg);
   }
@@ -52,11 +52,13 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 1px solid transparent;
+      border-width: 1px;
+      border-style: solid;
+      border-radius: 5px;
 
-      &.active {
-        border-color: var(--gray-400);
-        border-radius: 5px;
+      // 고른 색은 kit .rw-picked(파랑 바탕 · 파랑 테두리)가 칠한다.
+      &:not(.rw-picked) {
+        border-color: transparent;
       }
 
       .color-picker-swatch-color {
@@ -88,7 +90,7 @@
       align-items: center;
       box-sizing: border-box;
       padding-left: var(--space-lg);
-      border: 1px solid var(--gray-400);
+      border: 1px solid var(--r-border);
       border-radius: 4px;
       background-color: var(--gray-25);
       color: var(--gray-600);
