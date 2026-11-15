@@ -1,3 +1,5 @@
+// 오류 자동 수집은 다른 코드보다 먼저 켠다.
+import { flushErrorReport } from './errorReport'
 import { pageUrl, preloadPath } from './pages'
 import {
   app,
@@ -2468,10 +2470,10 @@ function rawLog(message: string, ...args: unknown[]) {
 
 process.on('uncaughtException', (error) => {
   console.log('[DRAW:FATAL] uncaughtException', error)
-  app.quit()
+  void flushErrorReport().finally(() => app.quit())
 })
 
 process.on('unhandledRejection', (reason) => {
   console.log('[DRAW:FATAL] unhandledRejection', reason)
-  app.quit()
+  void flushErrorReport().finally(() => app.quit())
 })

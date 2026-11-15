@@ -1,3 +1,4 @@
+import '../errorReport'
 import { createRoot } from 'react-dom/client'
 import { RunnersUpdate } from '../../runners-account/runners-update'
 import { t } from '../../shared/i18n'

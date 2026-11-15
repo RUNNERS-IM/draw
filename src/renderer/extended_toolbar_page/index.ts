@@ -1,3 +1,4 @@
+import '../errorReport'
 import { t } from '../../shared/i18n'
 
 console.log('[DRAW]: Extended toolbar page loading...')

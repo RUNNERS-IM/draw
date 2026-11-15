@@ -1,11 +1,13 @@
 ## 한국어
 
-- Draw 첫 판입니다. 발표하면서 화면 위에 펜 · 형광펜 · 화살표 · 네모 · 동그라미 · 글자로 그릴 수 있습니다.
-- 왼쪽 세로 막대에서 도구와 색을 고르고, 되돌리기와 전체 지우기를 할 수 있습니다.
-- 메뉴 막대 아이콘의 패널에서 그리기를 켜고 끄며, 설정과 업데이트 확인도 여기서 합니다.
+- 밝은 화면과 어두운 화면 모두에서 흰색 · 검은색 색 칸이 바탕에 묻히지 않도록 테두리를 둘렀습니다.
+- 설정 창의 단추 글자를 더 진하게 하고, 누를 수 없는 단추는 흐린 색으로 바로 알아보게 했습니다.
+- 어두운 화면에서 오픈소스 고지 창의 가장자리가 잘 보이도록 바탕을 한 단계 밝게 했습니다.
+- Draw 가 오류를 만나면 고칠 수 있도록 오류 보고를 보냅니다. 보내기 전에 이메일 · 컴퓨터 이름 · 사용자 이름 같은 개인 정보는 가리고, 그린 그림 · 화면 · 앱 메모리는 보내지 않습니다. 자세한 내용은 개인정보 처리방침에 적었습니다.
 
 ## English
 
-- This is the first version of Draw. Draw on your screen while you present, with a pen, highlighter, arrow, rectangle, oval and text.
-- Pick a tool and a color from the bar on the left, and undo or clear everything from the same bar.
-- Turn drawing on and off from the menu bar panel, which also holds settings and update checks.
+- White and black color swatches now have an outline, so they stand out from the toolbar in both light and dark mode.
+- Button labels in settings are easier to read, and buttons you cannot press now look clearly dimmed.
+- In dark mode, the open source notices window is a shade lighter so its edges are easy to see.
+- When Draw runs into an error, it now sends an error report so we can fix it. Personal details such as your email, computer name and user name are hidden before it is sent, and your drawings, your screen and the app's memory are never sent. The privacy policy has the details.
