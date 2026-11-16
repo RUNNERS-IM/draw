@@ -219,6 +219,38 @@ body {
 }
 
 // 흰 카드 한 장과 그 안의 줄. 줄 모양(글자 · 스위치 · 단추)은 Draw 의 예전 설정 창 그대로다.
+.settings-section.account-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 32px var(--rw-row-pad-x);
+  text-align: center;
+
+  .account-empty-panda {
+    width: 96px;
+    height: 96px;
+    object-fit: contain;
+    -webkit-user-drag: none;
+  }
+
+  .account-empty-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--rw-text);
+  }
+
+  .account-empty-description {
+    font-size: var(--rw-font-small);
+    line-height: 14px;
+    color: var(--rw-text-secondary);
+  }
+
+  .rw-button {
+    margin-top: 8px;
+  }
+}
+
 .settings-section {
   background: var(--rw-box-bg);
   border: 1px solid var(--r-border);
