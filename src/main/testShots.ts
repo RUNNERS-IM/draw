@@ -519,7 +519,11 @@ async function accountScenes(pass: TestShotPass, app: any, settingsWindow: Elect
 // 앱 위에 따로 뜨는 것: 업데이트 창(다 받음 · 받는 중), 그림판 알림.
 async function popupScenes(pass: TestShotPass) {
   const { note, shot } = pass
-  const notes = ['왼쪽 도구 막대를 고쳤습니다.', '패널 글을 다듬었습니다.']
+  // 한 줄은 실제 출시 노트만큼 길게 두어, 낱말 중간에서 줄이 바뀌지 않는지(kit 0.1.43 keep-all) 사진으로 본다.
+  const notes = [
+    '켜진 스위치와 고른 탭 · 도구 · 색을 파랑으로 표시하고, 카드와 창의 둘레 선을 또렷하게 해 무엇이 켜지고 골라졌는지 한눈에 보이게 했습니다.',
+    '패널 글을 다듬었습니다.'
+  ]
   const updateWindow = () =>
     BrowserWindow.getAllWindows().find((window) =>
       window.webContents.getURL().includes('update_page')
