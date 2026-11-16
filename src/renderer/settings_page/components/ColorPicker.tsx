@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
-import { IoCheckmark } from 'react-icons/io5'
+import { Check } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { defaultColorPickerColors } from '../../app_page/components/constants'
 import './ColorPicker.scss'
 
@@ -49,6 +50,7 @@ const ColorPicker = ({
   onCancel: (...args: any[]) => any
   onSave: (...args: any[]) => any
 }) => {
+  const { t } = useTranslation()
   const pickerRef = useRef<any>(null)
   const [draftColor, setDraftColor] = useState(initialColor)
 
@@ -97,7 +99,7 @@ const ColorPicker = ({
   return (
     <div ref={pickerRef} className="color-picker-popover">
       <div className="color-picker-section">
-        <div className="color-picker-section-title">Defaults</div>
+        <div className="color-picker-section-title">{t('colorPicker.defaults')}</div>
 
         <div className="color-picker-defaults">
           {defaultColorPickerColors.map((color) => (
@@ -112,7 +114,7 @@ const ColorPicker = ({
       </div>
 
       <div className="color-picker-section">
-        <div className="color-picker-section-title">Colors</div>
+        <div className="color-picker-section-title">{t('colorPicker.colors')}</div>
 
         <div className="color-picker-grid">
           {COLOR_PICKER_COLORS.map((shades) => {
@@ -132,7 +134,7 @@ const ColorPicker = ({
       </div>
 
       <div className="color-picker-section">
-        <div className="color-picker-section-title">Shades</div>
+        <div className="color-picker-section-title">{t('colorPicker.shades')}</div>
 
         {activeShades ? (
           <div className="color-picker-shades">
@@ -146,12 +148,12 @@ const ColorPicker = ({
             ))}
           </div>
         ) : (
-          <div className="color-picker-empty-shades">No shades available...</div>
+          <div className="color-picker-empty-shades">{t('colorPicker.noShades')}</div>
         )}
       </div>
 
       <div className="color-picker-section">
-        <div className="color-picker-section-title">Hex code</div>
+        <div className="color-picker-section-title">{t('colorPicker.hex')}</div>
 
         <div className="color-picker-input-row">
           <div className="color-picker-input-wrapper">
@@ -163,7 +165,7 @@ const ColorPicker = ({
             className={`color-picker-save ${isInputValid ? '' : 'disabled'}`}
             onClick={saveColor}
           >
-            <IoCheckmark />
+            <Check strokeWidth={1.5} />
           </div>
         </div>
       </div>

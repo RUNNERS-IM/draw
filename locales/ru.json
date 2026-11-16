@@ -118,5 +118,10 @@
   "figure.lineWidth": "Толщина линии",
   "menu.toggleDraw": "Включить или выключить рисование",
   "menu.toolbar": "Показать или скрыть панель инструментов",
-  "menu.clear": "Стереть всё"
+  "menu.clear": "Стереть всё",
+  "colorPicker.defaults": "По умолчанию",
+  "colorPicker.colors": "Цвета",
+  "colorPicker.shades": "Оттенки",
+  "colorPicker.hex": "Hex-код",
+  "colorPicker.noShades": "У этого цвета нет оттенков"
 }

@@ -118,5 +118,10 @@
   "figure.lineWidth": "线条粗细",
   "menu.toggleDraw": "打开或关闭绘图",
   "menu.toolbar": "显示或隐藏工具栏",
-  "menu.clear": "全部清除"
+  "menu.clear": "全部清除",
+  "colorPicker.defaults": "默认",
+  "colorPicker.colors": "颜色",
+  "colorPicker.shades": "深浅",
+  "colorPicker.hex": "色值",
+  "colorPicker.noShades": "此颜色没有深浅可选"
 }

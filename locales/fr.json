@@ -118,5 +118,10 @@
   "figure.lineWidth": "Épaisseur du trait",
   "menu.toggleDraw": "Activer ou désactiver le dessin",
   "menu.toolbar": "Afficher ou masquer la barre d'outils",
-  "menu.clear": "Tout effacer"
+  "menu.clear": "Tout effacer",
+  "colorPicker.defaults": "Par défaut",
+  "colorPicker.colors": "Couleurs",
+  "colorPicker.shades": "Nuances",
+  "colorPicker.hex": "Code hex",
+  "colorPicker.noShades": "Aucune nuance pour cette couleur"
 }

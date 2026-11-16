@@ -118,5 +118,10 @@
   "figure.lineWidth": "Espessura da linha",
   "menu.toggleDraw": "Ativar ou desativar o desenho",
   "menu.toolbar": "Mostrar ou ocultar a barra de ferramentas",
-  "menu.clear": "Limpar tudo"
+  "menu.clear": "Limpar tudo",
+  "colorPicker.defaults": "Padrões",
+  "colorPicker.colors": "Cores",
+  "colorPicker.shades": "Tons",
+  "colorPicker.hex": "Código hex",
+  "colorPicker.noShades": "Esta cor não tem tons"
 }

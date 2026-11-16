@@ -53,7 +53,7 @@ body,
 
 body {
   font-family: var(--font-primary);
-  font-size: 10px;
+  font-size: var(--rw-font);
   background-color: var(--rw-window-bg);
   color: var(--rw-text);
   overflow: hidden;
@@ -228,8 +228,9 @@ body {
   .settings-item {
     display: flex;
     align-items: center;
-    height: 30px;
-    padding: 12px 0;
+    gap: var(--rw-row-gap);
+    min-height: var(--rw-button-height);
+    padding: var(--rw-row-pad-y) 0;
     border-bottom: var(--rw-border) solid var(--rw-separator);
 
     &:last-child {
@@ -239,78 +240,75 @@ body {
     .settings-item-info {
       flex: 1;
       min-width: 0;
-      padding-right: var(--space-lg);
 
+      // kit .rw-row-title · .rw-row-desc 와 같은 값
       .settings-item-title {
-        font-size: 13px;
-        font-weight: 500;
-        color: var(--gray-700);
+        font-size: var(--rw-font);
+        line-height: 16px;
+        color: var(--rw-text);
       }
 
       .settings-item-description {
-        margin: 3px 0 0 0;
-        color: var(--gray-600);
+        margin: var(--rw-title-gap) 0 0 0;
+        font-size: var(--rw-font-small);
+        line-height: 14px;
+        color: var(--rw-text-secondary);
       }
     }
 
     .settings-item-control {
       display: flex;
       align-items: center;
-      gap: var(--space-sm);
+      gap: 8px;
 
+      // kit 스위치(runners-menu.css .rm-knob)와 같은 크기 · 움직임: 길 44 x 20, 알약 동그라미 26 x 16.
+      // 켜짐은 kit 파랑, 동그라미는 켜짐 · 꺼짐 모두 흰색(2026-11-16 켜짐 부가 색 1A 2A)
       .toggle {
         position: relative;
+        flex: none;
         width: 44px;
-        height: 24px;
+        height: 20px;
         background-color: var(--r-track);
-        border-radius: 12px;
+        border-radius: 10px;
         cursor: pointer;
-        transition: background-color 0.2s ease;
+        transition: background-color 0.15s;
 
         &::after {
           content: '';
           position: absolute;
           top: 2px;
-          left: 2px;
-          width: 20px;
-          height: 20px;
+          inset-inline-start: 2px;
+          width: 26px;
+          height: 16px;
           background-color: #ffffff;
-          border-radius: 50%;
-          transition: transform 0.3s ease;
+          border-radius: 8px;
+          box-shadow: 0 0.5px 1.5px rgba(0, 0, 0, 0.25);
+          transition: transform 0.15s;
         }
 
-        // 켜짐은 kit 파랑, 동그라미는 켜짐 · 꺼짐 모두 흰색(2026-11-16 켜짐 부가 색 1A 2A)
         &.active {
           background-color: var(--r-active);
 
           &::after {
-            transform: translateX(20px);
+            transform: translateX(14px);
           }
-        }
-
-        &:active::after {
-          transform: scale(0.95);
         }
       }
 
+      // kit .rw-button 크기(높이 28 · 좌우 14 · 모서리 6 · 글자 13). 안 고른 단추라 둘레 선을 두른다(2026-11-15 1A)
       .button {
-        padding: 6px 16px;
+        height: var(--rw-button-height);
+        padding: 0 14px;
         border: 1px solid var(--r-border);
-        border-radius: 4px;
-        background-color: var(--gray-25);
-        color: var(--r-text);
+        border-radius: var(--rw-small-radius);
+        background-color: var(--rw-control-bg);
+        color: var(--rw-text);
         font-family: var(--font-primary);
-        font-size: 12px;
-        cursor: pointer;
-        transition: transform 0.3s ease;
+        font-size: var(--rw-font);
+        cursor: default;
 
         &:hover {
-          background-color: var(--gray-100);
-        }
-
-        &:active {
-          background-color: var(--gray-250);
-          transform: translateY(1px);
+          background-color: var(--rw-control-hover);
         }
 
         &.danger {
@@ -331,39 +329,39 @@ body {
         position: relative;
 
         .selectbar {
-          padding: 6px 16px;
+          height: var(--rw-button-height);
+          padding: 0 26px 0 10px;
           border: 1px solid var(--r-border);
-          border-radius: 4px;
-          background-color: var(--gray-25);
-          color: var(--r-text);
+          border-radius: var(--rw-small-radius);
+          background-color: var(--rw-control-bg);
+          color: var(--rw-text);
           font-family: var(--font-primary);
-          font-size: 12px;
-          cursor: pointer;
+          font-size: var(--rw-font);
+          cursor: default;
 
-          max-width: 130px;
+          max-width: 160px;
           text-overflow: ellipsis;
           white-space: nowrap;
           overflow: hidden;
 
           appearance: none;
-          padding-right: 24px;
 
           &:hover {
-            background-color: var(--gray-100);
+            background-color: var(--rw-control-hover);
           }
         }
 
         .selectbar-arrow {
           display: flex;
           position: absolute;
-          top: calc(50% - 6px);
-          right: 6px;
+          top: calc(50% - 7px);
+          inset-inline-end: 8px;
           pointer-events: none;
 
           .icon {
-            width: 12px;
-            height: 12px;
-            color: var(--r-text);
+            width: 14px;
+            height: 14px;
+            color: var(--rw-text-secondary);
           }
         }
       }
@@ -372,10 +370,11 @@ body {
         user-select: none;
 
         display: flex;
-        height: 27px;
-        background-color: var(--gray-25);
+        height: var(--rw-button-height);
+        box-sizing: border-box;
+        background-color: var(--rw-control-bg);
         border: 1px solid var(--r-border);
-        border-radius: 4px;
+        border-radius: var(--rw-small-radius);
         overflow: hidden;
 
         .stepper-button {
@@ -385,16 +384,15 @@ body {
           justify-content: center;
           align-items: center;
           width: 30px;
-          background-color: var(--gray-50);
 
-          &:active {
-            background-color: var(--gray-100);
+          &:hover {
+            background-color: var(--rw-control-hover);
           }
 
           .stepper-button--icon {
-            width: 10px;
-            height: 10px;
-            color: var(--gray-500);
+            width: 14px;
+            height: 14px;
+            color: var(--rw-text-secondary);
           }
         }
 
@@ -403,8 +401,9 @@ body {
           justify-content: center;
           align-items: center;
           width: 45px;
-          color: var(--r-text);
-          font-weight: 600;
+          color: var(--rw-text);
+          font-size: var(--rw-font);
+          font-variant-numeric: tabular-nums;
 
           border-left: 1px solid var(--r-border);
           border-right: 1px solid var(--r-border);
@@ -414,18 +413,16 @@ body {
       .icon {
         width: 16px;
         height: 16px;
-        cursor: pointer;
-        color: var(--gray-500);
+        cursor: default;
+        color: var(--rw-text-secondary);
 
         &:hover {
-          color: var(--gray-700);
+          color: var(--rw-text);
         }
 
         &.icon--disabled {
-          cursor: default;
-
           &:hover {
-            color: var(--gray-500);
+            color: var(--rw-text-secondary);
           }
         }
       }
@@ -435,18 +432,18 @@ body {
         align-items: center;
 
         .record-block {
-          cursor: pointer;
+          cursor: default;
           padding: var(--space-sm);
-          border-radius: 5px;
-          color: var(--gray-500);
-          transition: background-color 0.3s ease;
+          border-radius: var(--rw-small-radius);
+          color: var(--rw-text-secondary);
+          transition: background-color 0.15s;
 
           &:hover {
-            background-color: var(--gray-250);
+            background-color: var(--rw-control-hover);
           }
 
           &.recording {
-            color: var(--gray-500);
+            color: var(--rw-text-secondary);
 
             .hotkey-pill {
               .key {
@@ -459,7 +456,7 @@ body {
 
           .placeholder {
             padding: 5px;
-            font-size: 12px;
+            font-size: var(--rw-font-small);
           }
 
           .hotkey-pill {
@@ -473,11 +470,12 @@ body {
               height: 22px;
               display: flex;
               align-items: center;
-              font-size: 12px;
+              font-size: var(--rw-font-small);
               justify-content: center;
               border: 1px solid var(--r-border);
-              background-color: var(--gray-25);
-              border-radius: 4px;
+              background-color: var(--rw-control-bg);
+              color: var(--rw-text);
+              border-radius: var(--rw-small-radius);
             }
           }
         }
@@ -514,7 +512,7 @@ body {
 
       .buttons-group {
         display: flex;
-        gap: var(--space-sm);
+        gap: 8px;
       }
     }
   }
@@ -554,9 +552,6 @@ body {
   }
 
   .settings-item--nested {
-    border-top: 1px solid var(--gray-25);
-    border-bottom: 1px solid var(--gray-25);
-
     .settings-item--forward {
       display: flex;
       justify-content: center;
@@ -565,20 +560,16 @@ body {
       pointer-events: none;
 
       .icon {
-        width: 12px;
-        height: 12px;
-        color: var(--gray-500);
+        width: 14px;
+        height: 14px;
+        color: var(--rw-text-secondary);
       }
     }
-
-    &:last-child {
-      border-bottom: none;
-    }
   }
+}
 
-  .settings-item--nested + .settings-item {
-    border-top: 1px solid var(--gray-300);
-  }
+:root[dir='rtl'] .settings-section .settings-item .settings-item-control .toggle.active::after {
+  transform: translateX(-14px);
 }
 
 @keyframes slideUp {
@@ -593,34 +584,4 @@ body {
   100% {
     transform: translateY(0);
   }
-}
-
-// https://fonts.google.com/specimen/Inter
-@font-face {
-  font-family: 'Inter';
-  src: url('/assets/Inter_18pt-Regular.ttf') format('truetype');
-  font-weight: 400;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Inter';
-  src: url('/assets/Inter_18pt-Medium.ttf') format('truetype');
-  font-weight: 500;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Inter';
-  src: url('/assets/Inter_18pt-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: 'Inter';
-  src: url('/assets/Inter_18pt-Bold.ttf') format('truetype');
-  font-weight: 700;
-  font-style: normal;
-  font-display: swap;
 }

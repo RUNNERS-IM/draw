@@ -9,11 +9,13 @@
   max-width: 340px;
   min-width: 240px;
 
-  background-color: var(--gray-100);
-  border: 1px solid var(--gray-500);
-  border-radius: 10px;
+  // kit 떠 있는 판 색: 밝은 · 어두운 화면을 따라 바뀐다
+  background-color: var(--r-raised);
+  border: 1px solid var(--r-border);
+  border-radius: var(--rw-radius);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
   font-family: var(--font-primary);
-  color: var(--gray-700);
+  color: var(--r-text);
   padding: 14px;
 
   .toast-icon {
@@ -32,34 +34,38 @@
     gap: 2px;
 
     .toast-main-title {
-      font-size: 13px;
+      font-size: var(--rw-font);
+      line-height: 16px;
       font-weight: 600;
     }
 
     .toast-main-description {
-      font-size: 12px;
-      color: var(--gray-600);
+      font-size: var(--rw-font-small);
+      line-height: 14px;
+      color: var(--r-text-muted);
       overflow-wrap: anywhere;
     }
   }
 
   .toast-action {
+    // kit .rw-button 크기, 안 고른 단추라 둘레 선
     .toast-action-button {
-      padding: 6px 16px;
-      border: 1px solid var(--gray-400);
-      border-radius: 4px;
-      background-color: var(--gray-25);
-      color: var(--gray-500);
+      display: flex;
+      align-items: center;
+      height: var(--rw-button-height);
+      box-sizing: border-box;
+      padding: 0 14px;
+      border: 1px solid var(--r-border);
+      border-radius: var(--rw-small-radius);
+      background-color: var(--rw-control-bg);
+      color: var(--r-text);
       font-family: var(--font-primary);
-      font-size: 12px;
-      cursor: pointer;
+      font-size: var(--rw-font);
+      white-space: nowrap;
+      cursor: default;
 
       &:hover {
-        background-color: var(--gray-100);
-      }
-
-      &:active {
-        background-color: var(--gray-250);
+        background-color: var(--rw-control-hover);
       }
     }
   }

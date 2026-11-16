@@ -118,5 +118,10 @@
   "figure.lineWidth": "Spessore della linea",
   "menu.toggleDraw": "Attiva o disattiva il disegno",
   "menu.toolbar": "Mostra o nascondi la barra degli strumenti",
-  "menu.clear": "Cancella tutto"
+  "menu.clear": "Cancella tutto",
+  "colorPicker.defaults": "Predefiniti",
+  "colorPicker.colors": "Colori",
+  "colorPicker.shades": "Sfumature",
+  "colorPicker.hex": "Codice hex",
+  "colorPicker.noShades": "Nessuna sfumatura per questo colore"
 }

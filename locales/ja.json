@@ -118,5 +118,10 @@
   "figure.lineWidth": "線の太さ",
   "menu.toggleDraw": "描画のオン・オフ",
   "menu.toolbar": "ツールバーの表示・非表示",
-  "menu.clear": "すべて消去"
+  "menu.clear": "すべて消去",
+  "colorPicker.defaults": "標準",
+  "colorPicker.colors": "色",
+  "colorPicker.shades": "濃淡",
+  "colorPicker.hex": "カラーコード",
+  "colorPicker.noShades": "この色には濃淡がありません"
 }

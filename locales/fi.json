@@ -118,5 +118,10 @@
   "figure.lineWidth": "Viivan paksuus",
   "menu.toggleDraw": "Piirtäminen päälle tai pois",
   "menu.toolbar": "Näytä tai piilota työkalupalkki",
-  "menu.clear": "Tyhjennä kaikki"
+  "menu.clear": "Tyhjennä kaikki",
+  "colorPicker.defaults": "Oletukset",
+  "colorPicker.colors": "Värit",
+  "colorPicker.shades": "Sävyt",
+  "colorPicker.hex": "Hex-koodi",
+  "colorPicker.noShades": "Tällä värillä ei ole sävyjä"
 }

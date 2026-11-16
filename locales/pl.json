@@ -118,5 +118,10 @@
   "figure.lineWidth": "Grubość linii",
   "menu.toggleDraw": "Włącz lub wyłącz rysowanie",
   "menu.toolbar": "Pokaż lub ukryj pasek narzędzi",
-  "menu.clear": "Wyczyść wszystko"
+  "menu.clear": "Wyczyść wszystko",
+  "colorPicker.defaults": "Domyślne",
+  "colorPicker.colors": "Kolory",
+  "colorPicker.shades": "Odcienie",
+  "colorPicker.hex": "Kod hex",
+  "colorPicker.noShades": "Ten kolor nie ma odcieni"
 }

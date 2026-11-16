@@ -118,5 +118,10 @@
   "figure.lineWidth": "Lijndikte",
   "menu.toggleDraw": "Tekenen aan of uit",
   "menu.toolbar": "Werkbalk tonen of verbergen",
-  "menu.clear": "Alles wissen"
+  "menu.clear": "Alles wissen",
+  "colorPicker.defaults": "Standaard",
+  "colorPicker.colors": "Kleuren",
+  "colorPicker.shades": "Tinten",
+  "colorPicker.hex": "Hexcode",
+  "colorPicker.noShades": "Geen tinten voor deze kleur"
 }

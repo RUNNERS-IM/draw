@@ -118,5 +118,10 @@
   "figure.lineWidth": "Line width",
   "menu.toggleDraw": "Drawing On or Off",
   "menu.toolbar": "Show or Hide Toolbar",
-  "menu.clear": "Clear All"
+  "menu.clear": "Clear All",
+  "colorPicker.defaults": "Defaults",
+  "colorPicker.colors": "Colors",
+  "colorPicker.shades": "Shades",
+  "colorPicker.hex": "Hex code",
+  "colorPicker.noShades": "No shades for this color"
 }

@@ -118,5 +118,10 @@
   "figure.lineWidth": "रेखा की मोटाई",
   "menu.toggleDraw": "ड्रॉइंग चालू या बंद",
   "menu.toolbar": "टूलबार दिखाएँ या छिपाएँ",
-  "menu.clear": "सब मिटाएँ"
+  "menu.clear": "सब मिटाएँ",
+  "colorPicker.defaults": "डिफ़ॉल्ट",
+  "colorPicker.colors": "रंग",
+  "colorPicker.shades": "शेड",
+  "colorPicker.hex": "हेक्स कोड",
+  "colorPicker.noShades": "इस रंग के शेड नहीं हैं"
 }
