@@ -9,6 +9,7 @@ import {
   type CodePurpose,
   type SignMode
 } from '../../../runners-account/runners-account'
+import signInPanda from '../../../runners-account/assets/panda/signin.webp'
 
 const api = window.electronAPI
 
@@ -27,26 +28,31 @@ const AccountTab = () => {
     <>
       <section className="settings-group">
         <h2 className="settings-group-title">{t('settings.tabAccount')}</h2>
-        <div className="settings-section">
-          <div className="settings-item">
-            <div className="settings-item-info">
-              <div className="settings-item-title">{email ?? accountText(lang, 'title')}</div>
-              <div className="settings-item-description">
-                {email ? accountText(lang, 'title') : t('settings.accountOptional')}
+        {email ? (
+          <div className="settings-section">
+            <div className="settings-item">
+              <div className="settings-item-info">
+                <div className="settings-item-title">{email}</div>
+                <div className="settings-item-description">{accountText(lang, 'title')}</div>
+              </div>
+
+              <div className="settings-item-control">
+                <AccountButton lang={lang} account={email} onSignOut={() => void api.signOut()} />
               </div>
             </div>
-
-            <div className="settings-item-control">
-              {email ? (
-                <AccountButton lang={lang} account={email} onSignOut={() => void api.signOut()} />
-              ) : (
-                <button className="button" onClick={() => setSigningIn(true)}>
-                  {accountText(lang, 'signIn')}
-                </button>
-              )}
-            </div>
           </div>
-        </div>
+        ) : (
+          // 로그인 전은 가이드의 빈 화면 꼴(판다 그림 → 한 줄 → 채운 단추 하나, design.runners.im 06-2).
+          // 그림은 밝은 얼굴의 signin 판다(2026-11-16 판다 자리 표, runners-wiki 803d86d).
+          <div className="settings-section account-empty">
+            <img className="account-empty-panda" src={signInPanda} alt="" draggable={false} />
+            <div className="account-empty-title">{accountText(lang, 'title')}</div>
+            <div className="account-empty-description">{t('settings.accountOptional')}</div>
+            <button className="rw-button default" onClick={() => setSigningIn(true)}>
+              {accountText(lang, 'signIn')}
+            </button>
+          </div>
+        )}
       </section>
 
       {signingIn && !email && (

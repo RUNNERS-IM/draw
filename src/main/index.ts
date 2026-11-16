@@ -27,7 +27,8 @@ import { t, setLocale, currentLocale } from '../shared/i18n'
 import { loginItemsAllowed } from './loginItems'
 import { startUpdates, checkNow } from './updates'
 import { startAccount, accountForTest } from './account'
-import { runTestShots } from './testShots'
+import { prepareTestShots, readTestShots } from './runners/test-shots'
+import { runDrawTestShots } from './testShots'
 
 const isDevelopment = process.env.NODE_ENV === 'development'
 const isDebugLoggingEnabled = process.env.DRAW_DEBUG === '1'
@@ -954,9 +955,14 @@ app.on('activate', () => {
 
 app.commandLine.appendSwitch('disable-pinch')
 
+// 시험 촬영 모드(RUNNERS_TEST_SHOTS). 출시 빌드에는 들어가지 않는다.
+const testShots = DRAW_TEST_BUILD ? readTestShots() : null
+prepareTestShots(testShots, app.commandLine)
+
 app.whenReady().then(() => {
-  const testing = testLanguage()
-  setLocale(testing ? [testing] : [...app.getPreferredSystemLanguages(), app.getLocale()])
+  setLocale(
+    testShots ? [testShots.langs[0]] : [...app.getPreferredSystemLanguages(), app.getLocale()]
+  )
 
   hideDock()
 
@@ -990,9 +996,9 @@ app.whenReady().then(() => {
     }
   })
 
-  if (DRAW_TEST_BUILD && process.env.DRAW_TEST_SHOTS) {
-    runTestShots({
-      dir: process.env.DRAW_TEST_SHOTS,
+  if (DRAW_TEST_BUILD && testShots) {
+    runDrawTestShots(testShots, {
+      setLanguage: setTestLanguage,
       enableDrawMode,
       enablePointerMode,
       showPanel,
@@ -1009,8 +1015,7 @@ app.whenReady().then(() => {
         settingsWindow
       }),
       isDrawing: () => drawingMode,
-      account: accountForTest,
-      quit: quitApp
+      account: accountForTest
     })
   }
 
@@ -1045,8 +1050,25 @@ app.on('window-all-closed', () => {
   app.quit()
 })
 
-function testLanguage() {
-  return DRAW_TEST_BUILD ? process.env.DRAW_TEST_LANG : undefined
+// 시험 촬영에서 언어를 바꾼다. 메인 글(메뉴 · 메뉴 막대)을 다시 만들고, 창은 preload 가 언어를 다시 읽게 새로 불러온다.
+async function setTestLanguage(lang: string) {
+  if (currentLocale() === lang) {
+    return
+  }
+  setLocale([lang])
+  setApplicationMenu()
+  updateTray()
+  updateContextMenu()
+  settingsWindow?.close()
+  const reloads = [mainWindow, extendedToolbarWindow, panelWindow].map(
+    (window) =>
+      new Promise<void>((resolve) => {
+        window.webContents.once('did-finish-load', () => resolve())
+        window.webContents.reload()
+      })
+  )
+  await Promise.all(reloads)
+  await new Promise((resolve) => setTimeout(resolve, 800))
 }
 
 function startDrawingWhenMainWindowLoaded() {
