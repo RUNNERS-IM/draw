@@ -118,5 +118,10 @@
   "figure.lineWidth": "Ketebalan garis",
   "menu.toggleDraw": "Nyalakan atau matikan menggambar",
   "menu.toolbar": "Tampilkan atau sembunyikan bilah alat",
-  "menu.clear": "Hapus semua"
+  "menu.clear": "Hapus semua",
+  "colorPicker.defaults": "Bawaan",
+  "colorPicker.colors": "Warna",
+  "colorPicker.shades": "Gradasi",
+  "colorPicker.hex": "Kode hex",
+  "colorPicker.noShades": "Warna ini tidak punya gradasi"
 }

@@ -118,5 +118,10 @@
   "figure.lineWidth": "سماكة الخط",
   "menu.toggleDraw": "تشغيل الرسم أو إيقافه",
   "menu.toolbar": "إظهار شريط الأدوات أو إخفاؤه",
-  "menu.clear": "مسح الكل"
+  "menu.clear": "مسح الكل",
+  "colorPicker.defaults": "الألوان الافتراضية",
+  "colorPicker.colors": "الألوان",
+  "colorPicker.shades": "الدرجات",
+  "colorPicker.hex": "رمز اللون",
+  "colorPicker.noShades": "لا توجد درجات لهذا اللون"
 }

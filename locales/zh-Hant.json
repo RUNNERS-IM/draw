@@ -118,5 +118,10 @@
   "figure.lineWidth": "線條粗細",
   "menu.toggleDraw": "開啟或關閉繪圖",
   "menu.toolbar": "顯示或隱藏工具列",
-  "menu.clear": "全部清除"
+  "menu.clear": "全部清除",
+  "colorPicker.defaults": "預設",
+  "colorPicker.colors": "顏色",
+  "colorPicker.shades": "深淺",
+  "colorPicker.hex": "色碼",
+  "colorPicker.noShades": "此顏色沒有深淺可選"
 }

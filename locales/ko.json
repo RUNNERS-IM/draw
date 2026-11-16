@@ -118,5 +118,10 @@
   "figure.lineWidth": "선 굵기",
   "menu.toggleDraw": "그리기 켜기 · 끄기",
   "menu.toolbar": "도구 막대 보이기 · 숨기기",
-  "menu.clear": "전체 지우기"
+  "menu.clear": "전체 지우기",
+  "colorPicker.defaults": "기본 색",
+  "colorPicker.colors": "색",
+  "colorPicker.shades": "밝기",
+  "colorPicker.hex": "색 코드",
+  "colorPicker.noShades": "이 색은 밝기를 고를 수 없습니다"
 }

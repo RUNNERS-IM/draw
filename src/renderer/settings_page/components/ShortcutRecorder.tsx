@@ -1,19 +1,14 @@
 import { useState, useEffect, useRef } from 'react'
 import { debounce } from 'lodash'
-import {
-  MdKeyboardCommandKey,
-  MdOutlineKeyboardControlKey,
-  MdOutlineKeyboardOptionKey
-} from 'react-icons/md'
-import { ImShift } from 'react-icons/im'
+import { ArrowBigUp, ChevronUp, Command, Option } from 'lucide-react'
 
 const HotkeyPill = ({ accelerator }: { accelerator: any }) => {
   const humanizedKey = (key: string) => {
     const keyMap: Record<string, any> = {
-      Meta: <MdKeyboardCommandKey />,
-      Control: <MdOutlineKeyboardControlKey />,
-      Alt: <MdOutlineKeyboardOptionKey />,
-      Shift: <ImShift />
+      Meta: <Command size={12} strokeWidth={1.5} />,
+      Control: <ChevronUp size={12} strokeWidth={1.5} />,
+      Alt: <Option size={12} strokeWidth={1.5} />,
+      Shift: <ArrowBigUp size={12} strokeWidth={1.5} />
     }
 
     return keyMap[key] || key

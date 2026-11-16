@@ -4,11 +4,12 @@
   top: 40px;
   right: -10px;
   padding: 16px;
-  border: 2px solid var(--gray-75);
-  border-radius: 20px;
-  background-color: var(--gray-100);
-  box-shadow: 2px 2px 8px var(--shadow-ambient-strong);
-  color: var(--gray-700);
+  border: 1px solid var(--r-border);
+  border-radius: var(--rw-radius);
+  background-color: var(--r-raised);
+  // 가이드 계정 메뉴와 같은 떠 있는 판 그림자
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.22);
+  color: var(--rw-text);
 
   &::before {
     content: '';
@@ -18,21 +19,23 @@
     right: 17px;
     width: 10px;
     height: 10px;
-    border-top: 2px solid var(--gray-75);
-    border-left: 2px solid var(--gray-75);
-    background: var(--gray-100);
+    border-top: 1px solid var(--r-border);
+    border-left: 1px solid var(--r-border);
+    background: var(--r-raised);
     transform: rotate(45deg);
   }
 
   .color-picker-section + .color-picker-section {
-    margin-top: 10px;
+    margin-top: 12px;
   }
 
+  // kit .rw-section-title 꼴: 11px · 굵게 · 흐린 글자
   .color-picker-section-title {
     margin-bottom: 6px;
-    color: var(--gray-700);
-    font-size: 13px;
-    font-weight: 500;
+    color: var(--rw-text-secondary);
+    font-size: var(--rw-font-small);
+    line-height: 14px;
+    font-weight: 600;
   }
 
   .color-picker-defaults,
@@ -52,18 +55,20 @@
       display: flex;
       justify-content: center;
       align-items: center;
-      border: 1px solid transparent;
+      border-width: 1px;
+      border-style: solid;
+      border-radius: 5px;
 
-      &.active {
-        border-color: var(--gray-400);
-        border-radius: 5px;
+      // 고른 색은 kit .rw-picked(파랑 바탕 · 파랑 테두리)가 칠한다.
+      &:not(.rw-picked) {
+        border-color: transparent;
       }
 
       .color-picker-swatch-color {
         box-sizing: border-box;
         width: 24px;
         height: 24px;
-        border: 1px solid var(--gray-400);
+        border: 1px solid var(--r-border);
         border-radius: 4px;
       }
     }
@@ -73,51 +78,54 @@
     min-height: 32px;
     display: flex;
     align-items: center;
-    color: var(--gray-600);
-    font-size: 12px;
+    color: var(--rw-text-secondary);
+    font-size: var(--rw-font-small);
   }
 
   .color-picker-input-row {
     display: flex;
-    gap: var(--space-sm);
+    gap: 8px;
 
+    // kit .rw-input 꼴: 높이 28 · 모서리 6
     .color-picker-input-wrapper {
       display: flex;
       flex: 1 1 0;
       min-width: 0;
       align-items: center;
       box-sizing: border-box;
-      padding-left: var(--space-lg);
-      border: 1px solid var(--gray-400);
-      border-radius: 4px;
-      background-color: var(--gray-25);
-      color: var(--gray-600);
-      font-size: 13px;
+      height: var(--rw-button-height);
+      padding-inline-start: 8px;
+      border: 1px solid var(--r-border);
+      border-radius: var(--rw-small-radius);
+      background-color: var(--rw-control-bg);
+      color: var(--rw-text-secondary);
+      font-size: var(--rw-font);
 
       input {
         flex: 1;
         min-width: 0;
         width: 0;
         height: 100%;
-        margin-left: 5px;
+        margin-inline-start: 4px;
         padding: 0;
         border: 0;
         background: transparent;
-        color: inherit;
+        color: var(--rw-text);
         font-family: var(--font-primary);
-        font-size: 13px;
+        font-size: var(--rw-font);
       }
     }
 
+    // 채운 단추는 한 창에 하나: 저장이 이 창의 주 단추라 kit .rw-button.default(검정 · 흰색) 꼴
     .color-picker-save {
       flex: 0 0 28px;
       width: 28px;
-      height: 28px;
-      border: 1px solid var(--rw-primary);
-      border-radius: 4px;
-      background: var(--gray-25);
-      color: var(--rw-primary);
-      cursor: pointer;
+      height: var(--rw-button-height);
+      border: 0;
+      border-radius: var(--rw-small-radius);
+      background: var(--rw-primary);
+      color: var(--rw-on-primary);
+      cursor: default;
       display: flex;
       align-items: center;
       justify-content: center;
@@ -129,9 +137,9 @@
       }
 
       &.disabled {
-        border-color: var(--gray-400);
-        color: var(--gray-400);
-        cursor: default;
+        border: 1px solid var(--r-border);
+        background: var(--rw-control-bg);
+        color: var(--rw-text-secondary);
       }
     }
   }

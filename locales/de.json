@@ -118,5 +118,10 @@
   "figure.lineWidth": "Linienstärke",
   "menu.toggleDraw": "Zeichnen ein oder aus",
   "menu.toolbar": "Werkzeugleiste ein- oder ausblenden",
-  "menu.clear": "Alles löschen"
+  "menu.clear": "Alles löschen",
+  "colorPicker.defaults": "Standard",
+  "colorPicker.colors": "Farben",
+  "colorPicker.shades": "Abstufungen",
+  "colorPicker.hex": "Hex-Code",
+  "colorPicker.noShades": "Keine Abstufungen für diese Farbe"
 }

@@ -118,5 +118,10 @@
   "figure.lineWidth": "Độ dày nét",
   "menu.toggleDraw": "Bật hoặc tắt vẽ",
   "menu.toolbar": "Hiện hoặc ẩn thanh công cụ",
-  "menu.clear": "Xóa tất cả"
+  "menu.clear": "Xóa tất cả",
+  "colorPicker.defaults": "Mặc định",
+  "colorPicker.colors": "Màu",
+  "colorPicker.shades": "Sắc độ",
+  "colorPicker.hex": "Mã hex",
+  "colorPicker.noShades": "Màu này không có sắc độ"
 }
