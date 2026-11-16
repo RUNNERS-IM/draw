@@ -118,5 +118,10 @@
   "figure.lineWidth": "Çizgi kalınlığı",
   "menu.toggleDraw": "Çizimi aç veya kapat",
   "menu.toolbar": "Araç çubuğunu göster veya gizle",
-  "menu.clear": "Tümünü temizle"
+  "menu.clear": "Tümünü temizle",
+  "colorPicker.defaults": "Varsayılanlar",
+  "colorPicker.colors": "Renkler",
+  "colorPicker.shades": "Tonlar",
+  "colorPicker.hex": "Hex kodu",
+  "colorPicker.noShades": "Bu rengin tonu yok"
 }

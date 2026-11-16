@@ -319,8 +319,9 @@
           font-weight: 600;
           color: var(--gray-700);
 
+          // 고른 칸은 kit 파랑(2026-11-16 켜짐 부가 색 2A)
           .whiteboard-sidebar__theme-preview {
-            border-color: var(--rw-primary);
+            border-color: var(--r-active);
           }
         }
 
@@ -369,8 +370,9 @@
           font-weight: 600;
           color: var(--gray-700);
 
+          // 고른 칸은 kit 파랑(2026-11-16 켜짐 부가 색 2A)
           .whiteboard-sidebar__style-preview-wrapper {
-            border-color: var(--rw-primary);
+            border-color: var(--r-active);
           }
         }
 

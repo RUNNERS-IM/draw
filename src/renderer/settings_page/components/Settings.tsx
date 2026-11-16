@@ -1,5 +1,18 @@
 import { useEffect, useState, type ReactNode } from 'react'
-import { Brush, CircleUser, Info, Settings as SettingsIcon, type LucideIcon } from 'lucide-react'
+import {
+  ArrowLeftRight,
+  Brush,
+  ChevronDown,
+  ChevronRight,
+  CircleUser,
+  CircleX,
+  Info,
+  Minus,
+  Plus,
+  RotateCcw,
+  Settings as SettingsIcon,
+  type LucideIcon
+} from 'lucide-react'
 import '../../../runners-account/runners-window.css'
 import './Settings.scss'
 import ShortcutRecorder from './ShortcutRecorder'
@@ -19,15 +32,6 @@ import {
   fadeOutDurationTimeMsMax,
   toolbarColorIds
 } from '../../app_page/components/constants'
-
-import {
-  IoRefreshCircleOutline,
-  IoCloseCircleOutline,
-  IoChevronDown,
-  IoChevronForward
-} from 'react-icons/io5'
-import { HiSwitchHorizontal } from 'react-icons/hi'
-import { FaPlus, FaMinus } from 'react-icons/fa'
 
 // 첫 판(그리기만)에 없는 설정. 코드는 두고 화면에서만 뺀다.
 const HIDDEN_FEATURES = false
@@ -128,18 +132,14 @@ const ShortcutRow = ({
 
       <div className="settings-item-control">
         {canReset && (
-          <IoRefreshCircleOutline
-            className="icon"
-            title={t('settings.resetDefault')}
-            onClick={onReset}
-          />
+          <RotateCcw className="icon" strokeWidth={1.5} onClick={onReset}>
+            <title>{t('settings.resetDefault')}</title>
+          </RotateCcw>
         )}
         {canRemove && (
-          <IoCloseCircleOutline
-            className="icon"
-            title={t('settings.removeShortcut')}
-            onClick={onRemove}
-          />
+          <CircleX className="icon" strokeWidth={1.5} onClick={onRemove}>
+            <title>{t('settings.removeShortcut')}</title>
+          </CircleX>
         )}
 
         <ShortcutRecorder
@@ -269,10 +269,16 @@ const Settings = (config: any) => {
         setShowHideApp({ ...showHideApp, accelerator: showHideApp.init })
         break
       case 'key_binding_show_hide_toolbar':
-        setShowHideToolbar({ ...showHideToolbar, accelerator: showHideToolbar.init })
+        setShowHideToolbar({
+          ...showHideToolbar,
+          accelerator: showHideToolbar.init
+        })
         break
       case 'key_binding_show_hide_whiteboard':
-        setShowHideWhiteboard({ ...showHideWhiteboard, accelerator: showHideWhiteboard.init })
+        setShowHideWhiteboard({
+          ...showHideWhiteboard,
+          accelerator: showHideWhiteboard.init
+        })
         break
       case 'key_binding_clear_desk':
         setClearDesk({ ...clearDesk, accelerator: clearDesk.init })
@@ -493,7 +499,7 @@ const Settings = (config: any) => {
             type="button"
             role="tab"
             aria-selected={activeTab === id}
-            className={`settings-toolbar-item ${activeTab === id ? 'selected' : ''}`}
+            className={`settings-toolbar-item ${activeTab === id ? 'rw-selected' : ''}`}
             onClick={() => selectTab(id)}
           >
             <Icon size={22} strokeWidth={1.5} aria-hidden />
@@ -564,7 +570,7 @@ const Settings = (config: any) => {
                       title={mainColorInfo.title}
                     />
 
-                    <HiSwitchHorizontal className="icon icon--disabled" />
+                    <ArrowLeftRight className="icon icon--disabled" strokeWidth={1.5} />
 
                     <button
                       type="button"
@@ -596,7 +602,7 @@ const Settings = (config: any) => {
                       return (
                         <li
                           key={colorId}
-                          className={`toolbar-color-slot-anchor ${isEditing ? 'active' : ''}`}
+                          className={`toolbar-color-slot-anchor ${isEditing ? 'rw-picked' : ''}`}
                         >
                           <button
                             type="button"
@@ -652,7 +658,7 @@ const Settings = (config: any) => {
                     </select>
 
                     <div className="selectbar-arrow">
-                      <IoChevronDown className="icon" />
+                      <ChevronDown className="icon" strokeWidth={1.5} />
                     </div>
                   </div>
                 </div>
@@ -711,14 +717,14 @@ const Settings = (config: any) => {
                         className="stepper-button"
                         onClick={() => applyFadeDisappearAfter(fadeDisappearAfterMs - timeStep)}
                       >
-                        <FaMinus className="stepper-button--icon" />
+                        <Minus className="stepper-button--icon" strokeWidth={1.5} />
                       </div>
                       <div className="stepper-value">{fadeDisappearAfterMs / 1000}s</div>
                       <div
                         className="stepper-button"
                         onClick={() => applyFadeDisappearAfter(fadeDisappearAfterMs + timeStep)}
                       >
-                        <FaPlus className="stepper-button--icon" />
+                        <Plus className="stepper-button--icon" strokeWidth={1.5} />
                       </div>
                     </div>
                   </div>
@@ -729,7 +735,7 @@ const Settings = (config: any) => {
                 <div className="settings-item--nested">
                   <div className="settings-item">
                     <div className="settings-item--forward">
-                      <IoChevronForward className="icon" />
+                      <ChevronRight className="icon" strokeWidth={1.5} />
                     </div>
 
                     <div className="settings-item-info">
@@ -747,7 +753,7 @@ const Settings = (config: any) => {
                             applyFadeOutDurationTimeMs(fadeOutDurationTimeMs - timeStep)
                           }
                         >
-                          <FaMinus className="stepper-button--icon" />
+                          <Minus className="stepper-button--icon" strokeWidth={1.5} />
                         </div>
                         <div className="stepper-value">{fadeOutDurationTimeMs / 1000}s</div>
                         <div
@@ -756,7 +762,7 @@ const Settings = (config: any) => {
                             applyFadeOutDurationTimeMs(fadeOutDurationTimeMs + timeStep)
                           }
                         >
-                          <FaPlus className="stepper-button--icon" />
+                          <Plus className="stepper-button--icon" strokeWidth={1.5} />
                         </div>
                       </div>
                     </div>
@@ -779,14 +785,14 @@ const Settings = (config: any) => {
                         className="stepper-button"
                         onClick={() => applyLaserTime(laserTimeMs - timeStep)}
                       >
-                        <FaMinus className="stepper-button--icon" />
+                        <Minus className="stepper-button--icon" strokeWidth={1.5} />
                       </div>
                       <div className="stepper-value">{laserTimeMs / 1000}s</div>
                       <div
                         className="stepper-button"
                         onClick={() => applyLaserTime(laserTimeMs + timeStep)}
                       >
-                        <FaPlus className="stepper-button--icon" />
+                        <Plus className="stepper-button--icon" strokeWidth={1.5} />
                       </div>
                     </div>
                   </div>
@@ -873,7 +879,7 @@ const Settings = (config: any) => {
                     </select>
 
                     <div className="selectbar-arrow">
-                      <IoChevronDown className="icon" />
+                      <ChevronDown className="icon" strokeWidth={1.5} />
                     </div>
                   </div>
                 </div>
@@ -911,7 +917,7 @@ const Settings = (config: any) => {
                       </select>
 
                       <div className="selectbar-arrow">
-                        <IoChevronDown className="icon" />
+                        <ChevronDown className="icon" strokeWidth={1.5} />
                       </div>
                     </div>
                   </div>
@@ -936,7 +942,7 @@ const Settings = (config: any) => {
                       </select>
 
                       <div className="selectbar-arrow">
-                        <IoChevronDown className="icon" />
+                        <ChevronDown className="icon" strokeWidth={1.5} />
                       </div>
                     </div>
                   </div>
@@ -954,11 +960,13 @@ const Settings = (config: any) => {
 
                   <div className="settings-item-control">
                     {!screenshotDirectory.isDefault && (
-                      <IoRefreshCircleOutline
+                      <RotateCcw
                         className="icon"
-                        title={t('settings.resetDefault')}
+                        strokeWidth={1.5}
                         onClick={resetScreenshotDirectory}
-                      />
+                      >
+                        <title>{t('settings.resetDefault')}</title>
+                      </RotateCcw>
                     )}
                     <div className="buttons-group">
                       <button className="button" onClick={openScreenshotDirectory}>

@@ -118,5 +118,10 @@
   "figure.lineWidth": "ความหนาเส้น",
   "menu.toggleDraw": "เปิดหรือปิดการวาด",
   "menu.toolbar": "แสดงหรือซ่อนแถบเครื่องมือ",
-  "menu.clear": "ล้างทั้งหมด"
+  "menu.clear": "ล้างทั้งหมด",
+  "colorPicker.defaults": "ค่าเริ่มต้น",
+  "colorPicker.colors": "สี",
+  "colorPicker.shades": "เฉดสี",
+  "colorPicker.hex": "รหัสสี",
+  "colorPicker.noShades": "สีนี้ไม่มีเฉดสี"
 }
