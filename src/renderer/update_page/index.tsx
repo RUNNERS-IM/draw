@@ -2,7 +2,7 @@ import '../errorReport'
 import { createRoot } from 'react-dom/client'
 import { RunnersUpdate } from '../../runners-account/runners-update'
 import { t } from '../../shared/i18n'
-import { useAppIcon } from '../appIcon'
+import { APP_ICON, APP_ICON_DARK } from '../appIcon'
 import { applyTextDirection } from '../i18n'
 
 applyTextDirection()
@@ -11,7 +11,8 @@ const { answerUpdate, fitHeight, onUpdateOffer, updateOffer } = window.electronA
 
 const Update = () => (
   <RunnersUpdate
-    appIcon={useAppIcon()}
+    appIcon={APP_ICON}
+    appIconDark={APP_ICON_DARK}
     t={t}
     offer={updateOffer}
     onOffer={onUpdateOffer}
