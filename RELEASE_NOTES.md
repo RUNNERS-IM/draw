@@ -1,9 +1,7 @@
 ## 한국어
 
-- 설정의 계정 칸에 로그인하지 않았을 때 판다 그림과 로그인 단추를 크게 보여, 로그인하지 않아도 그대로 그릴 수 있다는 것을 한눈에 알 수 있게 했습니다.
-- 업데이트 창 · 정보 탭의 한국어 글이 낱말 중간에서 줄이 바뀌지 않게 했습니다.
+- 업데이트 창 · 정보 탭 · 알림의 앱 아이콘을 다른 RUNNERS 앱과 같은 크기 · 색의 판으로 맞췄습니다. 어두운 화면에서는 어두운 판이 나옵니다.
 
 ## English
 
-- When you are not signed in, the Account tab in Settings now shows a panda and a clear Sign In button, so it is easy to see that you can keep drawing without an account.
-- Korean text in the update window and the About tab no longer breaks lines in the middle of a word.
+- The app icon in the update window, the About tab and notifications now uses the same plate size and colors as the other RUNNERS apps, with a dark plate in Dark Mode.
