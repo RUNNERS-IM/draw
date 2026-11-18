@@ -36,7 +36,7 @@
   "about.close": "Schließen",
   "update.title": "Eine neue Version ist verfügbar",
   "update.ask": "Draw {{version}} jetzt installieren?",
-  "update.notes": "Neuigkeiten",
+  "update.notes": "Neuerungen",
   "update.downloading": "Wird geladen… {{percent}}%",
   "update.later": "Später",
   "update.install": "Jetzt installieren",

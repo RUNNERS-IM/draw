@@ -36,7 +36,7 @@
   "about.close": "닫기",
   "update.title": "새 버전이 나왔습니다",
   "update.ask": "Draw {{version}} 버전을 지금 설치할까요?",
-  "update.notes": "새로워진 점",
+  "update.notes": "바뀐 점",
   "update.downloading": "내려받는 중… {{percent}}%",
   "update.later": "나중에",
   "update.install": "지금 설치",

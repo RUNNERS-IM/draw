@@ -36,7 +36,7 @@
   "about.close": "Close",
   "update.title": "A new version is available",
   "update.ask": "Install Draw {{version}} now?",
-  "update.notes": "What's new",
+  "update.notes": "What’s New",
   "update.downloading": "Downloading… {{percent}}%",
   "update.later": "Later",
   "update.install": "Install Now",

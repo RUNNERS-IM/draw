@@ -36,7 +36,7 @@
   "about.close": "बंद करें",
   "update.title": "नया संस्करण उपलब्ध है",
   "update.ask": "क्या Draw {{version}} अभी इंस्टॉल करें?",
-  "update.notes": "क्या नया है",
+  "update.notes": "नया क्या है",
   "update.downloading": "डाउनलोड हो रहा है… {{percent}}%",
   "update.later": "बाद में",
   "update.install": "अभी इंस्टॉल करें",

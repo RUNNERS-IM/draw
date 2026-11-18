@@ -36,7 +36,7 @@
   "about.close": "閉じる",
   "update.title": "新しいバージョンがあります",
   "update.ask": "Draw {{version}} を今すぐインストールしますか?",
-  "update.notes": "新機能",
+  "update.notes": "変更点",
   "update.downloading": "ダウンロード中… {{percent}}%",
   "update.later": "あとで",
   "update.install": "今すぐインストール",

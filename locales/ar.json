@@ -36,7 +36,7 @@
   "about.close": "إغلاق",
   "update.title": "يتوفر إصدار جديد",
   "update.ask": "هل تريد تثبيت Draw {{version}} الآن؟",
-  "update.notes": "ما الجديد",
+  "update.notes": "الجديد",
   "update.downloading": "جارٍ التنزيل… {{percent}}%",
   "update.later": "لاحقًا",
   "update.install": "التثبيت الآن",
