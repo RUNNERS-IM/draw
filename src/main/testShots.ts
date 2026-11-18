@@ -516,7 +516,7 @@ async function accountScenes(pass: TestShotPass, app: any, settingsWindow: Elect
   )
 }
 
-// 앱 위에 따로 뜨는 것: 업데이트 창(다 받음 · 받는 중), 그림판 알림.
+// 앱 위에 따로 뜨는 것: 업데이트 창(다 받음 · 받는 중 · 깔린 뒤), 그림판 알림.
 async function popupScenes(pass: TestShotPass) {
   const { note, shot } = pass
   // 한 줄은 실제 출시 노트만큼 길게 두어, 낱말 중간에서 줄이 바뀌지 않는지(kit 0.1.43 keep-all) 사진으로 본다.
@@ -541,6 +541,21 @@ async function popupScenes(pass: TestShotPass) {
   await wait(1500)
   await shot(updateWindow(), 'popups', '업데이트창-받는중')
   downloading.close()
+  await wait(300)
+
+  // 저절로 깔린 뒤 처음 열 때의 알림. 「바뀐 점 보기」를 누르면 새 소식이 펼쳐진다.
+  const installed = askUpdate(
+    { version: '2.6.110602', notes, downloading: false, percent: 100, installed: true },
+    false
+  )
+  await wait(1500)
+  await shot(updateWindow(), 'popups', '업데이트창-깔린뒤')
+  await updateWindow().webContents.executeJavaScript(
+    `document.querySelector('.update-buttons .rw-button:not(.default)')?.click()`
+  )
+  await wait(800)
+  await shot(updateWindow(), 'popups', '업데이트창-깔린뒤-바뀐점')
+  installed.close()
   await wait(300)
 
   const mainWindow = BrowserWindow.getAllWindows().find((window) =>

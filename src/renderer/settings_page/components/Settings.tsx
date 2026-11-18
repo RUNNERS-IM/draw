@@ -821,6 +821,7 @@ const Settings = (config: any) => {
               <div className="settings-item">
                 <div className="settings-item-info">
                   <div className="settings-item-title">{t('settings.autoUpdate')}</div>
+                  <div className="settings-item-description">{t('settings.autoUpdateDesc')}</div>
                 </div>
 
                 <div className="settings-item-control">

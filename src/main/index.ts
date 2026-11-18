@@ -222,6 +222,10 @@ const schema = {
     type: 'string',
     default: ''
   },
+  update_ready: {
+    type: ['object', 'null'],
+    default: null
+  },
   key_binding_show_hide_app: {
     type: 'string',
     default: KEY_SHOW_HIDE_APP
