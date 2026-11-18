@@ -44,7 +44,7 @@
   "update.latest": "Käytössäsi on Drawn uusin versio.",
   "update.failed": "Päivityksiä ei voitu tarkistaa: {{error}}",
   "update.done": "Päivitetty versioon {{version}}",
-  "update.showNotes": "Katso uudet ominaisuudet",
+  "update.showNotes": "Katso uutta",
   "update.ok": "OK",
   "settings.groupBehavior": "Toiminta",
   "settings.title": "Drawn asetukset",

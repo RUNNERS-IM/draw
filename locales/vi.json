@@ -44,7 +44,7 @@
   "update.latest": "Bạn đang dùng phiên bản Draw mới nhất.",
   "update.failed": "Không thể kiểm tra cập nhật: {{error}}",
   "update.done": "Đã cập nhật lên {{version}}",
-  "update.showNotes": "Xem điểm mới",
+  "update.showNotes": "Xem có gì mới",
   "update.ok": "OK",
   "settings.groupBehavior": "Hoạt động",
   "settings.title": "Cài đặt Draw",

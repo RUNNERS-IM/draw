@@ -43,7 +43,7 @@
   "update.installing": "इंस्टॉल हो रहा है…",
   "update.latest": "आप Draw का नवीनतम संस्करण चला रहे हैं।",
   "update.failed": "अपडेट नहीं जाँचे जा सके: {{error}}",
-  "update.done": "{{version}} में अपडेट हो गया",
+  "update.done": "{{version}} पर अपडेट किया गया",
   "update.showNotes": "नया क्या है देखें",
   "update.ok": "ठीक है",
   "settings.groupBehavior": "व्यवहार",

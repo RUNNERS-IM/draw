@@ -44,7 +44,7 @@
   "update.latest": "Du verwendest die neueste Version von Draw.",
   "update.failed": "Nach Updates konnte nicht gesucht werden: {{error}}",
   "update.done": "Auf {{version}} aktualisiert",
-  "update.showNotes": "Neuerungen ansehen",
+  "update.showNotes": "Neuerungen anzeigen",
   "update.ok": "OK",
   "settings.groupBehavior": "Verhalten",
   "settings.title": "Draw-Einstellungen",

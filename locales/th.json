@@ -44,7 +44,7 @@
   "update.latest": "คุณใช้ Draw เวอร์ชันล่าสุดแล้ว",
   "update.failed": "ตรวจหาอัปเดตไม่ได้: {{error}}",
   "update.done": "อัปเดตเป็น {{version}} แล้ว",
-  "update.showNotes": "ดูสิ่งที่เปลี่ยนไป",
+  "update.showNotes": "ดูสิ่งใหม่",
   "update.ok": "ตกลง",
   "settings.groupBehavior": "การทำงาน",
   "settings.title": "การตั้งค่า Draw",

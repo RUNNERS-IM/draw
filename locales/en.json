@@ -44,7 +44,7 @@
   "update.latest": "You are on the latest version of Draw.",
   "update.failed": "Could not check for updates: {{error}}",
   "update.done": "Updated to {{version}}",
-  "update.showNotes": "See what's new",
+  "update.showNotes": "See What’s New",
   "update.ok": "OK",
   "settings.groupBehavior": "Behavior",
   "settings.title": "Draw Settings",

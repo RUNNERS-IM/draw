@@ -44,7 +44,7 @@
   "update.latest": "お使いの Draw は最新バージョンです。",
   "update.failed": "アップデートを確認できませんでした: {{error}}",
   "update.done": "{{version}} にアップデートしました",
-  "update.showNotes": "新機能を見る",
+  "update.showNotes": "変更点を見る",
   "update.ok": "OK",
   "settings.groupBehavior": "動作",
   "settings.title": "Draw の設定",
