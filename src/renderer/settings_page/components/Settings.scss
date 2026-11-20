@@ -291,6 +291,10 @@ body {
         font-size: var(--rw-font-small);
         line-height: 14px;
         color: var(--rw-text-secondary);
+        // 설명 줄에 대신 뜨는 알림(별명 30자 넘김 등)은 Remotrol 설정 칸과 같은 kit 위험 글 색
+        &.ra-error {
+          color: var(--r-danger-text);
+        }
       }
     }
 
