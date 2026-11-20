@@ -127,5 +127,11 @@
   "colorPicker.colors": "色",
   "colorPicker.shades": "濃淡",
   "colorPicker.hex": "カラーコード",
-  "colorPicker.noShades": "この色には濃淡がありません"
+  "colorPicker.noShades": "この色には濃淡がありません",
+  "account.nickname": "ニックネーム",
+  "account.nicknameHint": "パンダの横とほかの RUNNERS アプリに表示される名前です。空にするとメールの @ より前を使います。",
+  "account.nicknameLong": "ニックネームは30文字までです。",
+  "account.save": "保存",
+  "account.saved": "保存しました",
+  "account.network": "サーバーに接続できませんでした。しばらくしてからもう一度お試しください。"
 }

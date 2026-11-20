@@ -127,5 +127,11 @@
   "colorPicker.colors": "Цвета",
   "colorPicker.shades": "Оттенки",
   "colorPicker.hex": "Hex-код",
-  "colorPicker.noShades": "У этого цвета нет оттенков"
+  "colorPicker.noShades": "У этого цвета нет оттенков",
+  "account.nickname": "Никнейм",
+  "account.nicknameHint": "Показывается рядом с пандой и в других приложениях RUNNERS. Оставьте пустым, чтобы использовать часть почты до @.",
+  "account.nicknameLong": "Никнейм может быть не длиннее 30 символов.",
+  "account.save": "Сохранить",
+  "account.saved": "Сохранено",
+  "account.network": "Не удалось связаться с сервером. Попробуйте чуть позже."
 }

@@ -127,5 +127,11 @@
   "colorPicker.colors": "Kolory",
   "colorPicker.shades": "Odcienie",
   "colorPicker.hex": "Kod hex",
-  "colorPicker.noShades": "Ten kolor nie ma odcieni"
+  "colorPicker.noShades": "Ten kolor nie ma odcieni",
+  "account.nickname": "Pseudonim",
+  "account.nicknameHint": "Widoczny obok pandy i w innych aplikacjach RUNNERS. Zostaw puste, aby użyć części adresu e-mail przed @.",
+  "account.nicknameLong": "Pseudonim może mieć najwyżej 30 znaków.",
+  "account.save": "Zapisz",
+  "account.saved": "Zapisano",
+  "account.network": "Nie udało się połączyć z serwerem. Spróbuj za chwilę."
 }

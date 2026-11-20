@@ -251,6 +251,12 @@ body {
   }
 }
 
+// 계정 칸의 별명 입력칸(2026-11-19 결정 2B). 폭은 Remotrol 설정 › 계정 칸과 같다.
+.account-nickname {
+  width: 180px;
+  box-sizing: border-box;
+}
+
 .settings-section {
   background: var(--rw-box-bg);
   border: 1px solid var(--r-border);

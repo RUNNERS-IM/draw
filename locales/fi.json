@@ -127,5 +127,11 @@
   "colorPicker.colors": "Värit",
   "colorPicker.shades": "Sävyt",
   "colorPicker.hex": "Hex-koodi",
-  "colorPicker.noShades": "Tällä värillä ei ole sävyjä"
+  "colorPicker.noShades": "Tällä värillä ei ole sävyjä",
+  "account.nickname": "Lempinimi",
+  "account.nicknameHint": "Näkyy pandan vieressä ja muissa RUNNERS-apeissa. Jätä tyhjäksi, niin käytetään sähköpostin @-merkkiä edeltävää osaa.",
+  "account.nicknameLong": "Lempinimessä voi olla enintään 30 merkkiä.",
+  "account.save": "Tallenna",
+  "account.saved": "Tallennettu",
+  "account.network": "Palvelimeen ei saatu yhteyttä. Yritä hetken päästä uudelleen."
 }

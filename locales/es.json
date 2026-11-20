@@ -127,5 +127,11 @@
   "colorPicker.colors": "Colores",
   "colorPicker.shades": "Tonos",
   "colorPicker.hex": "Código hex",
-  "colorPicker.noShades": "Este color no tiene tonos"
+  "colorPicker.noShades": "Este color no tiene tonos",
+  "account.nickname": "Apodo",
+  "account.nicknameHint": "Se muestra junto al panda y en las demás apps de RUNNERS. Déjalo vacío para usar la parte del correo antes de @.",
+  "account.nicknameLong": "El apodo puede tener hasta 30 caracteres.",
+  "account.save": "Guardar",
+  "account.saved": "Guardado",
+  "account.network": "No se pudo llegar al servidor. Inténtalo de nuevo en un momento."
 }

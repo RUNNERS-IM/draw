@@ -127,5 +127,11 @@
   "colorPicker.colors": "색",
   "colorPicker.shades": "밝기",
   "colorPicker.hex": "색 코드",
-  "colorPicker.noShades": "이 색은 밝기를 고를 수 없습니다"
+  "colorPicker.noShades": "이 색은 밝기를 고를 수 없습니다",
+  "account.nickname": "닉네임",
+  "account.nicknameHint": "판다 옆과 다른 RUNNERS 앱에 보이는 이름입니다. 비우면 이메일 @ 앞부분을 씁니다.",
+  "account.nicknameLong": "닉네임은 30자까지 쓸 수 있습니다.",
+  "account.save": "저장",
+  "account.saved": "저장됨",
+  "account.network": "서버에 연결하지 못했습니다. 잠시 뒤 다시 해 보세요."
 }

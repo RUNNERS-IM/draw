@@ -127,5 +127,11 @@
   "colorPicker.colors": "顏色",
   "colorPicker.shades": "深淺",
   "colorPicker.hex": "色碼",
-  "colorPicker.noShades": "此顏色沒有深淺可選"
+  "colorPicker.noShades": "此顏色沒有深淺可選",
+  "account.nickname": "暱稱",
+  "account.nicknameHint": "顯示在熊貓旁邊和其他 RUNNERS App 中的名字。留空則使用電子郵件 @ 前面的部分。",
+  "account.nicknameLong": "暱稱最多 30 個字元。",
+  "account.save": "儲存",
+  "account.saved": "已儲存",
+  "account.network": "無法連線到伺服器，請稍後再試。"
 }

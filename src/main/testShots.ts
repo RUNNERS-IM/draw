@@ -487,13 +487,28 @@ async function accountScenes(pass: TestShotPass, app: any, settingsWindow: Elect
   note(`로그인 · 틀린 비밀번호: 알림=${await problem()}`)
   await shot(settingsWindow, 'account', '로그인-비밀번호틀림')
 
-  await fill('.ra-field[type=password]', 'draw1234')
-  await page("document.querySelector('.ra-submit').click()")
-  await wait(1000)
+  // kit 시험 서버(relay-dev)는 모양만 맞으면 어떤 비밀번호로도 로그인시킨다. 그때는 이미 로그인돼 창이 닫혀 있다.
+  if (await page("Boolean(document.querySelector('.ra-sheet'))")) {
+    await fill('.ra-field[type=password]', 'draw1234')
+    await page("document.querySelector('.ra-submit').click()")
+    await wait(1000)
+  }
   note(
     `로그인: 메인 계정=${app.account().current()}, 창 제목 줄=${await page("document.querySelector('.settings-item-title')?.textContent")}, 로그인 창 남음=${await page("Boolean(document.querySelector('.ra-sheet'))")}`
   )
   await shot(settingsWindow, 'account', '로그인됨')
+  // 별명 칸(2026-11-19 결정 2B): 30자를 넘기면 서버에 보내기 전에 칸 아래에 알린다.
+  await fill('.account-nickname', '가'.repeat(31))
+  await page(
+    "document.querySelector('.account-nickname').closest('.settings-item').querySelector('.rw-button').click()"
+  )
+  await wait(300)
+  note(
+    `별명 31자: 알림=${await page("document.querySelector('.account-nickname').closest('.settings-item').querySelector('.ra-error')?.textContent ?? '(없음)'")}, 칸 기본 글=${await page("document.querySelector('.account-nickname').placeholder")}`
+  )
+  await shot(settingsWindow, 'account', '별명-너무김')
+  await fill('.account-nickname', '')
+  await wait(200)
   await page("document.querySelector('.ra-badge').click()")
   await wait(400)
   await shot(settingsWindow, 'account', '계정메뉴')

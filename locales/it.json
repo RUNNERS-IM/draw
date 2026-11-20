@@ -127,5 +127,11 @@
   "colorPicker.colors": "Colori",
   "colorPicker.shades": "Sfumature",
   "colorPicker.hex": "Codice hex",
-  "colorPicker.noShades": "Nessuna sfumatura per questo colore"
+  "colorPicker.noShades": "Nessuna sfumatura per questo colore",
+  "account.nickname": "Nickname",
+  "account.nicknameHint": "Mostrato accanto al panda e nelle altre app RUNNERS. Lascia vuoto per usare la parte dell’e-mail prima di @.",
+  "account.nicknameLong": "Il nickname può avere al massimo 30 caratteri.",
+  "account.save": "Salva",
+  "account.saved": "Salvato",
+  "account.network": "Impossibile raggiungere il server. Riprova tra poco."
 }

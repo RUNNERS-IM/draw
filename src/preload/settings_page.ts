@@ -56,6 +56,9 @@ const api = {
   resetPassword: (email: string, code: string, password: string) =>
     attempt('account_reset_password', email, code, password),
   signOut: () => ipcRenderer.invoke('account_sign_out'),
+  accountProfile: (): Promise<{ email: string | null; nickname: string | null; custom: boolean }> =>
+    ipcRenderer.invoke('account_profile'),
+  setNickname: (name: string) => attempt('account_set_nickname', name),
   onAccountChanged: (callback: (email: string | null) => void) => {
     const listener = (_event: unknown, email: string | null) => callback(email)
     ipcRenderer.on('account_changed', listener)

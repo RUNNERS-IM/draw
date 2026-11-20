@@ -127,5 +127,11 @@
   "colorPicker.colors": "สี",
   "colorPicker.shades": "เฉดสี",
   "colorPicker.hex": "รหัสสี",
-  "colorPicker.noShades": "สีนี้ไม่มีเฉดสี"
+  "colorPicker.noShades": "สีนี้ไม่มีเฉดสี",
+  "account.nickname": "ชื่อเล่น",
+  "account.nicknameHint": "ชื่อที่แสดงข้างแพนด้าและในแอป RUNNERS อื่น เว้นว่างไว้เพื่อใช้ส่วนของอีเมลก่อน @",
+  "account.nicknameLong": "ชื่อเล่นยาวได้ไม่เกิน 30 ตัวอักษร",
+  "account.save": "บันทึก",
+  "account.saved": "บันทึกแล้ว",
+  "account.network": "ติดต่อเซิร์ฟเวอร์ไม่ได้ ลองอีกครั้งในอีกสักครู่"
 }

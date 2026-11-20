@@ -127,5 +127,11 @@
   "colorPicker.colors": "الألوان",
   "colorPicker.shades": "الدرجات",
   "colorPicker.hex": "رمز اللون",
-  "colorPicker.noShades": "لا توجد درجات لهذا اللون"
+  "colorPicker.noShades": "لا توجد درجات لهذا اللون",
+  "account.nickname": "الاسم المستعار",
+  "account.nicknameHint": "يظهر بجانب الباندا وفي تطبيقات RUNNERS الأخرى. اتركه فارغًا لاستخدام الجزء الذي قبل @ في بريدك.",
+  "account.nicknameLong": "يمكن أن يصل الاسم المستعار إلى 30 حرفًا.",
+  "account.save": "حفظ",
+  "account.saved": "تم الحفظ",
+  "account.network": "تعذّر الوصول إلى الخادم. حاول مرة أخرى بعد قليل."
 }

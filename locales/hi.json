@@ -127,5 +127,11 @@
   "colorPicker.colors": "रंग",
   "colorPicker.shades": "शेड",
   "colorPicker.hex": "हेक्स कोड",
-  "colorPicker.noShades": "इस रंग के शेड नहीं हैं"
+  "colorPicker.noShades": "इस रंग के शेड नहीं हैं",
+  "account.nickname": "उपनाम",
+  "account.nicknameHint": "पांडा के पास और दूसरे RUNNERS ऐप में दिखने वाला नाम। खाली छोड़ें तो ईमेल में @ से पहले का हिस्सा इस्तेमाल होगा।",
+  "account.nicknameLong": "उपनाम ज़्यादा से ज़्यादा 30 अक्षरों का हो सकता है।",
+  "account.save": "सहेजें",
+  "account.saved": "सहेजा गया",
+  "account.network": "सर्वर तक नहीं पहुँच सके। थोड़ी देर बाद फिर कोशिश करें।"
 }

@@ -58,6 +58,18 @@ export function startAccount() {
     attempt(() => account.resetPassword(String(email), String(code), String(password)))
   )
   ipcMain.handle('account_sign_out', () => account.signOut())
+
+  // 별명(2026-11-19 결정 2B): 계정 서버에 두어 모든 RUNNERS 앱이 같은 이름을 보인다. 설정 › 계정 칸에서 고친다.
+  ipcMain.handle('account_profile', () => ({
+    email: account.current(),
+    nickname: account.nickname(),
+    custom: account.customNickname()
+  }))
+  ipcMain.handle('account_set_nickname', (_event, name) =>
+    attempt(() => account.setNickname(String(name ?? '')))
+  )
+  // 다른 앱에서 바꾼 별명을 켤 때 따라간다. 로그아웃이면 아무것도 하지 않고, 실패해도 던지지 않는다.
+  void account.loadProfile()
 }
 
 /** 시험 모드가 로그인 · 로그아웃을 부른다(시험 서버로만). */
