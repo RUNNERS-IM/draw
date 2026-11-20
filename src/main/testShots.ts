@@ -481,13 +481,13 @@ async function accountScenes(pass: TestShotPass, app: any, settingsWindow: Elect
   await page("[...document.querySelectorAll('.ra-link')].at(-1).click()")
   await wait(300)
   await fill('.ra-field[type=email]', 'kim@example.com')
-  await fill('.ra-field[type=password]', 'wrong123')
+  await fill('.ra-field[type=password]', 'wrong1234')
   await page("document.querySelector('.ra-submit').click()")
   await wait(800)
   note(`로그인 · 틀린 비밀번호: 알림=${await problem()}`)
   await shot(settingsWindow, 'account', '로그인-비밀번호틀림')
 
-  // kit 시험 서버(relay-dev)는 모양만 맞으면 어떤 비밀번호로도 로그인시킨다. 그때는 이미 로그인돼 창이 닫혀 있다.
+  // kit 0.1.50 시험 서버(relay-dev)는 wrong1234 만 거절한다. 옛 시험 서버는 어떤 비밀번호로도 로그인시켜 창이 이미 닫혀 있다.
   if (await page("Boolean(document.querySelector('.ra-sheet'))")) {
     await fill('.ra-field[type=password]', 'draw1234')
     await page("document.querySelector('.ra-submit').click()")
@@ -507,8 +507,18 @@ async function accountScenes(pass: TestShotPass, app: any, settingsWindow: Elect
     `별명 31자: 알림=${await page("document.querySelector('.account-nickname').closest('.settings-item').querySelector('.ra-error')?.textContent ?? '(없음)'")}, 칸 기본 글=${await page("document.querySelector('.account-nickname').placeholder")}`
   )
   await shot(settingsWindow, 'account', '별명-너무김')
-  await fill('.account-nickname', '')
-  await wait(200)
+  // 시험 서버(kit 0.1.50 relay-dev)의 별명 API 로 실제로 저장하고, 비워 저장하면 기본 이름(이메일 앞부분)으로 돌아오는지 본다.
+  const saveNickname = async (name: string) => {
+    await fill('.account-nickname', name)
+    await page(
+      "document.querySelector('.account-nickname').closest('.settings-item').querySelector('.rw-button').click()"
+    )
+    await wait(800)
+    return `제목 줄=${await page("document.querySelector('.settings-item-title')?.textContent")}, 동그라미=${await page("document.querySelector('.ra-badge')?.textContent")}, 설명 줄=${await page("document.querySelector('.account-nickname').closest('.settings-item').querySelector('.settings-item-description')?.textContent")}`
+  }
+  note(`별명 저장(김러너): ${await saveNickname('김러너')}`)
+  await shot(settingsWindow, 'account', '별명-저장됨')
+  note(`별명 비워 저장: ${await saveNickname('')}`)
   await page("document.querySelector('.ra-badge').click()")
   await wait(400)
   await shot(settingsWindow, 'account', '계정메뉴')
