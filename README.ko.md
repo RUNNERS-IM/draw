@@ -20,7 +20,7 @@
 <table>
 <tr>
 <td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="https://runners.im/images/apps/draw/click-ko-dark.webp"><img src="https://runners.im/images/apps/draw/click-ko-light.webp" alt=""></picture><br><b>그림은 남기고 클릭은 아래 앱으로</b><br>그리기를 끄면 클릭이 아래 앱으로 갑니다. 그린 그림은 화면에 남고 작은 막대만 떠 있습니다.</td>
-<td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="https://runners.im/images/apps/draw/menubar-ko-dark.webp"><img src="https://runners.im/images/apps/draw/menubar-ko-light.webp" alt=""></picture><br><b>메뉴 막대에서 바로</b><br>메뉴 막대 아이콘이나 ⌘⇧A · ⌘T · ⌘K 로 그리기 시작 · 도구 막대 숨기기 · 전체 지우기를 합니다.</td>
+<td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="https://runners.im/images/apps/draw/menubar-ko-dark.webp"><img src="https://runners.im/images/apps/draw/menubar-ko-light.webp" alt=""></picture><br><b>메뉴 막대에서 바로</b><br>메뉴 막대 아이콘이나 ⌘⇧A · ⌘T · ⌘K 로 그리기 켜기 · 도구 막대 숨기기 · 전체 지우기를 합니다.</td>
 </tr>
 </table>
 
@@ -37,7 +37,7 @@ brew install --cask draw
 
 | 키                            | 하는 일                                                         |
 | ----------------------------- | --------------------------------------------------------------- |
-| ⌘⇧A                           | 그리기 시작 · 끝                                                |
+| ⌘⇧A                           | 그리기 켜기 · 끄기                                              |
 | ⌘T                            | 도구 막대 보이기 · 숨기기                                       |
 | ⌘K                            | 전체 지우기                                                     |
 | Esc 두 번                     | 클릭 모드로                                                     |
