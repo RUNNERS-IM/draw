@@ -41,8 +41,10 @@ Or download `draw-macos-arm64.dmg` (Apple silicon) or `draw-macos-x64.dmg` (Inte
 | ⌘T | Show or hide the toolbar |
 | ⌘K | Clear the screen |
 | Esc Esc | Back to click mode |
-| 1 – 6 | Pen · highlighter · arrow · rectangle · oval · text |
+| 1 – 7 | Pen · highlighter · arrow · rectangle · oval · text · eraser |
 | P · H · A · R · O · T · E · L | Pen · highlighter · arrow · rectangle · oval · text · eraser · laser |
+| B · D | Brush · diamond |
+| P P · A A | Press again for the fading pen · flat arrow |
 | X | Swap the two colors |
 | ⌘Z · ⌘⇧Z | Undo · redo |
 | ⌘C · ⌘V | Copy and paste the selected drawing |
