@@ -43,7 +43,7 @@
   "update.installing": "설치하는 중…",
   "update.latest": "지금 쓰는 Draw 가 최신 버전입니다.",
   "update.failed": "업데이트를 확인하지 못했습니다: {{error}}",
-  "update.done": "{{version}} 로 업데이트했습니다",
+  "update.done": "{{version}} 버전으로 업데이트했습니다",
   "update.showNotes": "바뀐 점 보기",
   "update.ok": "확인",
   "settings.groupBehavior": "동작",
