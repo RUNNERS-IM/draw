@@ -372,7 +372,8 @@ body {
 
         .selectbar {
           height: var(--rw-button-height);
-          padding: 0 26px 0 10px;
+          padding-block: 0;
+          padding-inline: 10px 26px;
           border: 1px solid var(--r-border);
           border-radius: var(--rw-small-radius);
           background-color: var(--rw-control-bg);
