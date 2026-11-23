@@ -4,7 +4,6 @@
   "printWidth": 100,
   "trailingComma": "none",
   "ignorePatterns": [
-    ".worktrees/**",
     "THIRD_PARTY_NOTICES.md",
     "**/*.generated.*",
     "native/index.d.ts",
