@@ -628,12 +628,12 @@ const Settings = (config: any) => {
 
               <div className="settings-item">
                 <div className="settings-item-info">
-                  <div className="settings-item-title">{t('settings.hideBorder')}</div>
+                  <div className="settings-item-title">{t('settings.showBorder')}</div>
                 </div>
 
                 <div className="settings-item-control">
                   <div
-                    className={`toggle ${showDrawingBorder ? '' : 'active'}`}
+                    className={`toggle ${showDrawingBorder ? 'active' : ''}`}
                     onClick={toggleDrawingBorder}
                   />
                 </div>
@@ -666,12 +666,12 @@ const Settings = (config: any) => {
 
               <div className="settings-item">
                 <div className="settings-item-info">
-                  <div className="settings-item-title">{t('settings.hideExtended')}</div>
+                  <div className="settings-item-title">{t('settings.showExtended')}</div>
                 </div>
 
                 <div className="settings-item-control">
                   <div
-                    className={`toggle ${disableToolbarInPointerMode ? 'active' : ''}`}
+                    className={`toggle ${disableToolbarInPointerMode ? '' : 'active'}`}
                     onClick={toggleDisableToolbarInPointerMode}
                   />
                 </div>
@@ -888,12 +888,12 @@ const Settings = (config: any) => {
 
               <div className="settings-item">
                 <div className="settings-item-info">
-                  <div className="settings-item-title">{t('settings.startsHidden')}</div>
+                  <div className="settings-item-title">{t('settings.showOnLaunch')}</div>
                 </div>
 
                 <div className="settings-item-control">
                   <div
-                    className={`toggle ${startsHidden ? 'active' : ''}`}
+                    className={`toggle ${startsHidden ? '' : 'active'}`}
                     onClick={toggleStartsHidden}
                   />
                 </div>
