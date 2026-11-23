@@ -1,39 +1,62 @@
-# Draw
+<p align="center">
+  <img src="https://runners.im/images/apps/draw/icon.webp" width="96" alt="Draw">
+</p>
+<h1 align="center">Draw</h1>
+<p align="center"><b>Draw on your screen while you present.</b><br>Pen, highlighter, arrows, shapes and text over any app, from a toolbar on the left.</p>
+<p align="center">
+  <a href="https://github.com/RUNNERS-IM/draw/releases/latest"><b>Download for Mac</b></a> ·
+  <a href="https://runners.im/en/draw">runners.im/draw</a> ·
+  <a href="README.ko.md">한국어</a>
+</p>
+<p align="center"><sub>Free · macOS 12 or later · Apple silicon · Intel · 20 languages</sub></p>
 
-발표하거나 화면을 공유할 때 화면 위에 바로 그리는 맥 앱입니다. 메뉴 막대에 살고, 왼쪽 세로 막대에서 도구를 고릅니다.
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://runners.im/images/apps/draw/tools-en-dark.webp">
+  <img src="https://runners.im/images/apps/draw/tools-en-light.webp" alt="Draw toolbar on the left with a wave, a highlight, an arrow and text drawn over the desktop">
+</picture>
 
-- 도구: 펜 · 형광펜 · 화살표 · 네모 · 동그라미 · 글자 · 지우개
-- 되돌리기 · 전체 지우기 · 색 고르기
-- 그리기를 끄면 클릭이 아래 앱으로 그대로 갑니다(클릭 모드). 그린 그림은 화면에 그대로 남고, 큰 도구 막대만 사라집니다. 작은 막대는 떠 있으며, 설정에서 숨길 수 있습니다
-- 20개 언어(`locales/`), 다크 · 라이트
+## What it does
 
-Draw on your screen while you present. Draw is a macOS menu bar app with a vertical toolbar on the left.
+<table>
+<tr>
+<td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="https://runners.im/images/apps/draw/click-en-dark.webp"><img src="https://runners.im/images/apps/draw/click-en-light.webp" alt=""></picture><br><b>Click through, drawings stay</b><br>Turn drawing off and clicks go to the app underneath. Your drawings stay on screen and only a small bar floats.</td>
+<td width="50%"><picture><source media="(prefers-color-scheme: dark)" srcset="https://runners.im/images/apps/draw/menubar-en-dark.webp"><img src="https://runners.im/images/apps/draw/menubar-en-light.webp" alt=""></picture><br><b>Lives in the menu bar</b><br>Start drawing, hide the toolbar or clear everything from the menu bar icon, or with ⌘⇧A, ⌘T and ⌘K.</td>
+</tr>
+</table>
 
-## 내려받기
-
-[GitHub Releases](https://github.com/RUNNERS-IM/draw/releases/latest) 에서 받습니다.
-
-- Apple 실리콘: `draw-macos-arm64.dmg`
-- Intel: `draw-macos-x64.dmg`
-
-## 개발
-
-Node 24 와 pnpm 이 필요합니다.
+## Install
 
 ```sh
-pnpm install
-pnpm typecheck     # 타입 검사
-pnpm lint          # 린트
-pnpm format:check  # 서식 확인
-pnpm test          # 단위 테스트
-pnpm check:account # 공용 키트(runners-app-kit v0.1.34) 복사본 확인
-pnpm check:locales # 언어 파일 확인
-pnpm dev           # 개발 판 실행
-pnpm dist          # dist.noindex/ 에 이 맥에서 열어 볼 판 묶기
+brew tap runners-im/tap && brew trust runners-im/tap
+brew install --cask draw
 ```
 
-기본 가지는 `master` 입니다. `release` 가지에 올리면 GitHub Actions 가 버전을 올리고, 서명 · 공증한 판을 GitHub Releases 에 냅니다(`.github/workflows/release.yml`). 버전 번호는 `scripts/bump-release.sh` 가 고르므로 손으로 고치지 않습니다. 출시 전에 `RELEASE_NOTES.md` 를 이번 판 내용으로 고칩니다.
+Or download `draw-macos-arm64.dmg` (Apple silicon) or `draw-macos-x64.dmg` (Intel) from [Releases](https://github.com/RUNNERS-IM/draw/releases/latest). Draw checks GitHub for a new version, downloads it and asks before installing.
 
-## 원본과 라이선스
+## Shortcuts
 
-Draw 는 Dmytro Vasin 의 [DrawPen](https://github.com/DmytroVasin/DrawPen)(MIT 라이선스)을 바탕으로 만들었습니다. 원본의 저작권 표시와 MIT 라이선스 전문은 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) 맨 앞에 그대로 있고, 앱 정보 창의 「오픈소스 고지」에서도 볼 수 있습니다. 원본의 변경 기록은 [CHANGELOG.md](CHANGELOG.md) 에 있습니다. Draw 자체의 저작권은 [LICENSE.md](LICENSE.md) 에 있습니다.
+| Keys | What it does |
+|---|---|
+| ⌘⇧A | Start or stop drawing |
+| ⌘T | Show or hide the toolbar |
+| ⌘K | Clear the screen |
+| Esc Esc | Back to click mode |
+| 1 – 6 | Pen · highlighter · arrow · rectangle · oval · text |
+| P · H · A · R · O · T · E · L | Pen · highlighter · arrow · rectangle · oval · text · eraser · laser |
+| X | Swap the two colors |
+| ⌘Z · ⌘⇧Z | Undo · redo |
+| ⌘C · ⌘V | Copy and paste the selected drawing |
+
+Change ⌘⇧A, ⌘T and ⌘K in **Settings → Draw → Shortcuts**. Hover a toolbar button to see its key.
+
+## Privacy
+
+Draw does not record or upload your screen. Drawings stay on your Mac and are gone when you clear them. Draw talks to the internet only to check GitHub for updates, to send error reports without screenshots or personal details, and, if you choose to sign in, for your RUNNERS account.
+
+## Development
+
+See [docs/development.md](docs/development.md).
+
+---
+
+<p align="center"><a href="https://runners.im"><picture><source media="(prefers-color-scheme: dark)" srcset="https://runners.im/icons/logos/RUNNERS_H_W.svg"><img src="https://runners.im/icons/logos/RUNNERS_H.svg" height="20" alt="RUNNERS"></picture></a><br><sub>Made by RUNNERS · Based on <a href="https://github.com/DmytroVasin/DrawPen">DrawPen</a> by Dmytro Vasin (MIT) · <a href="LICENSE.md">License</a></sub></p>
