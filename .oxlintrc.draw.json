@@ -13,5 +13,5 @@
       }
     }
   ],
-  "ignorePatterns": ["out/**", "dist/**", "dist.noindex/**", "version-parts.cjs"]
+  "ignorePatterns": [".worktrees/**", "out/**", "dist/**", "dist.noindex/**", "version-parts.cjs"]
 }
