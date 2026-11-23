@@ -588,6 +588,7 @@ const Settings = (config: any) => {
               <div className="settings-item">
                 <div className="settings-item-info">
                   <div className="settings-item-title">{t('settings.toolbarColors')}</div>
+                  <div className="settings-item-description">{t('settings.toolbarColorsDesc')}</div>
                 </div>
 
                 <div className="settings-item-control">
