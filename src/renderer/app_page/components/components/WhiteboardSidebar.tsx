@@ -1,5 +1,6 @@
 import type { Callback } from '../types'
 import { useTranslation } from 'react-i18next'
+import { currentLocale } from '../../../../shared/i18n'
 
 const OPACITY_MIN = 0
 const OPACITY_MAX = 100
@@ -64,7 +65,8 @@ const WhiteboardSidebar = ({
 
   return (
     <div className="whiteboard-sidebar">
-      <div className="whiteboard-sidebar-panel">
+      {/* 그림판은 화면 좌표 때문에 왼쪽→오른쪽으로 두지만, 글을 읽는 이 칸만은 아랍어에서 방향을 뒤집는다. */}
+      <div className="whiteboard-sidebar-panel" dir={currentLocale() === 'ar' ? 'rtl' : 'ltr'}>
         <div className="whiteboard-sidebar__head">{t('whiteboard.settings')}</div>
 
         <div className="whiteboard-sidebar__body">

@@ -252,7 +252,8 @@
         font-weight: 600;
         line-height: 28px;
         border-bottom: 1px solid var(--gray-400);
-        padding: 0 12px 10px 12px;
+        // 톱니 단추(.whiteboard-toggle)가 언어와 상관없이 오른쪽 위에 떠 있어서, 그 자리만큼 오른쪽을 비운다.
+        padding: 0 44px 10px 12px;
       }
 
       .whiteboard-sidebar__body {
@@ -417,6 +418,8 @@
     }
 
     .whiteboard-slider {
+      // 막대 손잡이 자리를 left 값으로 그리므로 아랍어 칸 안에서도 왼쪽→오른쪽으로 둔다.
+      direction: ltr;
       position: relative;
       padding: 10px 0;
       margin: 0 5px;
