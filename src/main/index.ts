@@ -1372,8 +1372,8 @@ ipcMain.handle('choose_screenshot_directory', async () => {
   const screenshotDirectory = store.get('screenshot_directory')
   const fallbackDirrectory = app.getPath('pictures')
   const dialogOptions: Electron.OpenDialogOptions = {
-    title: 'Choose screenshot folder',
-    buttonLabel: 'Choose',
+    title: t('settings.chooseShotsFolder'),
+    buttonLabel: t('settings.chooseButton'),
     properties: isMac ? ['openDirectory', 'createDirectory'] : ['openDirectory']
   }
 
@@ -1913,9 +1913,9 @@ async function captureZoomImage() {
     mainWindow.webContents.send('stop_zoom')
 
     sendNotification({
-      title: 'Zoom capture failed',
+      title: t('notify.zoomFailed'),
       body: (error as Error).message,
-      button_label: isMac ? 'Settings' : null,
+      button_label: isMac ? t('notify.settings') : null,
       button_action: isMac ? 'open_security_preferences' : null,
       button_data: null
     })
@@ -2071,17 +2071,17 @@ async function makeScreenshot() {
     } catch {}
 
     sendNotification({
-      title: `Click to open ${isMac ? 'in Finder' : 'folder'}`,
+      title: isMac ? t('notify.openInFinder') : t('notify.openFolder'),
       body: savePath,
-      button_label: 'Open',
+      button_label: t('settings.open'),
       button_action: 'open_screenshot',
       button_data: screenshotName
     })
   } catch (error) {
     sendNotification({
-      title: 'Image export failed',
+      title: t('notify.exportFailed'),
       body: (error as Error).message,
-      button_label: isMac ? 'Settings' : null,
+      button_label: isMac ? t('notify.settings') : null,
       button_action: isMac ? 'open_security_preferences' : null,
       button_data: null
     })

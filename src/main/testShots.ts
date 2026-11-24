@@ -285,6 +285,32 @@ async function drawScenes(pass: TestShotPass, app: any) {
   await shot(panelWindow, 'menu', '패널-그리는중')
   note(`패널 줄(그리는 중): ${await panelRows()}`)
   app.hidePanel()
+  await wait(400)
+
+  // 화이트보드: 켠 모습, 설정 칸(바탕색 · 진하기 · 무늬 간격 · 무늬), 크기 · 자리 바꾸기 틀. 글이 언어마다 나오는지 본다.
+  const board = (script: string) => mainWindow.webContents.executeJavaScript(script)
+  mainWindow.webContents.send('toggle_whiteboard')
+  await wait(600)
+  await shot(mainWindow, 'main', '화이트보드')
+  await board("document.querySelector('.whiteboard-toggle')?.click()")
+  await wait(500)
+  note(
+    `화이트보드 설정 칸: ${await board("[...document.querySelectorAll('.whiteboard-sidebar__head, .whiteboard-sidebar__label, .whiteboard-sidebar__theme, .whiteboard-sidebar__style')].map((el) => el.textContent.trim()).join(' | ')")}`
+  )
+  await shot(mainWindow, 'main', '화이트보드-설정')
+  await board("document.querySelector('.whiteboard-sidebar__label-link')?.click()")
+  await wait(500)
+  note(
+    `화이트보드 크기 틀 안내: ${await board("document.querySelector('.whiteboard-resize-frame__hint')?.textContent ?? '(없음)'")}`
+  )
+  await shot(mainWindow, 'main', '화이트보드-크기바꾸기')
+  await board(
+    "document.querySelector('.whiteboard-resize-frame')?.dispatchEvent(new MouseEvent('dblclick', { bubbles: true }))"
+  )
+  await wait(400)
+  mainWindow.webContents.send('toggle_whiteboard')
+  await wait(400)
+
   app.enablePointerMode()
   await wait(600)
 }
@@ -321,6 +347,14 @@ async function settingsScenes(pass: TestShotPass, app: any) {
     `설정 › 그리기 첫 줄: 설명 칸 높이=${await page("document.querySelector('.settings-item-description').offsetHeight")}, 단축키 칸 방향=${await page("getComputedStyle(document.querySelector('.hotkey-pill')).direction")}, 글꼴 들어옴=${await page("document.fonts.check('13px Pretendard')")}, 단추 글꼴=${await page("getComputedStyle(document.querySelector('.settings-item-control .button, .settings-item-control select') ?? document.body).fontFamily.split(',')[0]")}`
   )
   note(`설정 › 그리기 위: ${await page(inspectLayout)}`)
+  // 단축키 칸을 누르면 키를 기다리는 동안 「키를 누르세요…」가 그 언어로 나오는지(사진 번호를 바꾸지 않으려고 글로만 본다).
+  await page("document.querySelector('.record-block')?.click()")
+  await wait(300)
+  note(
+    `단축키 칸 누름: ${await page("document.querySelector('.record-block .placeholder')?.textContent ?? '(글 없음)'")}`
+  )
+  await page('document.activeElement?.blur()')
+  await wait(400)
   await shot(settingsWindow, 'settings', '그리기-위')
   await scrollDown()
   note(`설정 › 그리기 아래: ${await page(inspectLayout)}`)

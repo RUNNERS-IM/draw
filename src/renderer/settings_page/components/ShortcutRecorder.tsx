@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { debounce } from 'lodash'
 import { ArrowBigUp, ChevronUp, Command, Option } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 
 const HotkeyPill = ({ accelerator }: { accelerator: any }) => {
   const humanizedKey = (key: string) => {
@@ -34,6 +35,7 @@ const ShortcutRecorder = ({
   onCheck: (...args: any[]) => any
   onChange: (...args: any[]) => any
 }) => {
+  const { t } = useTranslation()
   const isMac = window.electronAPI.isMac
 
   const [isRecording, setIsRecording] = useState(false)
@@ -213,12 +215,12 @@ const ShortcutRecorder = ({
     currentKeys.length > 0 ? (
       <HotkeyPill accelerator={currentKeys} />
     ) : (
-      <div className="placeholder">Recording...</div>
+      <div className="placeholder">{t('settings.recordingShortcut')}</div>
     )
 
   const idleContent =
     !accelerator || accelerator === '[NULL]' ? (
-      <div className="placeholder">Record shortcut</div>
+      <div className="placeholder">{t('settings.recordShortcut')}</div>
     ) : (
       <HotkeyPill accelerator={accelerator.split('+')} />
     )

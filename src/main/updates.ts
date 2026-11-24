@@ -88,5 +88,5 @@ export function checkNow() {
 
 async function tell(message: string) {
   app.focus({ steal: true })
-  await dialog.showMessageBox({ type: 'info', message, buttons: ['OK'] })
+  await dialog.showMessageBox({ type: 'info', message, buttons: [t('update.ok')] })
 }

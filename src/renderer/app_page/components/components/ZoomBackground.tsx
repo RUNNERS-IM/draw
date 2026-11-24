@@ -2,6 +2,7 @@ import type { Callback } from '../types'
 import './ZoomBackground.scss'
 
 import { zoomLevels } from '../constants'
+import { useTranslation } from 'react-i18next'
 
 const ZoomBackground = ({
   imageDataUrl,
@@ -14,6 +15,7 @@ const ZoomBackground = ({
   currentZoomIndex: number
   onStartExitZoom: Callback
 }) => {
+  const { t } = useTranslation()
   const zoom = zoomLevels[currentZoomIndex]
 
   const handleHintClick = (event: any) => {
@@ -34,13 +36,9 @@ const ZoomBackground = ({
         }}
       />
 
-      <div
-        className="zoom_background__hint"
-        title="Right-click to resume · Esc to exit"
-        onClick={handleHintClick}
-      >
+      <div className="zoom_background__hint" title={t('zoom.frozenHint')} onClick={handleHintClick}>
         <div className="zoom_background__hint-main">
-          <div className="zoom_background__hint-title">Zoom: Draw</div>
+          <div className="zoom_background__hint-title">{t('zoom.frozen')}</div>
         </div>
       </div>
     </div>

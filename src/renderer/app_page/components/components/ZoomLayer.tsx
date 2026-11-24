@@ -3,6 +3,7 @@ import './ZoomLayer.scss'
 
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { zoomLevels } from '../constants'
+import { useTranslation } from 'react-i18next'
 
 const maxZoomIndex = zoomLevels.length - 1
 const minZoomIndex = 0
@@ -32,6 +33,7 @@ const ZoomLayer = ({
   onLockZoom: Callback
   onResumeZoomEnd: Callback
 }) => {
+  const { t } = useTranslation()
   const [zoomIndex, setZoomIndex] = useState(currentZoomIndex)
   const [focusPoint, setFocusPoint] = useState(resumeFocusPoint || currentFocusPoint)
 
@@ -190,13 +192,9 @@ const ZoomLayer = ({
       />
 
       {!isExiting && (
-        <div
-          className="zoom_layer__hint"
-          title="Scroll to zoom · Left-click to lock · Esc to exit"
-          onClick={handleHintClick}
-        >
+        <div className="zoom_layer__hint" title={t('zoom.hint')} onClick={handleHintClick}>
           <div className="zoom_layer__hint-main">
-            <div className="zoom_layer__hint-title">Zoom: {zoom}x</div>
+            <div className="zoom_layer__hint-title">{t('zoom.level', { zoom })}</div>
           </div>
         </div>
       )}
